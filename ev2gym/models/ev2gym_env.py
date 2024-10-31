@@ -38,7 +38,7 @@ class EV2Gym(gym.Env):
                  save_plots=False,
                  state_function=PublicPST,
                  reward_function=SquaredTrackingErrorReward,
-                 cost_function=None, # cost function to use in the simulation
+                 cost_function=None,  # cost function to use in the simulation
                  eval_mode="Normal",  # eval mode can be "Normal", "Unstirred" or "Optimal" in order to save the correct statistics in the replay file
                  lightweight_plots=False,
                  # whether to empty the ports at the end of the simulation or not
@@ -122,15 +122,15 @@ class EV2Gym(gym.Env):
             if self.config['random_day']:
                 if "random_hour" in self.config:
                     if self.config["random_hour"]:
-                        self.config['hour'] = random.randint(5, 15) 
-                        
+                        self.config['hour'] = random.randint(5, 15)
+
                 self.sim_date = datetime.datetime(2022,
                                                   1,
                                                   1,
                                                   self.config['hour'],
                                                   self.config['minute'],
                                                   ) + datetime.timedelta(days=random.randint(0, int(1.5*365)))
-                   
+
                 if self.scenario == 'workplace':
                     # dont simulate weekends
                     while self.sim_date.weekday() > 4:
@@ -155,7 +155,6 @@ class EV2Gym(gym.Env):
             self.sim_name = f'sim_' + \
                 f'{datetime.datetime.now().strftime("%Y_%m_%d_%f")}'
 
-            
             self.heterogeneous_specs = self.config['heterogeneous_ev_specs']
 
         # Whether to simulate the grid or not (Future feature...)
@@ -250,7 +249,7 @@ class EV2Gym(gym.Env):
             lows = -1 * np.ones([self.number_of_ports])
         else:
             lows = np.zeros([self.number_of_ports])
-        self.action_space = spaces.Box(low=lows, high=high, dtype=np.float64)                        
+        self.action_space = spaces.Box(low=lows, high=high, dtype=np.float64)
 
         # Observation space: is a matrix of size ("Sum of all ports of all charging stations",n_features)
         obs_dim = len(self._get_observation())
@@ -402,7 +401,7 @@ class EV2Gym(gym.Env):
             - done: is a boolean value indicating whether the episode is done or not
         '''
         assert not self.done, "Episode is done, please reset the environment"
-           
+
         if self.verbose:
             print("-"*80)
 
@@ -487,14 +486,22 @@ class EV2Gym(gym.Env):
                                             user_satisfaction_list,
                                             total_invalid_action_punishment)
 
+        if self.cost_function is not None:
+                cost = self.cost_function(total_costs,
+                                          user_satisfaction_list,
+                                          total_invalid_action_punishment)
+        else:
+            cost = None
+            
         if visualize:
             visualize_step(self)
 
         self.render()
+        
 
-        return self._check_termination(user_satisfaction_list, reward)
+        return self._check_termination(user_satisfaction_list, reward, cost)
 
-    def _check_termination(self, user_satisfaction_list, reward):
+    def _check_termination(self, user_satisfaction_list, reward, cost):
         '''Checks if the episode is done or any constraint is violated'''
         truncated = False
         # Check if the episode is done or any constraint is violated
@@ -532,16 +539,13 @@ class EV2Gym(gym.Env):
 
             self.done = True
             self.stats = get_statistics(self)
-            
-            
+
             if self.cost_function is not None:
-                cost = self.cost_function(self)
                 return self._get_observation(), reward, cost, True, truncated, self.stats
             else:
                 return self._get_observation(), reward, True, truncated, self.stats
         else:
             if self.cost_function is not None:
-                cost = self.cost_function(self)
                 return self._get_observation(), reward, cost, False, truncated, {'None': None}
             else:
                 return self._get_observation(), reward, False, truncated, {'None': None}
@@ -614,7 +618,7 @@ class EV2Gym(gym.Env):
     def _get_observation(self):
 
         return self.state_function(self)
-    
+
     def set_cost_function(self, cost_function):
         '''
         This function sets the cost function of the environment
