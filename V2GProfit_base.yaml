@@ -89,6 +89,7 @@ demand_response:
 ##############################################################################
 heterogeneous_ev_specs: True #if False, each EV has the same specifications
 # such as battery capacity, charging rate, etc.
+ev_specs_file: ./ev2gym/data/ev_specs_v2g_enabled2024.json # path to the file with the EV specifications
 
 ##############################################################################
 # Default Model values
@@ -113,17 +114,22 @@ charging_station:
    
 # Default EV model
 ev:
+  #The following values are used if "heterogeneous_ev_specs = False"
   battery_capacity: 50 # in kWh
-  min_battery_capacity: 10 # in kWh, technical minimum
-  min_required_capacity: 25 # in kWh, minimum required capacity for V2G
-  desired_capacity: 50 # in kWh. Has to become SOC
   max_ac_charge_power: 11 # in kW
   min_ac_charge_power: 0 # in kW
   max_dc_charge_power: 50 # in kW
   max_discharge_power: -11 # in kW
   min_discharge_power: 0 # in kW
-  ev_phases: 3
-  transition_soc: 1 # 0-1 (0% - 100%)
+  ev_phases: 3  
   charge_efficiency: 1 # 0-1 (0% - 100%)
   discharge_efficiency: 1 # 0-1 (0% - 100%)
+  transition_soc: 1 # 0-1 (0% - 100%)
+
+  #The following values are also used if "heterogeneous_ev_specs = True"
+  min_required_capacity: 25 # in kWh, minimum required capacity for V2G
   min_time_of_stay: 60 # in minutes
+  min_battery_capacity: 5 # in kWh
+  desired_capacity: 1 # in (0-1) (0% - 100%)
+  #if trasition_soc is < 1, the curve of the line is affected by:
+  transition_soc_multiplier: 5 # default 1 (the higher the number the shorter the effect of CCCV region)
