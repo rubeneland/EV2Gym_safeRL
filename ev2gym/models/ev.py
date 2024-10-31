@@ -371,16 +371,23 @@ class EV():
         # current level
         if isinstance(self.charge_efficiency, dict):
             discharge_efficiency = self.discharge_efficiency.get(np.abs(np.round(amps)), 1)/100            
+            assert discharge_efficiency > 0
         else:
             discharge_efficiency = self.discharge_efficiency
-
+        
         given_energy = given_power * discharge_efficiency * self.timescale / 60
         if self.current_capacity + given_energy < self.min_battery_capacity:
-            self.current_energy = - \
-                (self.current_capacity - self.min_battery_capacity)
-            given_energy = self.current_energy
-            self.prev_capacity = self.current_capacity
-            self.current_capacity = self.min_battery_capacity
+            if self.current_capacity > self.min_battery_capacity:
+                self.current_energy = - \
+                    (self.current_capacity - self.min_battery_capacity)
+                given_energy = self.current_energy
+                self.prev_capacity = self.current_capacity
+                self.current_capacity = self.min_battery_capacity
+            else:
+                self.current_energy = 0
+                given_energy = 0
+                self.prev_capacity = self.current_capacity
+                self.current_capacity = self.min_battery_capacity
         else:
             self.current_energy = given_energy  # * 60 / self.timescale
             self.prev_capacity = self.current_capacity
@@ -391,6 +398,7 @@ class EV():
         if prev_capacity > self.min_emergency_battery_capacity and self.current_capacity < self.min_emergency_battery_capacity:
             self.min_emergency_battery_capacity_metric += 1        
 
+        assert given_energy <= 0
         return given_energy*60/self.timescale * 1000 / voltage
 
     def calculate_max_energy_with_AFAP(self,

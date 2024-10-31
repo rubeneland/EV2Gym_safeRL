@@ -21,7 +21,7 @@ def get_statistics(env) -> Dict:
     average_user_satisfaction = np.array(
         [cs.get_avg_user_satisfaction() for cs in env.charging_stations
          if cs.total_evs_served > 0]).mean()
-     
+
     # get transformer overload from env.tr_overload
     total_transformer_overload = np.array(env.tr_overload).sum()
 
@@ -53,7 +53,7 @@ def get_statistics(env) -> Dict:
     battery_degradation_calendar = battery_degradation[:, 0].sum()
     battery_degradation_cycling = battery_degradation[:, 1].sum()
     battery_degradation = battery_degradation.sum()
-    
+
     total_steps_min_emergency_battery_capacity_violation = 0
     energy_user_satisfaction = np.zeros((len(env.EVs)))
     for i, ev in enumerate(env.EVs):
@@ -96,7 +96,7 @@ def get_statistics(env) -> Dict:
 def print_statistics(env) -> None:
 
     assert env.stats is not None, "No statistics available. Run the simulation first!"
-        
+
     stats = env.stats
 
     total_ev_served = stats['total_ev_served']
@@ -111,7 +111,7 @@ def print_statistics(env) -> None:
     energy_user_satisfaction = stats['energy_user_satisfaction']
     std_energy_user_satisfaction = stats['std_energy_user_satisfaction']
     min_energy_user_satisfaction = stats['min_energy_user_satisfaction']
-    
+
     total_transformer_overload = stats['total_transformer_overload']
     battery_degradation = stats['battery_degradation']
     battery_degradation_calendar = stats['battery_degradation_calendar']
@@ -132,8 +132,10 @@ def print_statistics(env) -> None:
     print(
         f'  - Power Tracking squared error: {tracking_error:.2f}, Power Violation: {power_tracker_violation:.2f} kW')
     print(f' - Actual Energy Tracking error: {energy_tracking_error:.2f} kW')
-    print(f'  - Mean energy user satisfaction: {energy_user_satisfaction:.2f} % | Min: {min_energy_user_satisfaction:.2f} %')
-    print(f'  - Std Energy user satisfaction: {std_energy_user_satisfaction:.2f} %')
+    print(
+        f'  - Mean energy user satisfaction: {energy_user_satisfaction:.2f} % | Min: {min_energy_user_satisfaction:.2f} %')
+    print(
+        f'  - Std Energy user satisfaction: {std_energy_user_satisfaction:.2f} %')
     print(
         f'  - Total Battery degradation: {battery_degradation:.5f}% | Calendar: {battery_degradation_calendar:.5f}%, Cycling: {battery_degradation_cycling:.5f}%')
     print(
@@ -223,37 +225,37 @@ def spawn_single_EV(env,
         if time_of_stay + step + 4 >= env.simulation_length:
             return None
             time_of_stay = env.simulation_length - step - 4 - 2
-    
+
     if "transition_soc_multiplier" in env.config["ev"]:
         transition_soc_multiplier = env.config["ev"]["transition_soc_multiplier"]
     else:
         transition_soc_multiplier = 1
-        
+
     min_emergency_battery_capacity = env.config["ev"]["min_emergency_battery_capacity"]
-    
+
     if min_emergency_battery_capacity > battery_capacity:
         min_emergency_battery_capacity = 0.7*battery_capacity
-        
+
     if env.heterogeneous_specs:
-        
-        #get charge efficiency from env.ev_specs dict
+
+        # get charge efficiency from env.ev_specs dict
         charge_efficiency_v = env.ev_specs[sampled_ev]["ch_efficiency"]
         current_levels = env.ev_specs[sampled_ev]["ch_current"]
-        assert len(charge_efficiency_v) == len(current_levels)        
+        assert len(charge_efficiency_v) == len(current_levels)
         assert all([0 <= x <= 100 for x in charge_efficiency_v])
-        
+
         # make a dict with charge leves kay and charge efficiency value
-        charge_efficiency = dict(zip(current_levels, charge_efficiency_v))        
-        
-        #extend the dictionary to take values from 0 amps to 100 amps
+        charge_efficiency = dict(zip(current_levels, charge_efficiency_v))
+
+        # extend the dictionary to take values from 0 amps to 100 amps
         for i in range(0, 101):
             if i not in charge_efficiency:
                 # take the closest value
-                charge_efficiency[i] = charge_efficiency[min(charge_efficiency, key=lambda x:abs(x-i))]
-             
+                charge_efficiency[i] = charge_efficiency[min(
+                    charge_efficiency, key=lambda x: abs(x-i))]
+
         discharge_efficiency = charge_efficiency.copy()
 
-        
         return EV(id=port,
                   location=cs_id,
                   battery_capacity_at_arrival=initial_battery_capacity,
@@ -261,13 +263,13 @@ def spawn_single_EV(env,
                   max_dc_charge_power=env.ev_specs[sampled_ev]["max_dc_charge_power"],
                   max_discharge_power=-
                   env.ev_specs[sampled_ev]["max_dc_discharge_power"],
-                  min_emergency_battery_capacity = min_emergency_battery_capacity,
-                  charge_efficiency = charge_efficiency,
-                  discharge_efficiency= discharge_efficiency,
-                  
-                  transition_soc=np.round(0.9 - \
+                  min_emergency_battery_capacity=min_emergency_battery_capacity,
+                  charge_efficiency=charge_efficiency,
+                  discharge_efficiency=discharge_efficiency,
+
+                  transition_soc=np.round(0.9 -
                                           (np.random.rand()+0.00001)/5, 3),  # [0.7-0.9]
-                  transition_soc_multiplier = transition_soc_multiplier,
+                  transition_soc_multiplier=transition_soc_multiplier,
                   battery_capacity=battery_capacity,
                   desired_capacity=env.config["ev"]['desired_capacity'] * \
                   battery_capacity,
@@ -284,7 +286,7 @@ def spawn_single_EV(env,
                   battery_capacity=battery_capacity,
                   desired_capacity=env.config["ev"]['desired_capacity'] *
                   battery_capacity,
-                  min_emergency_battery_capacity = min_emergency_battery_capacity,
+                  min_emergency_battery_capacity=min_emergency_battery_capacity,
                   max_ac_charge_power=env.config["ev"]['max_ac_charge_power'],
                   min_ac_charge_power=env.config["ev"]['min_ac_charge_power'],
                   max_dc_charge_power=env.config["ev"]['max_dc_charge_power'],
@@ -295,7 +297,7 @@ def spawn_single_EV(env,
                       time_of_stay + step + 3),
                   ev_phases=env.config["ev"]['ev_phases'],
                   transition_soc=env.config["ev"]['transition_soc'],
-                  transition_soc_multiplier = transition_soc_multiplier,
+                  transition_soc_multiplier=transition_soc_multiplier,
                   charge_efficiency=env.config["ev"]['charge_efficiency'],
                   discharge_efficiency=env.config["ev"]['discharge_efficiency'],
                   timescale=env.timescale,
@@ -377,12 +379,12 @@ def spawn_single_EV_GF(env,
         print(f"Battery capacity: {battery_capacity}")
         raise ValueError(
             "Initial battery capacity cannot be higher than battery capacity!")
-    
+
     if "transition_soc_multiplier" in env.config["ev"]:
         transition_soc_multiplier = env.config["ev"]["transition_soc_multiplier"]
     else:
         transition_soc_multiplier = 1
-        
+
     if env.heterogeneous_specs:
         return EV(id=port,
                   location=cs_id,
@@ -395,7 +397,7 @@ def spawn_single_EV_GF(env,
                                                 (np.random.rand()+0.00001)/20, 3),  # [0.95-1]
                   transition_soc=np.round(0.9 - \
                                           (np.random.rand()+0.00001)/5, 3),  # [0.7-0.9]
-                  transition_soc_multiplier = transition_soc_multiplier,
+                  transition_soc_multiplier=transition_soc_multiplier,
                   battery_capacity=battery_capacity,
                   desired_capacity=env.config["ev"]['desired_capacity'] * \
                   battery_capacity,
@@ -422,7 +424,7 @@ def spawn_single_EV_GF(env,
                       time_of_stay + step + 3),
                   ev_phases=env.config["ev"]['ev_phases'],
                   transition_soc=env.config["ev"]['transition_soc'],
-                  transition_soc_multiplier = transition_soc_multiplier,
+                  transition_soc_multiplier=transition_soc_multiplier,
                   charge_efficiency=env.config["ev"]['charge_efficiency'],
                   discharge_efficiency=env.config["ev"]['discharge_efficiency'],
                   timescale=env.timescale,
