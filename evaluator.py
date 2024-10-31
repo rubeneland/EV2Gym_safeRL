@@ -47,17 +47,16 @@ def evaluator():
 
     device = "cuda" if torch.cuda.is_available() else "cpu"
 
-    args = arg_parser()
-    config = yaml.load(open(args.config_file, 'r'), Loader=yaml.FullLoader)
+    config = yaml.load(open(config_file, 'r'), Loader=yaml.FullLoader)
 
     number_of_charging_stations = config["number_of_charging_stations"]
     n_transformers = config["number_of_transformers"]
     timescale = config["timescale"]
     simulation_length = config["simulation_length"]
 
-    n_test_cycles = args.n_test_cycles
+    n_test_cycles = 1
 
-    scenario = args.config_file.split("/")[-1].split(".")[0]
+    scenario = config_file.split("/")[-1].split(".")[0]
     eval_replay_path = f'./replay/{number_of_charging_stations}cs_{n_transformers}tr_{scenario}/'
     print(f'Looking for replay files in {eval_replay_path}')
     try:
@@ -73,27 +72,28 @@ def evaluator():
         replays_exist = True
 
     except:
-        n_test_cycles = args.n_test_cycles
+        n_test_cycles = n_test_cycles
         replays_exist = False
 
     print(f'Number of test cycles: {n_test_cycles}')
 
-    if args.config_file == "ev2gym/example_config_files/V2GProfitMax.yaml":
+    if config_file == "ev2gym/example_config_files/V2GProfitMax.yaml":
         reward_function = profit_maximization
         state_function = V2G_profit_max
 
-    elif args.config_file == "ev2gym/example_config_files/PublicPST.yaml":
+    elif config_file == "ev2gym/example_config_files/PublicPST.yaml":
         reward_function = SquaredTrackingErrorReward
         state_function = PublicPST
 
-    elif args.config_file == "ev2gym/example_config_files/V2G_MPC.yaml":
+    elif config_file == "ev2gym/example_config_files/V2G_MPC.yaml":
         reward_function = profit_maximization
         state_function = V2G_profit_max
 
-    elif args.config_file == "ev2gym/example_config_files/V2GProfitPlusLoads.yaml":
+    elif config_file == "ev2gym/example_config_files/V2GProfitPlusLoads.yaml":
         reward_function = ProfitMax_TrPenalty_UserIncentives
         state_function = V2G_profit_max_loads
-    elif args.config_file == "ev2gym/V2GProfit_base.yaml":
+
+    elif config_file == "V2GProfit_base.yaml":
         reward_function = ProfitMax_TrPenalty_UserIncentives
         state_function = V2G_profit_max
     else:
@@ -102,7 +102,7 @@ def evaluator():
 
     def generate_replay(evaluation_name):
         env = ev2gym_env.EV2Gym(
-            config_file=args.config_file,
+            config_file=config_file,
             generate_rnd_game=True,
             save_replay=True,
             replay_save_path=f"replay/{evaluation_name}/",
@@ -165,7 +165,7 @@ def evaluator():
     # make a directory for the evaluation
     save_path = f'./results/{evaluation_name}/'
     os.makedirs(save_path, exist_ok=True)        
-    os.system(f'cp {args.config_file} {save_path}')
+    os.system(f'cp {config_file} {save_path}')
 
     if not replays_exist:
         eval_replay_files = [generate_replay(
@@ -188,7 +188,7 @@ def evaluator():
 
             if algorithm in [PPO, A2C, DDPG, SAC, TD3, TQC, TRPO, ARS, RecurrentPPO]:
                 gym.envs.register(id='evs-v0', entry_point='ev2gym.models.ev2gym_env:EV2Gym',
-                                kwargs={'config_file': args.config_file,
+                                kwargs={'config_file': config_file,
                                         'generate_rnd_game': True,
                                         'state_function': state_function,
                                         'reward_function': reward_function,
@@ -201,7 +201,7 @@ def evaluator():
                         f"rppo_{reward_function.__name__}_{state_function.__name__}"
                 else:
                     load_path = f'./saved_models/{number_of_charging_stations}cs_{scenario}/' + \
-                        f"{algorithm.__name__.lower()}_{reward_function.__name__}_{state_function.__name__}"
+                        f"{algorithm.__name__.lower()}_{reward_function.__name__}_{state_function.__name__}/best_model.zip"
 
                 # initialize the timer
                 timer = time.time()
@@ -212,7 +212,7 @@ def evaluator():
 
             else:
                 env = ev2gym_env.EV2Gym(
-                    config_file=args.config_file,
+                    config_file=config_file,
                     load_from_replay_path=replay_path,
                     generate_rnd_game=True,
                     state_function=state_function,
@@ -265,6 +265,7 @@ def evaluator():
                         saved_env = deepcopy(env.get_attr('env')[0])
 
                     stats = stats[0]
+                    print(stats)
                 else:
                     actions = model.get_action(env=env)
                     new_state, reward, done, _, stats = env.step(
@@ -285,6 +286,7 @@ def evaluator():
                                             'average_user_satisfaction': stats['average_user_satisfaction'],
                                             'power_tracker_violation': stats['power_tracker_violation'],
                                             'tracking_error': stats['tracking_error'],
+                                            'total_steps_min_emergency_battery_capacity_violation': stats['total_steps_min_emergency_battery_capacity_violation'],
                                             'energy_tracking_error': stats['energy_tracking_error'],
                                             'energy_user_satisfaction': stats['energy_user_satisfaction'],
                                             'total_transformer_overload': stats['total_transformer_overload'],
