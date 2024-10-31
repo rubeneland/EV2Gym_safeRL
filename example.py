@@ -26,7 +26,6 @@ def eval():
     """
 
     verbose = True
-    save_plots = True
 
     replay_path = "./replay/replay_sim_2024_07_05_106720.pkl"
     replay_path = None
@@ -40,8 +39,8 @@ def eval():
     env = EV2Gym(config_file=config_file,
                  load_from_replay_path=replay_path,
                  verbose=False,
-                 save_replay=True,
-                 save_plots=save_plots,
+                 save_replay=False,
+                 save_plots=True,
                  )
 
 
@@ -125,4 +124,4 @@ def eval():
 if __name__ == "__main__":
     while True:
         eval()
-        exit()
+        # exit()

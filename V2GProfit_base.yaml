@@ -105,8 +105,8 @@ transformer:
 charging_station:  
   min_charge_current: 0 # Amperes
   max_charge_current: 16 # Amperes
-  min_discharge_current: 0 # Amperes
-  max_discharge_current: -16 # Amperes
+  min_discharge_current: 0 # Amperes (actual value <=0)
+  max_discharge_current: -16 # Amperes (actual value <=0)
   voltage: 400 # Volts
   phases: 3 # 1,2, or 3
 
