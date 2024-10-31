@@ -75,6 +75,11 @@ def eval():
 
     for t in range(env.simulation_length):
         actions = agent.get_action(env)
+                
+        #do random actions from -1--1
+        actions = np.random.uniform(-1,1,len(actions))
+        
+        
 
         new_state, reward, done, truncated, stats = env.step(
             actions)  # takes action

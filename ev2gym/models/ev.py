@@ -285,9 +285,7 @@ class EV():
         # if charge efficeincy is dict, then get the charge efficiency based on the current
         # current level
         if isinstance(self.charge_efficiency, dict):
-            charge_efficiency = self.charge_efficiency.get(amps, 1)
-            print(f'charge_efficiency: {charge_efficiency}')
-            raise NotImplementedError
+            charge_efficiency = self.charge_efficiency.get(np.round(amps), 1)/100
         else:
             charge_efficiency = self.charge_efficiency
         
@@ -371,10 +369,8 @@ class EV():
             
         # if discharge efficeincy is dict, then get the discharge efficiency based on the current
         # current level
-        if isinstance(self.discharge_efficiency, dict):
-            discharge_efficiency = self.discharge_efficiency.get(amps, 1)
-            print(f'discharge_efficiency: {discharge_efficiency}')
-            raise NotImplementedError
+        if isinstance(self.charge_efficiency, dict):
+            discharge_efficiency = self.discharge_efficiency.get(np.abs(np.round(amps)), 1)/100            
         else:
             discharge_efficiency = self.discharge_efficiency
 
@@ -414,12 +410,14 @@ class EV():
         
         # if charge efficeincy is dict, then get the charge efficiency based on the current
         if isinstance(self.charge_efficiency, dict):
-            charge_efficiency = self.charge_efficiency.get(max_power, 1)
-            print(f'charge_efficiency: {charge_efficiency}')
-            #get maxiimum charge efficiency from the dict
+            # iterate over all values of charge efficiency and get the maximum
+            # charge efficiency
+            max_charge_efficiency = 0
+            for key, value in self.charge_efficiency.items():
+                if value > max_charge_efficiency:
+                    max_charge_efficiency = value
+            charge_efficiency = max_charge_efficiency/100                
             
-            
-            raise NotImplementedError
         else:
             charge_efficiency = self.charge_efficiency
 

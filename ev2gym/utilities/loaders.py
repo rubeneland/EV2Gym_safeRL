@@ -35,7 +35,7 @@ def load_ev_spawn_scenarios(env) -> None:
         registrations = np.zeros(len(env.ev_specs.keys()))
         for i, ev_name in enumerate(env.ev_specs.keys()):
             # sum the total number of registrations
-            registrations[i] = env.ev_specs[ev_name]['number_of_registrations_2023_nl']
+            registrations[i] = env.ev_specs[ev_name]['number_of_registrations']
 
         env.normalized_ev_registrations = registrations/registrations.sum()
 

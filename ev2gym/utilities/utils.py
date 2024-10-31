@@ -237,9 +237,22 @@ def spawn_single_EV(env,
     if env.heterogeneous_specs:
         
         #get charge efficiency from env.ev_specs dict
-        charge_efficiency = env.ev_specs[sampled_ev]["charge_efficiency"]
-        print(f"Charge efficiency: {charge_efficiency}")
-        input("Press Enter to continue...")
+        charge_efficiency_v = env.ev_specs[sampled_ev]["ch_efficiency"]
+        current_levels = env.ev_specs[sampled_ev]["ch_current"]
+        assert len(charge_efficiency_v) == len(current_levels)        
+        assert all([0 <= x <= 100 for x in charge_efficiency_v])
+        
+        # make a dict with charge leves kay and charge efficiency value
+        charge_efficiency = dict(zip(current_levels, charge_efficiency_v))        
+        
+        #extend the dictionary to take values from 0 amps to 100 amps
+        for i in range(0, 101):
+            if i not in charge_efficiency:
+                # take the closest value
+                charge_efficiency[i] = charge_efficiency[min(charge_efficiency, key=lambda x:abs(x-i))]
+             
+        discharge_efficiency = charge_efficiency.copy()
+
         
         return EV(id=port,
                   location=cs_id,
@@ -249,8 +262,8 @@ def spawn_single_EV(env,
                   max_discharge_power=-
                   env.ev_specs[sampled_ev]["max_dc_discharge_power"],
                   min_emergency_battery_capacity = min_emergency_battery_capacity,
-                  discharge_efficiency=np.round(1 -
-                                                (np.random.rand()+0.00001)/20, 3),  # [0.95-1]
+                  charge_efficiency = charge_efficiency,
+                  discharge_efficiency= discharge_efficiency,
                   
                   transition_soc=np.round(0.9 - \
                                           (np.random.rand()+0.00001)/5, 3),  # [0.7-0.9]
