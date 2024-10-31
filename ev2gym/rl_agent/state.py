@@ -68,21 +68,26 @@ def V2G_profit_max(env, *args):
     '''
     
     state = [
-        (env.current_step),        
+        # (env.current_step/env.simulation_length),
+        # env.sim_date.weekday() / 7,
+        # turn hour and minutes in sin and cos
+        math.sin(env.sim_date.hour/24*2*math.pi),
+        math.cos(env.sim_date.hour/24*2*math.pi),
     ]
 
     state.append(env.current_power_usage[env.current_step-1])
 
     charge_prices = abs(env.charge_prices[0, env.current_step:
-        env.current_step+20])
+        env.current_step+28]) # 28 steps = 7 hours, too many will make it to hard to learn for agent
     
-    if len(charge_prices) < 20:
-        charge_prices = np.append(charge_prices, np.zeros(20-len(charge_prices)))
+    if len(charge_prices) < 28:
+        charge_prices = np.append(charge_prices, np.zeros(28-len(charge_prices)))
     
     state.append(charge_prices)
     
     # For every transformer
     for tr in env.transformers:
+        state.append(tr.max_power[env.current_step])
 
         # For every charging station connected to the transformer
         for cs in env.charging_stations:
@@ -94,18 +99,19 @@ def V2G_profit_max(env, *args):
                     if EV is not None:
                         state.append([
                             EV.get_soc(),
+                            EV.min_emergency_battery_capacity,
                             EV.time_of_departure - env.current_step,
                             ])
 
                     # else if there is no EV connected put zeros
                     else:
-                        state.append(np.zeros(2))
+                        state.append(np.zeros(3))
 
     state = np.array(np.hstack(state))
 
     return state
 
-def V2G_profit_max_loads(env, *args):
+def V2G_profit_max_loads(env, *args): #no Demand Respone ?
     '''
     This is the state function for the V2GProfitMax scenario with loads
     '''
