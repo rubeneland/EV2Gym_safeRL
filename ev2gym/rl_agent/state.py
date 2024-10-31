@@ -87,7 +87,10 @@ def V2G_profit_max(env, *args):
     
     # For every transformer
     for tr in env.transformers:
-        state.append(tr.max_power[env.current_step])
+        if env.current_step < env.simulation_length:
+            state.append(tr.max_power[env.current_step])
+        else:
+            state.append(0)
 
         # For every charging station connected to the transformer
         for cs in env.charging_stations:
