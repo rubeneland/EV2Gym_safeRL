@@ -7,7 +7,7 @@
         "max_ac_charge_power": 11,
         "max_dc_charge_power": 170,
         "avg_dc_charge_power": 100,
-        "max_ac_discharge_power": 0,
+        "max_ac_discharge_power": 11,
         "max_dc_discharge_power": 0
     },
     "Kia Niro": {
@@ -18,7 +18,7 @@
         "max_ac_charge_power": 11,
         "max_dc_charge_power": 80,
         "avg_dc_charge_power": 70,
-        "max_ac_discharge_power": 0,
+        "max_ac_discharge_power": 11,
         "max_dc_discharge_power": 0
     },
     "Volkswagen ID.3": {
@@ -29,7 +29,7 @@
         "max_ac_charge_power": 11,
         "max_dc_charge_power": 120,
         "avg_dc_charge_power": 80,
-        "max_ac_discharge_power": 0,
+        "max_ac_discharge_power": 11,
         "max_dc_discharge_power": 0
     },
     "Hyundai Kona": {
@@ -40,7 +40,7 @@
         "max_ac_charge_power": 11,
         "max_dc_charge_power": 77,
         "avg_dc_charge_power": 64,
-        "max_ac_discharge_power": 0,
+        "max_ac_discharge_power": 11,
         "max_dc_discharge_power": 0
     },
     "Tesla Model Y": {
@@ -51,7 +51,7 @@
         "max_ac_charge_power": 11,
         "max_dc_charge_power": 170,
         "avg_dc_charge_power": 100,
-        "max_ac_discharge_power": 0,
+        "max_ac_discharge_power": 11,
         "max_dc_discharge_power": 0
     },
     "Skoda Enyaq": {
@@ -62,7 +62,7 @@
         "max_ac_charge_power": 11,
         "max_dc_charge_power": 124,
         "avg_dc_charge_power": 82,
-        "max_ac_discharge_power": 0,
+        "max_ac_discharge_power": 11,
         "max_dc_discharge_power": 0
     },
     "Peugeot 208": {
@@ -73,7 +73,7 @@
         "max_ac_charge_power": 7.4,
         "max_dc_charge_power": 101,
         "avg_dc_charge_power": 78,
-        "max_ac_discharge_power": 0,
+        "max_ac_discharge_power": 11,
         "max_dc_discharge_power": 0
     },
     "Renault Zoe": {
@@ -84,7 +84,7 @@
         "max_ac_charge_power": 22,
         "max_dc_charge_power": 46,
         "avg_dc_charge_power": 41,
-        "max_ac_discharge_power": 0,
+        "max_ac_discharge_power": 11,
         "max_dc_discharge_power": 0
     },
     "Volkswagen ID.4": {
@@ -95,7 +95,7 @@
         "max_ac_charge_power": 11,
         "max_dc_charge_power": 135,
         "avg_dc_charge_power": 120,
-        "max_ac_discharge_power": 0,
+        "max_ac_discharge_power": 11,
         "max_dc_discharge_power": 10
     },
     "Volvo XC40": {
@@ -106,7 +106,7 @@
         "max_ac_charge_power": 11,
         "max_dc_charge_power": 135,
         "avg_dc_charge_power": 85,
-        "max_ac_discharge_power": 0,
+        "max_ac_discharge_power": 11,
         "max_dc_discharge_power": 0
     },
     "Nissan Leaf": {
@@ -117,7 +117,7 @@
         "max_ac_charge_power": 3.6,
         "max_dc_charge_power": 46,
         "avg_dc_charge_power": 40,
-        "max_ac_discharge_power": 0,
+        "max_ac_discharge_power": 11,
         "max_dc_discharge_power": 7
     },
     "Tesla Model S": {
@@ -128,7 +128,7 @@
         "max_ac_charge_power": 11,
         "max_dc_charge_power": 250,
         "avg_dc_charge_power": 124,
-        "max_ac_discharge_power": 0,
+        "max_ac_discharge_power": 11,
         "max_dc_discharge_power": 0
     },
     "Volkswagen Golf": {
@@ -139,7 +139,7 @@
         "max_ac_charge_power": 7.2,
         "max_dc_charge_power": 40,
         "avg_dc_charge_power": 39,
-        "max_ac_discharge_power": 0,
+        "max_ac_discharge_power": 11,
         "max_dc_discharge_power": 0
     }
 }

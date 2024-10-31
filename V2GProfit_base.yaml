@@ -87,7 +87,7 @@ demand_response:
 ##############################################################################
 # EV Specifications
 ##############################################################################
-heterogeneous_ev_specs: False #if False, each EV has the same specifications
+heterogeneous_ev_specs: True #if False, each EV has the same specifications
 # such as battery capacity, charging rate, etc.
 
 ##############################################################################
@@ -106,7 +106,7 @@ charging_station:
   max_charge_current: 16 # Amperes
   min_discharge_current: 0 # Amperes
   max_discharge_current: -16 # Amperes
-  voltage: 230 # Volts
+  voltage: 400 # Volts
   phases: 3 # 1,2, or 3
 
 # Stavros does not yet have minimum emergency SoC. We can include it in the cost / reward function. Also can make evaluation metric.
@@ -114,8 +114,9 @@ charging_station:
 # Default EV model
 ev:
   battery_capacity: 50 # in kWh
-  min_battery_capacity: 10 # in kWh, technical limit. Not what people want.
-  desired_capacity: 50 # in kWh
+  min_battery_capacity: 10 # in kWh, technical minimum
+  min_required_capacity: 25 # in kWh, minimum required capacity for V2G
+  desired_capacity: 50 # in kWh. Has to become SOC
   max_ac_charge_power: 11 # in kW
   min_ac_charge_power: 0 # in kW
   max_dc_charge_power: 50 # in kW
