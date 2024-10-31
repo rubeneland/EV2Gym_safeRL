@@ -21,6 +21,7 @@ def get_statistics(env) -> Dict:
     average_user_satisfaction = np.array(
         [cs.get_avg_user_satisfaction() for cs in env.charging_stations
          if cs.total_evs_served > 0]).mean()
+     
     # get transformer overload from env.tr_overload
     total_transformer_overload = np.array(env.tr_overload).sum()
 
@@ -53,11 +54,13 @@ def get_statistics(env) -> Dict:
     battery_degradation_cycling = battery_degradation[:, 1].sum()
     battery_degradation = battery_degradation.sum()
     
+    total_steps_min_emergency_battery_capacity_violation = 0
     energy_user_satisfaction = np.zeros((len(env.EVs)))
     for i, ev in enumerate(env.EVs):
         e_actual = ev.current_capacity
         e_max = ev.max_energy_AFAP
         energy_user_satisfaction[i] = (e_actual / e_max) * 100
+        total_steps_min_emergency_battery_capacity_violation += ev.min_emergency_battery_capacity_metric
 
     stats = {'total_ev_served': total_ev_served,
              'total_profits': total_profits,
@@ -70,6 +73,7 @@ def get_statistics(env) -> Dict:
              'energy_user_satisfaction': np.mean(energy_user_satisfaction),
              'std_energy_user_satisfaction': np.std(energy_user_satisfaction),
              'min_energy_user_satisfaction': np.min(energy_user_satisfaction),
+             'total_steps_min_emergency_battery_capacity_violation': total_steps_min_emergency_battery_capacity_violation,
              'total_transformer_overload': total_transformer_overload,
              'battery_degradation': battery_degradation,
              'battery_degradation_calendar': battery_degradation_calendar,
@@ -225,7 +229,18 @@ def spawn_single_EV(env,
     else:
         transition_soc_multiplier = 1
         
+    min_emergency_battery_capacity = env.config["ev"]["min_emergency_battery_capacity"]
+    
+    if min_emergency_battery_capacity > battery_capacity:
+        min_emergency_battery_capacity = 0.7*battery_capacity
+        
     if env.heterogeneous_specs:
+        
+        #get charge efficiency from env.ev_specs dict
+        charge_efficiency = env.ev_specs[sampled_ev]["charge_efficiency"]
+        print(f"Charge efficiency: {charge_efficiency}")
+        input("Press Enter to continue...")
+        
         return EV(id=port,
                   location=cs_id,
                   battery_capacity_at_arrival=initial_battery_capacity,
@@ -233,8 +248,10 @@ def spawn_single_EV(env,
                   max_dc_charge_power=env.ev_specs[sampled_ev]["max_dc_charge_power"],
                   max_discharge_power=-
                   env.ev_specs[sampled_ev]["max_dc_discharge_power"],
+                  min_emergency_battery_capacity = min_emergency_battery_capacity,
                   discharge_efficiency=np.round(1 -
                                                 (np.random.rand()+0.00001)/20, 3),  # [0.95-1]
+                  
                   transition_soc=np.round(0.9 - \
                                           (np.random.rand()+0.00001)/5, 3),  # [0.7-0.9]
                   transition_soc_multiplier = transition_soc_multiplier,
@@ -254,6 +271,7 @@ def spawn_single_EV(env,
                   battery_capacity=battery_capacity,
                   desired_capacity=env.config["ev"]['desired_capacity'] *
                   battery_capacity,
+                  min_emergency_battery_capacity = min_emergency_battery_capacity,
                   max_ac_charge_power=env.config["ev"]['max_ac_charge_power'],
                   min_ac_charge_power=env.config["ev"]['min_ac_charge_power'],
                   max_dc_charge_power=env.config["ev"]['max_dc_charge_power'],
