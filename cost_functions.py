@@ -14,8 +14,7 @@ def transformer_overload_usrpenalty_cost(env,total_costs, user_satisfaction_list
         cost += 100 * tr.get_how_overloaded()                        
     
     for score in user_satisfaction_list:        
-        cost += 100 * math.exp(-10*score)
-        
+        cost += 100 * math.exp(-10*score)        
     return cost
 
 

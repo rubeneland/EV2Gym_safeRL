@@ -487,17 +487,17 @@ class EV2Gym(gym.Env):
                                             total_invalid_action_punishment)
 
         if self.cost_function is not None:
-                cost = self.cost_function(total_costs,
-                                          user_satisfaction_list,
-                                          total_invalid_action_punishment)
+            cost = self.cost_function(self,
+                                      total_costs,
+                                      user_satisfaction_list,
+                                      total_invalid_action_punishment)
         else:
             cost = None
-            
+
         if visualize:
             visualize_step(self)
 
         self.render()
-        
 
         return self._check_termination(user_satisfaction_list, reward, cost)
 
@@ -541,12 +541,12 @@ class EV2Gym(gym.Env):
             self.stats = get_statistics(self)
 
             if self.cost_function is not None:
-                return self._get_observation(), reward, cost, True, truncated, self.stats
+                return self._get_observation(), reward, True, truncated, self.stats
             else:
                 return self._get_observation(), reward, True, truncated, self.stats
         else:
             if self.cost_function is not None:
-                return self._get_observation(), reward, cost, False, truncated, {'None': None}
+                return self._get_observation(), reward, False, truncated, {'cost': cost}
             else:
                 return self._get_observation(), reward, False, truncated, {'None': None}
 
