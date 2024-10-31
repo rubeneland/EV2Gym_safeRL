@@ -8,7 +8,9 @@
         "max_dc_charge_power": 170,
         "avg_dc_charge_power": 100,
         "max_ac_discharge_power": 11,
-        "max_dc_discharge_power": 0
+        "max_dc_discharge_power": 0,
+        "current": [6,8,10,12,14, 16,18,20,22,24,26,28,30,32],
+        "ch_efficiency": [85, 90, 92]
     },
     "Kia Niro": {
         "number_of_registrations_2023_nl": 23105,
