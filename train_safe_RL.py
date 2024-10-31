@@ -6,6 +6,9 @@ from ev2gym.models.ev2gym_env import EV2Gym
 from ev2gym.rl_agent.reward import SquaredTrackingErrorReward, ProfitMax_TrPenalty_UserIncentives
 from ev2gym.rl_agent.reward import profit_maximization
 
+from cost_functions import transformer_overload_usrpenalty_cost, ProfitMax_TrPenalty_UserIncentives_safety
+
+
 from ev2gym.rl_agent.state import V2G_profit_max, PublicPST, V2G_profit_max_loads
 
 import gymnasium as gym
@@ -24,8 +27,9 @@ from fsrl.agent import PPOLagAgent, CPOAgent
 from fsrl.utils import TensorboardLogger
 
 config_file = "V2GProfit_base.yaml"
-reward_function = ProfitMax_TrPenalty_UserIncentives
+reward_function = ProfitMax_TrPenalty_UserIncentives_safety #ProfitMax_TrPenalty_UserIncentives
 state_function = V2G_profit_max
+cost_function = transformer_overload_usrpenalty_cost
 
 gym.envs.register(id='evs-v0', entry_point='ev2gym.models.ev2gym_env:EV2Gym',
                       kwargs={'config_file': config_file,
@@ -34,7 +38,7 @@ gym.envs.register(id='evs-v0', entry_point='ev2gym.models.ev2gym_env:EV2Gym',
                               'generate_rnd_game': True,
                               'reward_function': reward_function,
                               'state_function': state_function,
-                            #   'cost_function': profit_maximization,
+                              'cost_function': cost_function,
                               })
 
 task = "evs-v0"

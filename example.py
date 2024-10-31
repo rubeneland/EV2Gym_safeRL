@@ -40,7 +40,7 @@ def eval():
                  load_from_replay_path=replay_path,
                  verbose=False,
                  save_replay=False,
-                 save_plots=True,
+                 save_plots=False,
                  )
 
 

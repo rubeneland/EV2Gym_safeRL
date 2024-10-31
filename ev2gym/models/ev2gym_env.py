@@ -38,6 +38,7 @@ class EV2Gym(gym.Env):
                  save_plots=False,
                  state_function=PublicPST,
                  reward_function=SquaredTrackingErrorReward,
+                 cost_function=None, # cost function to use in the simulation
                  eval_mode="Normal",  # eval mode can be "Normal", "Unstirred" or "Optimal" in order to save the correct statistics in the replay file
                  lightweight_plots=False,
                  # whether to empty the ports at the end of the simulation or not
@@ -75,6 +76,7 @@ class EV2Gym(gym.Env):
 
         self.reward_function = reward_function
         self.state_function = state_function
+        self.cost_function = cost_function
 
         if seed is None:
             self.seed = np.random.randint(0, 1000000)
@@ -530,9 +532,19 @@ class EV2Gym(gym.Env):
 
             self.done = True
             self.stats = get_statistics(self)
-            return self._get_observation(), reward, True, truncated, self.stats
+            
+            
+            if self.cost_function is not None:
+                cost = self.cost_function(self)
+                return self._get_observation(), reward, cost, True, truncated, self.stats
+            else:
+                return self._get_observation(), reward, True, truncated, self.stats
         else:
-            return self._get_observation(), reward, False, truncated, {'None': None}
+            if self.cost_function is not None:
+                cost = self.cost_function(self)
+                return self._get_observation(), reward, cost, False, truncated, {'None': None}
+            else:
+                return self._get_observation(), reward, False, truncated, {'None': None}
 
     def render(self):
         '''Renders the simulation'''
@@ -602,6 +614,12 @@ class EV2Gym(gym.Env):
     def _get_observation(self):
 
         return self.state_function(self)
+    
+    def set_cost_function(self, cost_function):
+        '''
+        This function sets the cost function of the environment
+        '''
+        self.cost_function = cost_function
 
     def set_reward_function(self, reward_function):
         '''
