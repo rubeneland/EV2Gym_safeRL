@@ -1,6 +1,6 @@
 # this file is used to evalaute the performance of the ev2gym environment with various stable baselines algorithms.
 
-from stable_baselines3 import PPO, A2C, DDPG, SAC, TD3      #try PPO, SAC TD3
+from stable_baselines3 import PPO, A2C, DDPG, SAC, TD3      #try PPO, SAC, TD3
 from stable_baselines3.common.callbacks import BaseCallback
 from stable_baselines3.common.callbacks import EvalCallback
 from sb3_contrib import TQC, TRPO, ARS, RecurrentPPO

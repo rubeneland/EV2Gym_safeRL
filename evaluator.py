@@ -34,8 +34,19 @@ from ev2gym.visuals.evaluator_plot import plot_total_power, plot_comparable_EV_S
 from ev2gym.visuals.evaluator_plot import plot_total_power_V2G, plot_actual_power_vs_setpoint
 from ev2gym.visuals.evaluator_plot import plot_comparable_EV_SoC_single, plot_prices
 
+from cost_functions import transformer_overload_usrpenalty_cost, ProfitMax_TrPenalty_UserIncentives_safety
+
+from fsrl.agent import CPOAgent as CPO
+from fsrl.utils import TensorboardLogger
+
 import gymnasium as gym
 import torch
+
+# class CPO():
+#     '''
+#     This class contains the CPO algorithm
+#     '''
+#     algo_name = "CPO"
 
 def evaluator():
 
@@ -96,9 +107,9 @@ def evaluator():
     elif config_file == "V2GProfit_base.yaml":
         reward_function = ProfitMax_TrPenalty_UserIncentives
         state_function = V2G_profit_max
+        cost_function = transformer_overload_usrpenalty_cost
     else:
         raise ValueError('Unknown config file')
-
 
     def generate_replay(evaluation_name):
         env = ev2gym_env.EV2Gym(
@@ -122,13 +133,14 @@ def evaluator():
 
 
     # Algorithms to compare:
+
     algorithms = [
         ChargeAsFastAsPossible,
         # ChargeAsLateAsPossible,
         # PPO, A2C, DDPG, SAC, TD3, TQC, TRPO, ARS, RecurrentPPO,
         # SAC,
         # TQC,
-        TD3,
+        # TD3,
         # # ARS,
         # # RecurrentPPO,
         RoundRobin,
@@ -137,7 +149,9 @@ def evaluator():
         # V2GProfitMaxOracleGB,
         # V2GProfitMaxOracle,
         # PowerTrackingErrorrMin
+        CPO
     ]
+
 
     # algorithms = [
     #     # ChargeAsFastAsPossibleToDesiredCapacity,
@@ -199,16 +213,55 @@ def evaluator():
                 if algorithm == RecurrentPPO:
                     load_path = f'./saved_models/{number_of_charging_stations}cs_{scenario}/' + \
                         f"rppo_{reward_function.__name__}_{state_function.__name__}"
+
                 else:
                     load_path = f'./saved_models/{number_of_charging_stations}cs_{scenario}/' + \
                         f"{algorithm.__name__.lower()}_{reward_function.__name__}_{state_function.__name__}/best_model.zip"
+                    
 
+                    
                 # initialize the timer
                 timer = time.time()
+
 
                 model = algorithm.load(load_path, env, device=device)
                 env = model.get_env()
                 state = env.reset()
+
+            elif algorithm == CPO:
+                gym.envs.register(id='evs-v0', entry_point='ev2gym.models.ev2gym_env:EV2Gym',
+                      kwargs={'config_file': config_file,
+                              'verbose': False,
+                              'save_plots': False,
+                              'generate_rnd_game': True,
+                              'reward_function': reward_function,
+                              'state_function': state_function,
+                              'cost_function': cost_function,
+                              })
+
+                task = "evs-v0"
+
+                load_path = './saved_models/CPO/policy.pth'
+                # init logger
+                logger = TensorboardLogger("logs", log_txt=True, name=task)
+                agent = CPO(gym.make(task), logger, cost_limit = 5)
+                # policy = CPO_policy
+                model = agent.policy
+                model.load_state_dict(torch.load(load_path))
+                model = model.actor
+                model.eval()
+
+                env = ev2gym_env.EV2Gym(
+                    config_file=config_file,
+                    load_from_replay_path=replay_path,
+                    generate_rnd_game=True,
+                    state_function=state_function,
+                    reward_function=reward_function,
+                )
+
+                # initialize the timer
+                timer = time.time()
+                state, _ = env.reset()
 
             else:
                 env = ev2gym_env.EV2Gym(
@@ -260,12 +313,24 @@ def evaluator():
                 ################# Evaluation ##############################
                 if algorithm in [PPO, A2C, DDPG, SAC, TD3, TQC, TRPO, ARS, RecurrentPPO]:
                     action, _ = model.predict(state, deterministic=True)
-                    obs, reward, done, stats = env.step(action)
+                    obs, reward, done, _, stats = env.step(action)
+                    # if CPO == True:
+                    #     action = policy.predict(state, deterministic=True)
+                    #     obs, reward, done, stats = env.step(action)
                     if i == simulation_length - 2:
                         saved_env = deepcopy(env.get_attr('env')[0])
 
                     stats = stats[0]
                     print(stats)
+                elif algorithm == CPO:
+                    
+                    # reshape the state to 1 x n_features
+                    state = state.reshape(1, -1)
+
+                    action = model.forward(state)
+                    action = action[0][0][0].detach().numpy()
+                    state, reward, done, _, stats = env.step(action)
+                    
                 else:
                     actions = model.get_action(env=env)
                     new_state, reward, done, _, stats = env.step(
@@ -297,7 +362,7 @@ def evaluator():
                                             'time': time.time() - timer,
                                             # 'time_gb': model.total_exec_time,
                                             }, index=[counter])
-
+                    
                     if counter == 1:
                         results = results_i
                     else:
@@ -327,9 +392,10 @@ def evaluator():
     # results_grouped.to_csv('results_grouped.csv')
     # print(results_grouped[['tracking_error', 'energy_tracking_error']])
     print(results_grouped[['total_transformer_overload', 'time']])
+    print(results_grouped[['total_reward', 'total_profits', 'total_ev_served']])
+    print(results_grouped[['total_energy_charged', 'total_energy_discharged']])
+    print(results_grouped[['average_user_satisfaction']])
     # input('Press Enter to continue')
-    
-    return
 
     algorithm_names = []
     for algorithm in algorithms:
