@@ -29,7 +29,7 @@ reward_function = ProfitMax_TrPenalty_UserIncentives_safety #ProfitMax_TrPenalty
 state_function = V2G_profit_max
 cost_function = transformer_overload_usrpenalty_cost
 
-run_name =  'min_c_1_tr_100_usr_100'
+run_name =  'min_c_8_tr_100_usr_100_also_reward'
 group_name = 'CPO'
 
 # run = wandb.init(project='ev2gym',
@@ -56,19 +56,21 @@ save_path = f"./saved_models/{group_name}/{run_name}"
 os.makedirs(f"./saved_models/{group_name}", exist_ok=True)
 os.makedirs(save_path, exist_ok=True)
 
-device = "cuda" if torch.cuda.is_available() else "cpu"
+device = "cpu"
+# device = "cuda" if torch.cuda.is_available() else "cpu"
+print(f"Using device {device}")
 
 # init logger
 logger = TensorboardLogger("logs", log_txt=True, name=task)
-# init the PPO Lag agent with default parameters
-agent = CPOAgent(gym.make(task), logger, cost_limit = 1)
+# CPO agent
+agent = CPOAgent(gym.make(task), logger, cost_limit = 2, device=device)
 
 # init the env
-training_num, testing_num = 10, 1
+training_num, testing_num = 10, 10
 train_envs = DummyVectorEnv([lambda: gym.make(task) for _ in range(training_num)])
 test_envs = DummyVectorEnv([lambda: gym.make(task) for _ in range(testing_num)])
 
-agent.learn(train_envs, test_envs, epoch=100)
+agent.learn(train_envs, test_envs, epoch=200)
 
 torch.save(agent.policy.state_dict(), f"{save_path}/policy.pth")
 

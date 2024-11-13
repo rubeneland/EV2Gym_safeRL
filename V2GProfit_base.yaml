@@ -103,7 +103,7 @@ transformer:
 
 # Default Charging Station model
 charging_station:  
-  min_charge_current: 0 # Amperes
+  min_charge_current: 0 # Amperes --> next step: put limits here and penalize wrong actions in cost function
   max_charge_current: 16 # Amperes
   min_discharge_current: 0 # Amperes (actual value <=0)
   max_discharge_current: -16 # Amperes (actual value <=0)

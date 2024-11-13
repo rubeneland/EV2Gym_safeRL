@@ -145,7 +145,7 @@ class CPO(BasePolicy):
         return batch
 
     def critics_loss(self, minibatch: Batch) -> Tuple[torch.Tensor, dict]:
-        critic_losses = torch.zeros(1)
+        critic_losses = 0
         stats = {}
         for i, critic in enumerate(self.critics):
             value = critic(minibatch.obs).flatten()
@@ -154,6 +154,7 @@ class CPO(BasePolicy):
             for param in critic.parameters():
                 vf_loss += param.pow(2).sum() * self._l2_reg
             critic_losses += vf_loss
+
             stats["loss/vf" + str(i)] = vf_loss.item()
         self.optim.zero_grad()
         critic_losses.backward()

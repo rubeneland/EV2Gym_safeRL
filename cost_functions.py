@@ -10,8 +10,8 @@ def transformer_overload_usrpenalty_cost(env,total_costs, user_satisfaction_list
     Returns the cost of a transformer overload.
     """
     cost = 0
-    for tr in env.transformers:
-        cost += 100 * tr.get_how_overloaded()                        
+    # for tr in env.transformers:
+    #     cost += 100 * tr.get_how_overloaded()                        
     
     for score in user_satisfaction_list:        
         cost += 100 * math.exp(-10*score)        
@@ -22,5 +22,11 @@ def transformer_overload_usrpenalty_cost(env,total_costs, user_satisfaction_list
 def ProfitMax_TrPenalty_UserIncentives_safety(env, total_costs, user_satisfaction_list, *args):
     
     reward = total_costs
+
+    # for tr in env.transformers:
+    #     reward -= 100 * tr.get_how_overloaded()                        
+    
+    # for score in user_satisfaction_list:        
+    #     reward -= 100 * math.exp(-10*score)        
         
     return reward

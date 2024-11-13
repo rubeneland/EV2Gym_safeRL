@@ -241,7 +241,7 @@ def evaluator():
 
                 task = "evs-v0"
 
-                load_path = './saved_models/CPO/policy.pth'
+                load_path = './saved_models/CPO/min_c_10_tr_100_usr_100_also_reward/policy.pth'
                 # init logger
                 logger = TensorboardLogger("logs", log_txt=True, name=task)
                 agent = CPO(gym.make(task), logger, cost_limit = 5)
