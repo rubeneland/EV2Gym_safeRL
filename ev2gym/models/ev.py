@@ -207,7 +207,7 @@ class EV():
         Outputs: 
             - Score: a value between 0 and 1
         '''
-
+        
         if self.current_capacity < self.max_energy_AFAP - 0.001:
             return self.current_capacity / self.max_energy_AFAP  # self.max_energy_AFAP gives what max energy an EV can get -> assume every EV wants 100% capacity
         else:

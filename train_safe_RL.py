@@ -22,22 +22,12 @@ from ev2gym.rl_agent.reward import profit_maximization
 from ev2gym.rl_agent.state import V2G_profit_max, PublicPST, V2G_profit_max_loads
 from tianshou.env import DummyVectorEnv
 from fsrl.agent import PPOLagAgent, CPOAgent
-from fsrl.utils import TensorboardLogger
+from fsrl.utils import TensorboardLogger, WandbLogger
 
 config_file = "V2GProfit_base.yaml"
 reward_function = ProfitMax_TrPenalty_UserIncentives_safety #ProfitMax_TrPenalty_UserIncentives
 state_function = V2G_profit_max
 cost_function = transformer_overload_usrpenalty_cost
-
-run_name =  'min_c_8_tr_100_usr_100_also_reward'
-group_name = 'CPO'
-
-# run = wandb.init(project='ev2gym',
-#                      sync_tensorboard=True,
-#                      group=group_name,
-#                      name=run_name,
-#                      save_code=True,
-#                      )
 
 gym.envs.register(id='evs-v0', entry_point='ev2gym.models.ev2gym_env:EV2Gym',
                       kwargs={'config_file': config_file,
@@ -48,6 +38,16 @@ gym.envs.register(id='evs-v0', entry_point='ev2gym.models.ev2gym_env:EV2Gym',
                               'state_function': state_function,
                               'cost_function': cost_function,
                               })
+
+run_name =  'min_c_1_usr_1000'
+group_name = 'CPO'                   
+
+run = wandb.init(project='SafeRL',
+                     sync_tensorboard=True,
+                     group=group_name,
+                     name=run_name,
+                     save_code=True,
+                     )
 
 task = "evs-v0"
 
@@ -61,9 +61,11 @@ device = "cpu"
 print(f"Using device {device}")
 
 # init logger
-logger = TensorboardLogger("logs", log_txt=True, name=task)
+# logger = TensorboardLogger("logs", log_txt=True, name=task)
+logger = WandbLogger(log_dir="logs", log_txt=True, group=group_name, name=run_name)
+
 # CPO agent
-agent = CPOAgent(gym.make(task), logger, cost_limit = 2, device=device)
+agent = CPOAgent(gym.make(task), logger, cost_limit = 1, device=device)
 
 # init the env
 training_num, testing_num = 10, 10
