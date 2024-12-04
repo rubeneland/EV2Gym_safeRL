@@ -45,6 +45,25 @@ from fsrl.utils.net.continuous import DoubleCritic, SingleCritic
 from dataclasses import dataclass
 from typing import Tuple
 
+
+import gym
+from gym import Wrapper
+
+class SpecMaxStepsWrapper(Wrapper):
+    def __init__(self, env, spec_max_steps):
+        """
+        Initialize the wrapper.
+
+        Parameters:
+        - env: The environment to wrap.
+        - spec_max_steps: The maximum number of steps allowed in the environment.
+        """
+        super(SpecMaxStepsWrapper, self).__init__(env)
+        print(env.spec)
+        self.spec.max_episode_steps = spec_max_steps
+
+
+
 # Environment configuration
 config_file = "V2GProfit_base.yaml"
 reward_function = ProfitMax_TrPenalty_UserIncentives_safety
@@ -171,10 +190,10 @@ def train_cvpo():
         logger = WandbLogger(log_dir="sfrl_logs", log_txt=True, group=group_name, name=run_name)
 
         env = gym.make(task)
-        env.spec.max_episode_steps = env.env.env.simulation_length
+        # env.spec.max_episode_steps = env.env.env.simulation_length
 
         agent = CVPOAgent(
-                env=env,
+                env=SpecMaxStepsWrapper(gym.make(task)),
                 logger=logger,
                 cost_limit=cost_limit,
                 device=device,
@@ -208,25 +227,25 @@ def train_cvpo():
 
         training_num = min(training_num, episode_per_collect)
         worker = eval(worker)
-        # train_envs = worker([lambda: gym.make(task) for _ in range(training_num)])
-        # test_envs = worker([lambda: gym.make(task) for _ in range(testing_num)])
+        train_envs = worker([lambda: SpecMaxStepsWrapper(gym.make(task)) for _ in range(training_num)])
+        test_envs = worker([lambda: SpecMaxStepsWrapper(gym.make(task)) for _ in range(testing_num)])
 
-        train_envs = []
-        test_envs = []  
+        # train_envs = []
+        # test_envs = []  
 
-        for i in range(training_num):
-                temp_train = gym.make(task)
-                temp_train.spec.max_episode_steps = env.env.env.simulation_length
-                train_envs.append(temp_train)
+        # for i in range(training_num):
+        #         temp_train = gym.make(task)
+        #         temp_train.spec.max_episode_steps = env.env.env.simulation_length
+        #         train_envs.append(temp_train)
 
-        train_envs = ShmemVectorEnv(train_envs)
+        # train_envs = ShmemVectorEnv(train_envs)
 
-        for i in range(testing_num):
-                temp_test = gym.make(task)
-                temp_test.spec.max_episode_steps = env.env.env.simulation_length
-                test_envs.append(temp_test)
+        # for i in range(testing_num):
+        #         temp_test = gym.make(task)
+        #         temp_test.spec.max_episode_steps = env.env.env.simulation_length
+        #         test_envs.append(temp_test)
 
-        test_envs = ShmemVectorEnv(test_envs)
+        # test_envs = ShmemVectorEnv(test_envs)
 
         # start training
         agent.learn(
