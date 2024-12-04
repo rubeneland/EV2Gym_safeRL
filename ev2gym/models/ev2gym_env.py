@@ -70,6 +70,8 @@ class EV2Gym(gym.Env):
 
         self.simulation_length = self.config['simulation_length']
 
+        self.spec = {'max_episode_steps': int(self.simulation_length)}
+
         self.replay_path = replay_save_path
 
         cs = self.config['number_of_charging_stations']

@@ -68,7 +68,7 @@ def evaluator():
     n_test_cycles = 1
 
     scenario = config_file.split("/")[-1].split(".")[0]
-    eval_replay_path = f'./replay/{number_of_charging_stations}cs_{n_transformers}tr_{scenario}/'
+    eval_replay_path = f'./replay/CPO_base/min_c_1_usr_1000/{number_of_charging_stations}cs_{n_transformers}tr_{scenario}/'
     print(f'Looking for replay files in {eval_replay_path}')
     try:
         eval_replay_files = [f for f in os.listdir(
@@ -146,7 +146,7 @@ def evaluator():
         RoundRobin,
         # eMPC_V2G,
         # # V2GProfitMaxLoadsOracle,
-        # V2GProfitMaxOracleGB,
+        V2GProfitMaxOracleGB,
         # V2GProfitMaxOracle,
         # PowerTrackingErrorrMin
         CPO
@@ -177,7 +177,7 @@ def evaluator():
         f'{datetime.datetime.now().strftime("%Y_%m_%d_%f")}'
 
     # make a directory for the evaluation
-    save_path = f'./results/{evaluation_name}/'
+    save_path = f'./results/CPO_base/min_c_2_usr_1000/{evaluation_name}/'
     os.makedirs(save_path, exist_ok=True)        
     os.system(f'cp {config_file} {save_path}')
 
@@ -229,7 +229,7 @@ def evaluator():
                 state = env.reset()
 
             elif algorithm == CPO:
-                gym.envs.register(id='evs-v0', entry_point='ev2gym.models.ev2gym_env:EV2Gym',
+                gym.envs.register(id='eval', entry_point='ev2gym.models.ev2gym_env:EV2Gym',
                       kwargs={'config_file': config_file,
                               'verbose': False,
                               'save_plots': False,
@@ -239,15 +239,16 @@ def evaluator():
                               'cost_function': cost_function,
                               })
 
-                task = "evs-v0"
+                task = "eval"
 
-                load_path = './saved_models/CPO/min_c_10_tr_100_usr_100_also_reward/policy.pth'
+                load_path = './logs/min_c_2_usr_1000_train_evs_50/checkpoint/model_best.pt'
                 # init logger
                 logger = TensorboardLogger("logs", log_txt=True, name=task)
-                agent = CPO(gym.make(task), logger, cost_limit = 5)
+                agent = CPO(gym.make(task), logger, cost_limit = 1)
                 # policy = CPO_policy
                 model = agent.policy
-                model.load_state_dict(torch.load(load_path))
+                state_dict = (torch.load(load_path))
+                model.load_state_dict(state_dict['model'])
                 model = model.actor
                 model.eval()
 
