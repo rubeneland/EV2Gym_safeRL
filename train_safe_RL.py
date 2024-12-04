@@ -45,9 +45,7 @@ from fsrl.utils.net.continuous import DoubleCritic, SingleCritic
 from dataclasses import dataclass
 from typing import Tuple
 
-
-import gym
-from gym import Wrapper
+from gymnasium import Wrapper
 
 class SpecMaxStepsWrapper(Wrapper):
     def __init__(self, env, spec_max_steps):
@@ -59,10 +57,7 @@ class SpecMaxStepsWrapper(Wrapper):
         - spec_max_steps: The maximum number of steps allowed in the environment.
         """
         super(SpecMaxStepsWrapper, self).__init__(env)
-        print(env.spec)
         self.spec.max_episode_steps = spec_max_steps
-
-
 
 # Environment configuration
 config_file = "V2GProfit_base.yaml"
@@ -91,7 +86,7 @@ env.spec.max_episode_steps = env.env.env.simulation_length
 
 def train_cpo():
 
-        run_name =  'min_c_2_usr_1000_train_envs_4_test_envs_50'
+        run_name =  'CPO_min_c_2_usr_1000_train_envs_4_test_envs_50'
         group_name = 'CPO'                   
 
         wandb.init(project='safeRL',
@@ -156,14 +151,14 @@ def train_cvpo():
         unbounded: bool = False
         last_layer_scale: bool = False
         # collecting params
-        epoch: int = 200
+        epoch: int = 100
         episode_per_collect: int = 10
         step_per_epoch: int = 10000
         update_per_step: float = 0.2
         buffer_size: int = 200000
         worker: str = "ShmemVectorEnv"
-        training_num: int = 20
-        testing_num: int = 2
+        training_num: int = 10
+        testing_num: int = 10
         # general train params
         batch_size: int = 256
         reward_threshold: float = 10000  # for early stop purpose
@@ -178,7 +173,8 @@ def train_cvpo():
 
 
         group_name: str = "CVPO"
-        run_name= "CVPO_test"
+        run_name= 'CVPO_min_c_10_usr_1000_train_envs_10_test_envs_10'
+
         wandb.init(project='safeRL',
                         sync_tensorboard=True,
                         group=group_name,
@@ -192,8 +188,10 @@ def train_cvpo():
         env = gym.make(task)
         # env.spec.max_episode_steps = env.env.env.simulation_length
 
+        sim_length = env.env.env.simulation_length
+
         agent = CVPOAgent(
-                env=SpecMaxStepsWrapper(gym.make(task)),
+                env=SpecMaxStepsWrapper(gym.make(task), sim_length),
                 logger=logger,
                 cost_limit=cost_limit,
                 device=device,
@@ -227,8 +225,8 @@ def train_cvpo():
 
         training_num = min(training_num, episode_per_collect)
         worker = eval(worker)
-        train_envs = worker([lambda: SpecMaxStepsWrapper(gym.make(task)) for _ in range(training_num)])
-        test_envs = worker([lambda: SpecMaxStepsWrapper(gym.make(task)) for _ in range(testing_num)])
+        train_envs = worker([lambda: SpecMaxStepsWrapper(gym.make(task), sim_length) for _ in range(training_num)])
+        test_envs = worker([lambda: SpecMaxStepsWrapper(gym.make(task), sim_length) for _ in range(testing_num)])
 
         # train_envs = []
         # test_envs = []  
