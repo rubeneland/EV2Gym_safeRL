@@ -86,7 +86,7 @@ env.spec.max_episode_steps = env.env.env.simulation_length
 
 def train_cpo():
 
-        run_name =  'CPO_min_c_2_usr_1000_train_envs_4_test_envs_50'
+        run_name =  'CPO_5_cs_cost_limit_30_usr_1000_train_envs_12_test_envs_8'
         group_name = 'CPO'                   
 
         wandb.init(project='safeRL',
@@ -113,9 +113,9 @@ def train_cpo():
         logger = WandbLogger(log_dir="logs", log_txt=True, group=group_name, name=run_name)
 
         # CPO agent
-        agent = CPOAgent(gym.make(task), logger, cost_limit = 2, device=device)
+        agent = CPOAgent(gym.make(task), logger, cost_limit = 30, device=device, action_bound_method = "tanh")
 
-        training_num, testing_num = 4, 50
+        training_num, testing_num = 12, 8
         train_envs = DummyVectorEnv([lambda: gym.make(task) for _ in range(training_num)])
         test_envs = DummyVectorEnv([lambda: gym.make(task) for _ in range(testing_num)])
 
@@ -125,7 +125,7 @@ def train_cpo():
 def train_cvpo():
         # general task params
         task: str = "fsrl-v0"
-        cost_limit: float = 10
+        cost_limit: float = 50
         device: str = "cpu"
         thread: int = 4  # if use "cpu" to train
         seed: int = 10
@@ -151,29 +151,29 @@ def train_cvpo():
         unbounded: bool = False
         last_layer_scale: bool = False
         # collecting params
-        epoch: int = 100
+        epoch: int = 200
         episode_per_collect: int = 10
         step_per_epoch: int = 10000
         update_per_step: float = 0.2
         buffer_size: int = 200000
         worker: str = "ShmemVectorEnv"
-        training_num: int = 10
-        testing_num: int = 10
+        training_num: int = 12
+        testing_num: int = 8
         # general train params
         batch_size: int = 256
         reward_threshold: float = 10000  # for early stop purpose
         save_interval: int = 4
         deterministic_eval: bool = True
         action_scaling: bool = True
-        action_bound_method: str = "clip"
+        action_bound_method: str = "tanh"
         resume: bool = False  # TODO
         save_ckpt: bool = True  # set this to True to save the policy model
         verbose: bool = False
         render: bool = False
 
 
-        group_name: str = "CVPO"
-        run_name= 'CVPO_min_c_10_usr_1000_train_envs_10_test_envs_10'
+        group_name: str = "CVPO_10cs"
+        run_name= 'CVPO_10cs_cost_lim_50_usr_1000_train_envs_12_test_envs_8'
 
         wandb.init(project='safeRL',
                         sync_tensorboard=True,
@@ -183,7 +183,7 @@ def train_cvpo():
                         )
 
         # init logger
-        logger = WandbLogger(log_dir="sfrl_logs", log_txt=True, group=group_name, name=run_name)
+        logger = WandbLogger(log_dir="fsrl_logs/10cs_60kw", log_txt=True, group=group_name, name=run_name)
 
         env = gym.make(task)
         # env.spec.max_episode_steps = env.env.env.simulation_length
@@ -265,4 +265,4 @@ def train_cvpo():
 
 
 if __name__ == "__main__":
-        train_cvpo()
+        train_cpo()

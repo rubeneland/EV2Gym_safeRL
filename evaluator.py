@@ -37,10 +37,25 @@ from ev2gym.visuals.evaluator_plot import plot_comparable_EV_SoC_single, plot_pr
 from cost_functions import transformer_overload_usrpenalty_cost, ProfitMax_TrPenalty_UserIncentives_safety
 
 from fsrl.agent import CPOAgent as CPO
+from fsrl.agent import CVPOAgent as CVPO
 from fsrl.utils import TensorboardLogger
 
 import gymnasium as gym
 import torch
+
+from gymnasium import Wrapper
+
+class SpecMaxStepsWrapper(Wrapper):
+    def __init__(self, env, spec_max_steps):
+        """
+        Initialize the wrapper.
+
+        Parameters:
+        - env: The environment to wrap.
+        - spec_max_steps: The maximum number of steps allowed in the environment.
+        """
+        super(SpecMaxStepsWrapper, self).__init__(env)
+        self.spec.max_episode_steps = spec_max_steps
 
 # class CPO():
 #     '''
@@ -65,7 +80,7 @@ def evaluator():
     timescale = config["timescale"]
     simulation_length = config["simulation_length"]
 
-    n_test_cycles = 1
+    n_test_cycles = 2
 
     scenario = config_file.split("/")[-1].split(".")[0]
     eval_replay_path = f'./replay/CPO_base/min_c_1_usr_1000/{number_of_charging_stations}cs_{n_transformers}tr_{scenario}/'
@@ -149,7 +164,8 @@ def evaluator():
         V2GProfitMaxOracleGB,
         # V2GProfitMaxOracle,
         # PowerTrackingErrorrMin
-        CPO
+        # CPO,
+        CVPO
     ]
 
 
@@ -177,7 +193,7 @@ def evaluator():
         f'{datetime.datetime.now().strftime("%Y_%m_%d_%f")}'
 
     # make a directory for the evaluation
-    save_path = f'./results/CPO_base/min_c_2_usr_1000/{evaluation_name}/'
+    save_path = f'./results/{evaluation_name}/'
     os.makedirs(save_path, exist_ok=True)        
     os.system(f'cp {config_file} {save_path}')
 
@@ -241,11 +257,50 @@ def evaluator():
 
                 task = "eval"
 
-                load_path = './logs/min_c_2_usr_1000_train_evs_50/checkpoint/model_best.pt'
+                load_path = './fsrl_logs/5cs_30kw/CPO_5_cs_cost_limit_30_usr_1000_train_envs_12_test_envs_8/checkpoint/model_best.pt'
                 # init logger
                 logger = TensorboardLogger("logs", log_txt=True, name=task)
-                agent = CPO(gym.make(task), logger, cost_limit = 1)
+                agent = CPO(gym.make(task), logger)
                 # policy = CPO_policy
+                model = agent.policy
+                state_dict = (torch.load(load_path))
+                model.load_state_dict(state_dict['model'])
+                model = model.actor
+                model.eval()
+
+                env = ev2gym_env.EV2Gym(
+                    config_file=config_file,
+                    load_from_replay_path=replay_path,
+                    generate_rnd_game=True,
+                    state_function=state_function,
+                    reward_function=reward_function,
+                )
+
+                # initialize the timer
+                timer = time.time()
+                state, _ = env.reset()
+
+            elif algorithm == CVPO:
+                gym.envs.register(id='eval', entry_point='ev2gym.models.ev2gym_env:EV2Gym',
+                      kwargs={'config_file': config_file,
+                              'verbose': False,
+                              'save_plots': False,
+                              'generate_rnd_game': True,
+                              'reward_function': reward_function,
+                              'state_function': state_function,
+                              'cost_function': cost_function,
+                              })
+
+                task = "eval"
+
+                env = gym.make(task)
+                sim_length = env.env.env.simulation_length
+
+                load_path = './fsrl_logs/5cs_30kw/CVPO_min_c_25_usr_1000_train_envs_12_test_envs_8_epochs_200/checkpoint/model_best.pt'
+
+                # init logger
+                logger = TensorboardLogger("logs", log_txt=True, name=task)
+                agent = CVPO(SpecMaxStepsWrapper(gym.make(task), sim_length), logger)
                 model = agent.policy
                 state_dict = (torch.load(load_path))
                 model.load_state_dict(state_dict['model'])
@@ -323,7 +378,7 @@ def evaluator():
 
                     stats = stats[0]
                     print(stats)
-                elif algorithm == CPO:
+                elif algorithm == CPO or algorithm == CVPO:
                     
                     # reshape the state to 1 x n_features
                     state = state.reshape(1, -1)
@@ -331,7 +386,7 @@ def evaluator():
                     action = model.forward(state)
                     action = action[0][0][0].detach().numpy()
                     state, reward, done, _, stats = env.step(action)
-                    
+
                 else:
                     actions = model.get_action(env=env)
                     new_state, reward, done, _, stats = env.step(
@@ -407,17 +462,17 @@ def evaluator():
             algorithm_names.append(algorithm.__name__)
 
 
-    plot_total_power(results_path=save_path + 'plot_results_dict.pkl',
-                    save_path=save_path,
-                    algorithm_names=algorithm_names)
+    # plot_total_power(results_path=save_path + 'plot_results_dict.pkl',
+    #                 save_path=save_path,
+    #                 algorithm_names=algorithm_names)
 
     plot_comparable_EV_SoC(results_path=save_path + 'plot_results_dict.pkl',
                         save_path=save_path,
                         algorithm_names=algorithm_names)
 
-    plot_actual_power_vs_setpoint(results_path=save_path + 'plot_results_dict.pkl',
-                                save_path=save_path,
-                                algorithm_names=algorithm_names)
+    # plot_actual_power_vs_setpoint(results_path=save_path + 'plot_results_dict.pkl',
+    #                             save_path=save_path,
+    #                             algorithm_names=algorithm_names)
 
     plot_total_power_V2G(results_path=save_path + 'plot_results_dict.pkl',
                         save_path=save_path,
