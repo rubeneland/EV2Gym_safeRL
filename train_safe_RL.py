@@ -85,7 +85,10 @@ env.spec.max_episode_steps = env.env.env.simulation_length
 
 def train_cpo(args):
 
-        run_name =  f'CPO_5spawn_20cs_cost_lim_{cost_limit}_usr_1000_train_envs_12_test_envs_8_run{random.randint(0, 1000)}'
+        cost_limit = args.cost_limit
+        epoch = args.epoch
+
+        run_name =  f'CPO_5spawn_20cs_cost_lim_{cost_limit}_epochs_{epoch}_usr_1000_train_envs_12_test_envs_8_run{random.randint(0, 1000)}'
         group_name = 'CPO'                   
 
         wandb.init(project='safeRL',
@@ -121,7 +124,7 @@ def train_cpo(args):
         train_envs = DummyVectorEnv([lambda: gym.make(task) for _ in range(training_num)])
         test_envs = DummyVectorEnv([lambda: gym.make(task) for _ in range(testing_num)])
 
-        agent.learn(train_envs, test_envs, epoch=400)
+        agent.learn(train_envs, test_envs, epoch=args.epoch)
 
 def train_cvpo(args):
         # general task params
@@ -152,7 +155,7 @@ def train_cvpo(args):
         unbounded: bool = False
         last_layer_scale: bool = False
         # collecting params
-        epoch: int = 500
+        epoch: int = args.epoch
         episode_per_collect: int = 10
         step_per_epoch: int = 10000
         update_per_step: float = 0.2
@@ -174,7 +177,7 @@ def train_cvpo(args):
 
 
         group_name: str = "CVPO_20cs"
-        run_name= f'CVPO_5spawn_20cs_cost_lim_{cost_limit}_usr_1000_train_envs_12_test_envs_8_run{random.randint(0, 1000)}'
+        run_name= f'CVPO_5spawn_20cs_cost_lim_{cost_limit}_epochs_{epoch}_usr_1000_train_envs_12_test_envs_8_run{random.randint(0, 1000)}'
 
         wandb.init(project='safeRL',
                         sync_tensorboard=True,
@@ -270,6 +273,7 @@ if __name__ == "__main__":
         parser = argparse.ArgumentParser() 
         parser.add_argument("--train", type=str, default="cvpo", help="Training algorithm to use")
         parser.add_argument("--cost_limit", type=float, default=250, help="Cost limit for the environment")
+        parser.add_argument("--epoch", type=int, default=200, help="Number of epochs to train for")
         args = parser.parse_args()
         if args.train == "cvpo":        
                 train_cvpo(args)
