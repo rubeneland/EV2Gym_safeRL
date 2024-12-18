@@ -86,7 +86,7 @@ env.spec.max_episode_steps = env.env.env.simulation_length
 
 def train_cpo():
 
-        run_name =  'CPO_5_cs_cost_limit_30_usr_1000_train_envs_12_test_envs_8'
+        run_name =  'CPO_5_cs_7_spawn_cost_limit_40_usr_1000_train_envs_12_test_envs_8'
         group_name = 'CPO'                   
 
         wandb.init(project='safeRL',
@@ -110,22 +110,23 @@ def train_cpo():
         # print(f"cuda{torch.cuda.is_available()}")
 
         # init logger
-        logger = WandbLogger(log_dir="logs", log_txt=True, group=group_name, name=run_name)
+        logger = WandbLogger(log_dir="fsrl_logs/5cs_30kw_7spawn", log_txt=True, group=group_name, name=run_name)
 
         # CPO agent
-        agent = CPOAgent(gym.make(task), logger, cost_limit = 30, device=device, action_bound_method = "tanh")
+        agent = CPOAgent(gym.make(task), logger, cost_limit = 40, device=device, max_batchsize=200000,
+                        action_bound_method = "tanh")
 
         training_num, testing_num = 12, 8
         train_envs = DummyVectorEnv([lambda: gym.make(task) for _ in range(training_num)])
         test_envs = DummyVectorEnv([lambda: gym.make(task) for _ in range(testing_num)])
 
-        agent.learn(train_envs, test_envs, epoch=200)
+        agent.learn(train_envs, test_envs, epoch=400)
 
 # @pyrallis.wrap()
 def train_cvpo():
         # general task params
         task: str = "fsrl-v0"
-        cost_limit: float = 50
+        cost_limit: float = 250
         device: str = "cpu"
         thread: int = 4  # if use "cpu" to train
         seed: int = 10
@@ -151,7 +152,7 @@ def train_cvpo():
         unbounded: bool = False
         last_layer_scale: bool = False
         # collecting params
-        epoch: int = 200
+        epoch: int = 500
         episode_per_collect: int = 10
         step_per_epoch: int = 10000
         update_per_step: float = 0.2
@@ -172,8 +173,8 @@ def train_cvpo():
         render: bool = False
 
 
-        group_name: str = "CVPO_10cs"
-        run_name= 'CVPO_10cs_cost_lim_50_usr_1000_train_envs_12_test_envs_8'
+        group_name: str = "CVPO_20cs"
+        run_name= 'CVPO_5spawn_20cs_cost_lim_200_usr_1000_train_envs_12_test_envs_8'
 
         wandb.init(project='safeRL',
                         sync_tensorboard=True,
@@ -183,7 +184,7 @@ def train_cvpo():
                         )
 
         # init logger
-        logger = WandbLogger(log_dir="fsrl_logs/10cs_60kw", log_txt=True, group=group_name, name=run_name)
+        logger = WandbLogger(log_dir="fsrl_logs/20cs_120kw_5spawn", log_txt=True, group=group_name, name=run_name)
 
         env = gym.make(task)
         # env.spec.max_episode_steps = env.env.env.simulation_length
@@ -265,4 +266,4 @@ def train_cvpo():
 
 
 if __name__ == "__main__":
-        train_cpo()
+        train_cvpo()
