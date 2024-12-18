@@ -1,7 +1,7 @@
 #!/bin/bash
-#SBATCH --job-name="20cs_cost_lim_250"
+#SBATCH --job-name="20cs_cost_lim_250_epochs_300"
 #SBATCH --partition=compute
-#SBATCH --time=1:00:00
+#SBATCH --time=5:00:00
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=4
 #SBATCH --mem-per-cpu=4G
