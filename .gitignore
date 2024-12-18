@@ -179,5 +179,8 @@ plots/
 plot_results_dict.pkl
 results_grouped.csv
 tests/
+*.pt
+*.out
+*.txt
 
 MPC EVCS V2G - v2/

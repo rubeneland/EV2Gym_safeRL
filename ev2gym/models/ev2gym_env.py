@@ -126,12 +126,15 @@ class EV2Gym(gym.Env):
                     if self.config["random_hour"]:
                         self.config['hour'] = random.randint(5, 15)
 
-                self.sim_date = datetime.datetime(2022,
+                start_training_year = self.config['start_training_year']
+                yrs = self.config['training_years']
+
+                self.sim_date = datetime.datetime(start_training_year,
                                                   1,
                                                   1,
                                                   self.config['hour'],
                                                   self.config['minute'],
-                                                  ) + datetime.timedelta(days=random.randint(0, int(1.5*365)))
+                                                  ) + datetime.timedelta(days=random.randint(0, int(yrs*365)))
 
                 if self.scenario == 'workplace':
                     # dont simulate weekends
@@ -297,12 +300,16 @@ class EV2Gym(gym.Env):
                 if self.config["random_hour"]:
                     self.config['hour'] = random.randint(5, 15)
 
-            self.sim_date = datetime.datetime(2022,
-                                              1,
-                                              1,
-                                              self.config['hour'],
-                                              self.config['minute'],
-                                              ) + datetime.timedelta(days=random.randint(0, int(1.5*365)))
+            
+            start_training_year = self.config['start_training_year']
+            yrs = self.config['training_years']
+
+            self.sim_date = datetime.datetime(start_training_year,
+                                                  1,
+                                                  1,
+                                                  self.config['hour'],
+                                                  self.config['minute'],
+                                                  ) + datetime.timedelta(days=random.randint(0, int(yrs*365)))
 
             if self.scenario == 'workplace':
                 # dont simulate weekends

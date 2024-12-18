@@ -25,7 +25,6 @@ from ev2gym.rl_agent.state import V2G_profit_max, PublicPST, V2G_profit_max_load
 
 import pprint
 from dataclasses import asdict
-import pyrallis
 
 from tianshou.data import VectorReplayBuffer
 from tianshou.env import BaseVectorEnv, DummyVectorEnv, ShmemVectorEnv, SubprocVectorEnv
@@ -84,7 +83,7 @@ task = "fsrl-v0"
 env = gym.make(task)
 env.spec.max_episode_steps = env.env.env.simulation_length
 
-def train_cpo():
+def train_cpo(args):
 
         run_name =  'CPO_5_cs_7_spawn_cost_limit_40_usr_1000_train_envs_12_test_envs_8'
         group_name = 'CPO'                   
@@ -122,11 +121,10 @@ def train_cpo():
 
         agent.learn(train_envs, test_envs, epoch=400)
 
-# @pyrallis.wrap()
-def train_cvpo():
+def train_cvpo(args):
         # general task params
         task: str = "fsrl-v0"
-        cost_limit: float = 250
+        cost_limit: float = args.cost_limit
         device: str = "cpu"
         thread: int = 4  # if use "cpu" to train
         seed: int = 10
@@ -174,7 +172,7 @@ def train_cvpo():
 
 
         group_name: str = "CVPO_20cs"
-        run_name= 'CVPO_5spawn_20cs_cost_lim_200_usr_1000_train_envs_12_test_envs_8'
+        run_name= 'CVPO_5spawn_20cs_cost_lim_250_usr_1000_train_envs_12_test_envs_8'
 
         wandb.init(project='safeRL',
                         sync_tensorboard=True,
@@ -266,4 +264,14 @@ def train_cvpo():
 
 
 if __name__ == "__main__":
-        train_cvpo()
+        #create an argument parser to adjust cost limit and define training algorithm
+        parser = argparse.ArgumentParser() 
+        parser.add_argument("--train", type=str, default="cvpo", help="Training algorithm to use")
+        parser.add_argument("--cost_limit", type=float, default=250, help="Cost limit for the environment")
+        args = parser.parse_args()
+        if args.train == "cvpo":        
+                train_cvpo(args)
+        elif args.train == "cpo":
+                train_cpo(args)
+        else:   
+                print("Invalid training algorithm. Please choose either 'cpo' or 'cvpo'")
