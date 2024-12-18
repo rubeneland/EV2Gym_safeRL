@@ -85,7 +85,7 @@ env.spec.max_episode_steps = env.env.env.simulation_length
 
 def train_cpo(args):
 
-        run_name =  'CPO_5_cs_7_spawn_cost_limit_40_usr_1000_train_envs_12_test_envs_8'
+        run_name =  f'CPO_5spawn_20cs_cost_lim_{cost_limit}_usr_1000_train_envs_12_test_envs_8_run{random.randint(0, 1000)}'
         group_name = 'CPO'                   
 
         wandb.init(project='safeRL',
@@ -111,8 +111,10 @@ def train_cpo(args):
         # init logger
         logger = WandbLogger(log_dir="fsrl_logs/5cs_30kw_7spawn", log_txt=True, group=group_name, name=run_name)
 
+        cost_limit = 40
+
         # CPO agent
-        agent = CPOAgent(gym.make(task), logger, cost_limit = 40, device=device, max_batchsize=200000,
+        agent = CPOAgent(gym.make(task), logger, cost_limit = cost_limit, device=device, max_batchsize=200000,
                         action_bound_method = "tanh")
 
         training_num, testing_num = 12, 8
@@ -172,7 +174,7 @@ def train_cvpo(args):
 
 
         group_name: str = "CVPO_20cs"
-        run_name= 'CVPO_5spawn_20cs_cost_lim_250_usr_1000_train_envs_12_test_envs_8'
+        run_name= f'CVPO_5spawn_20cs_cost_lim_{cost_limit}_usr_1000_train_envs_12_test_envs_8_run{random.randint(0, 1000)}'
 
         wandb.init(project='safeRL',
                         sync_tensorboard=True,

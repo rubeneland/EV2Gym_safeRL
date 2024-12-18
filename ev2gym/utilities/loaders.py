@@ -398,7 +398,7 @@ def load_electricity_prices(env) -> Tuple[np.ndarray, np.ndarray]:
 
     # else load historical prices
     file_path = pkg_resources.resource_filename(
-        'ev2gym', 'data/Netherlands_day-ahead-2015-2023.csv')
+        'ev2gym', 'data/Netherlands_day-ahead-2015-2024.csv')
     data = pd.read_csv(file_path, sep=',', header=0)
     drop_columns = ['Country', 'Datetime (Local)']
     data.drop(drop_columns, inplace=True, axis=1)
