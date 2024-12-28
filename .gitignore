@@ -182,5 +182,6 @@ tests/
 *.pt
 *.out
 *.txt
+*.sh
 
 MPC EVCS V2G - v2/
