@@ -159,7 +159,7 @@ def train_cvpo(args):
         episode_per_collect: int = 10
         step_per_epoch: int = 10000
         update_per_step: float = 0.2
-        buffer_size: int = 200000
+        buffer_size: int = 200000 # maybe increse for problems with more steps per simulation
         worker: str = "ShmemVectorEnv"
         training_num: int = 12
         testing_num: int = 8
@@ -176,8 +176,8 @@ def train_cvpo(args):
         render: bool = False
 
 
-        group_name: str = "CVPO_20cs"
-        run_name= f'CVPO_5spawn_20cs_cost_lim_{cost_limit}_epochs_{epoch}_usr_1000_train_envs_12_test_envs_8_run{random.randint(0, 1000)}'
+        group_name: str = "TEST_FINAL"
+        run_name= f'TEST_FINAL_no_DR_CVPO_5spawn_10cs_120kw_cost_lim_{cost_limit}_usr_1000_NO_tr_train_envs_12_test_envs_8_run{random.randint(0, 1000)}'
 
         wandb.init(project='safeRL',
                         sync_tensorboard=True,
@@ -187,7 +187,7 @@ def train_cvpo(args):
                         )
 
         # init logger
-        logger = WandbLogger(log_dir="fsrl_logs/20cs_120kw_5spawn", log_txt=True, group=group_name, name=run_name)
+        logger = WandbLogger(log_dir="fsrl_logs/TEST_FINAL_10_cs_120kw", log_txt=True, group=group_name, name=run_name)
 
         env = gym.make(task)
         # env.spec.max_episode_steps = env.env.env.simulation_length
@@ -273,7 +273,7 @@ if __name__ == "__main__":
         parser = argparse.ArgumentParser() 
         parser.add_argument("--train", type=str, default="cvpo", help="Training algorithm to use")
         parser.add_argument("--cost_limit", type=float, default=250, help="Cost limit for the environment")
-        parser.add_argument("--epoch", type=int, default=200, help="Number of epochs to train for")
+        parser.add_argument("--epoch", type=int, default=300, help="Number of epochs to train for")
         args = parser.parse_args()
         if args.train == "cvpo":        
                 train_cvpo(args)

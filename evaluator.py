@@ -66,7 +66,7 @@ class SpecMaxStepsWrapper(Wrapper):
 def evaluator():
 
     # config_file = "ev2gym/example_config_files/V2G_MPC2.yaml"
-    config_file = "V2GProfit_base.yaml"
+    config_file = "V2GProfit_evaluate.yaml"
     # config_file = "ev2gym/example_config_files/PublicPST.yaml"
     # config_file = "ev2gym/example_config_files/BusinessPST.yaml"
     # config_file = "ev2gym/example_config_files/V2GProfitPlusLoads.yaml"
@@ -120,6 +120,10 @@ def evaluator():
         state_function = V2G_profit_max_loads
 
     elif config_file == "V2GProfit_base.yaml":
+        reward_function = ProfitMax_TrPenalty_UserIncentives
+        state_function = V2G_profit_max
+        cost_function = transformer_overload_usrpenalty_cost
+    elif config_file == "V2GProfit_evaluate.yaml":
         reward_function = ProfitMax_TrPenalty_UserIncentives
         state_function = V2G_profit_max
         cost_function = transformer_overload_usrpenalty_cost
@@ -260,7 +264,7 @@ def evaluator():
                 load_path = './fsrl_logs/5cs_30kw_7spawn/CPO_5_cs_7_spawn_cost_limit_30_usr_1000_train_envs_12_test_envs_8/checkpoint/model.pt'
                 # init logger
                 logger = TensorboardLogger("logs", log_txt=True, name=task)
-                agent = CPO(gym.make(task), logger)
+                agent = CPO(env, logger)
                 # policy = CPO_policy
                 model = agent.policy
                 state_dict = (torch.load(load_path))
@@ -296,11 +300,11 @@ def evaluator():
                 env = gym.make(task)
                 sim_length = env.env.env.simulation_length
 
-                load_path = './fsrl_logs/10cs_60kw_5spawn/CVPO_5spawn_10cs_cost_lim_100_usr_1000_train_envs_12_test_envs_8/checkpoint/model_best.pt'
+                load_path = 'fsrl_logs/TEST_FINAL_10_cs_120kw/TEST_FINAL_no_DR_CVPO_5spawn_10cs_120kw_cost_lim_120.0_usr_1000_tr_50_train_envs_12_test_envs_8_run288/checkpoint/model_best.pt'
 
                 # init logger
                 logger = TensorboardLogger("logs", log_txt=True, name=task)
-                agent = CVPO(SpecMaxStepsWrapper(gym.make(task), sim_length), logger)
+                agent = CVPO(SpecMaxStepsWrapper(env, sim_length), logger)
                 model = agent.policy
                 state_dict = (torch.load(load_path))
                 model.load_state_dict(state_dict['model'])
