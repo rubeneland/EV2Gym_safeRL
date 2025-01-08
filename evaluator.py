@@ -80,7 +80,7 @@ def evaluator():
     timescale = config["timescale"]
     simulation_length = config["simulation_length"]
 
-    n_test_cycles = 50
+    n_test_cycles = 20
 
     scenario = config_file.split("/")[-1].split(".")[0]
     eval_replay_path = f'./replay/CPO_base/min_c_1_usr_1000/{number_of_charging_stations}cs_{n_transformers}tr_{scenario}/'
@@ -300,7 +300,7 @@ def evaluator():
                 env = gym.make(task)
                 sim_length = env.env.env.simulation_length
 
-                load_path = 'fsrl_logs/TEST_FINAL_10_cs_120kw/TEST_FINAL_no_DR_CVPO_5spawn_10cs_120kw_cost_lim_120.0_usr_1000_tr_50_train_envs_12_test_envs_8_run288/checkpoint/model_best.pt'
+                load_path = 'fsrl_logs/TEST_FINAL_10_cs_120kw/no_loads_no_PV_no_DR_CVPO_5spawn_10cs_120kw_cost_lim_15_usr_-5_100_NO_tr_train_envs_8_test_envs_8_run299/checkpoint/model_best.pt'
 
                 # init logger
                 logger = TensorboardLogger("logs", log_txt=True, name=task)
