@@ -159,9 +159,9 @@ def train_cvpo(args):
         episode_per_collect: int = 10
         step_per_epoch: int = 10000
         update_per_step: float = 0.2
-        buffer_size: int = 200000 # maybe increse for problems with more steps per simulation
+        buffer_size: int = 200000 # maybe increase for problems with more steps per simulation ?
         worker: str = "ShmemVectorEnv"
-        training_num: int = 12
+        training_num: int = 8
         testing_num: int = 8
         # general train params
         batch_size: int = 256
@@ -177,7 +177,7 @@ def train_cvpo(args):
 
 
         group_name: str = "TEST_FINAL"
-        run_name= f'no_loads_no_PV_no_DR_CVPO_5spawn_10cs_120kw_cost_lim_{int(cost_limit)}_usr_-5_100_NO_tr_train_envs_12_test_envs_8_run{random.randint(0, 1000)}'
+        run_name= f'no_loads_no_PV_no_DR_CVPO_5spawn_10cs_120kw_cost_lim_{int(cost_limit)}_usr_-5_100_NO_tr_train_envs_8_test_envs_8_run{random.randint(0, 1000)}'
 
         wandb.init(project='safeRL',
                         sync_tensorboard=True,
