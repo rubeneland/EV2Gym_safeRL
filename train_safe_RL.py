@@ -88,7 +88,7 @@ def train_cpo(args):
         cost_limit = args.cost_limit
         epoch = args.epoch
 
-        run_name =  f'CPO_5spawn_20cs_cost_lim_{cost_limit}_epochs_{epoch}_usr_1000_train_envs_12_test_envs_8_run{random.randint(0, 1000)}'
+        run_name =  f'CPO_5spawn_20cs_cost_lim_{cost_limit}_epochs_{epoch}_usr_1000_train_envs_8_test_envs_8_run{random.randint(0, 1000)}'
         group_name = 'CPO'                   
 
         wandb.init(project='safeRL',
@@ -131,7 +131,7 @@ def train_cvpo(args):
         task: str = "fsrl-v0"
         cost_limit: float = args.cost_limit
         device: str = "cpu"
-        thread: int = 4  # if use "cpu" to train
+        thread: int = 8  # if use "cpu" to train
         seed: int = 10
         # CVPO arguments
         estep_iter_num: int = 1
@@ -157,16 +157,16 @@ def train_cvpo(args):
         # collecting params
         epoch: int = args.epoch
         episode_per_collect: int = 10
-        step_per_epoch: int = 10000
-        update_per_step: float = 0.2
-        buffer_size: int = 200000 # maybe increase for problems with more steps per simulation ?
+        step_per_epoch: int = 3000
+        update_per_step: float = 0.1
+        buffer_size: int = 200000
         worker: str = "ShmemVectorEnv"
         training_num: int = 8
-        testing_num: int = 8
+        testing_num: int = 16
         # general train params
         batch_size: int = 256
         reward_threshold: float = 10000  # for early stop purpose
-        save_interval: int = 4
+        save_interval: int = 1
         deterministic_eval: bool = True
         action_scaling: bool = True
         action_bound_method: str = "tanh"
@@ -175,9 +175,10 @@ def train_cvpo(args):
         verbose: bool = False
         render: bool = False
 
+        # Use 1 task in example.sh! More tasks will create more runs...
 
         group_name: str = "TEST_FINAL"
-        run_name= f'no_loads_no_PV_no_DR_CVPO_5spawn_10cs_120kw_cost_lim_{int(cost_limit)}_usr_-5_100_NO_tr_train_envs_8_test_envs_8_run{random.randint(0, 1000)}'
+        run_name= f'no_loads_no_PV_no_DR_CVPO_5spawn_10cs_120kw_cost_lim_{int(cost_limit)}_usr_-5_100_NO_tr_train_envs_8_test_envs_16_run{random.randint(0, 1000)}'
 
         wandb.init(project='safeRL',
                         sync_tensorboard=True,
@@ -273,7 +274,7 @@ if __name__ == "__main__":
         parser = argparse.ArgumentParser() 
         parser.add_argument("--train", type=str, default="cvpo", help="Training algorithm to use")
         parser.add_argument("--cost_limit", type=float, default=250, help="Cost limit for the environment")
-        parser.add_argument("--epoch", type=int, default=300, help="Number of epochs to train for")
+        parser.add_argument("--epoch", type=int, default=1000, help="Number of epochs to train for")
         args = parser.parse_args()
         if args.train == "cvpo":        
                 train_cvpo(args)

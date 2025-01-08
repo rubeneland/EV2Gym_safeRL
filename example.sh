@@ -1,10 +1,10 @@
 #!/bin/bash
-#SBATCH --job-name="20cs_cost_lim_250_epochs_300"
+#SBATCH --job-name="10cs_cost_lim_15_epochs_1000"
 #SBATCH --partition=compute
-#SBATCH --time=8:00:00
+#SBATCH --time=3:00:00
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=8
-#SBATCH --mem-per-cpu=4G
+#SBATCH --mem-per-cpu=3G
 #SBATCH --account=education-eemcs-msc-ee
 
 module load 2024r1 openmpi miniconda3 py-pip
@@ -15,4 +15,4 @@ source "$(conda info --base)/etc/profile.d/conda.sh"
 
 conda activate EV2Gym_srl
 
-srun python train_safe_RL.py --train cvpo --cost_limit 12 --epoch 300
+srun python train_safe_RL.py --train cvpo --cost_limit 15 --epoch 1000
