@@ -177,7 +177,7 @@ def train_cvpo(args):
 
 
         group_name: str = "TEST_FINAL"
-        run_name= f'no_DR_CVPO_5spawn_10cs_120kw_cost_lim_{int(cost_limit)}_usr_-5_100_NO_tr_train_envs_12_test_envs_8_run{random.randint(0, 1000)}'
+        run_name= f'no_loads_no_PV_no_DR_CVPO_5spawn_10cs_120kw_cost_lim_{int(cost_limit)}_usr_-5_100_NO_tr_train_envs_12_test_envs_8_run{random.randint(0, 1000)}'
 
         wandb.init(project='safeRL',
                         sync_tensorboard=True,
