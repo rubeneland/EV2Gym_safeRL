@@ -300,7 +300,7 @@ def evaluator():
                 env = gym.make(task)
                 sim_length = env.env.env.simulation_length
 
-                load_path = 'fsrl_logs/TEST_FINAL_10_cs_120kw/no_loads_no_PV_no_DR_CVPO_5spawn_10cs_120kw_cost_lim_15_usr_-5_100_NO_tr_train_envs_8_test_envs_8_run299/checkpoint/model_best.pt'
+                load_path = 'fsrl_logs/TEST_FINAL_10_cs_120kw/no_loads_no_PV_no_DR_CVPO_5spawn_10cs_120kw_cost_lim_80_usr_-4_100_NO_tr_train_envs_8_test_envs_16_run791/checkpoint/model_best.pt'
 
                 # init logger
                 logger = TensorboardLogger("logs", log_txt=True, name=task)

@@ -14,10 +14,7 @@ def transformer_overload_usrpenalty_cost(env, total_costs, user_satisfaction_lis
     #     cost += 50 * tr.get_how_overloaded()                        
     
     for score in user_satisfaction_list:  
-        if score > 0.6:
-            cost += 100*math.exp(-3*score) - 100*math.exp(-3)
-        else:
-            cost += 2*100*math.exp(-3*score) - 2*100*math.exp(-3)
+        cost += 2*100*math.exp(-3*score) - 2*100*math.exp(-3)
 
     # # For every charging station connected to the transformer
     # for cs in env.charging_stations:

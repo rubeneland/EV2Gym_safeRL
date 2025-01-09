@@ -136,8 +136,8 @@ def train_cvpo(args):
         # CVPO arguments
         estep_iter_num: int = 1
         estep_kl: float = 0.02
-        estep_dual_max: float = 10 # was 20
-        estep_dual_lr: float = 0.02
+        estep_dual_max: float = 20 # was 20
+        estep_dual_lr: float = 0.01
         sample_act_num: int = 16
         mstep_iter_num: int = 1
         mstep_kl_mu: float = 0.005
@@ -178,7 +178,7 @@ def train_cvpo(args):
         # Use 1 task in example.sh! More tasks will create more runs...
 
         group_name: str = "TEST_FINAL"
-        run_name= f'e_max_10_no_loads_no_PV_no_DR_CVPO_5spawn_10cs_120kw_cost_lim_{int(cost_limit)}_usr_-3_100_0_6_200_NO_tr_train_envs_8_test_envs_8_run{random.randint(0, 1000)}'
+        run_name= f'lr_0_01_no_loads_no_PV_no_DR_CVPO_5spawn_10cs_120kw_cost_lim_{int(cost_limit)}_usr_-3_200_NO_tr_train_envs_8_test_envs_8_run{random.randint(0, 1000)}'
 
         wandb.init(project='safeRL',
                         sync_tensorboard=True,
