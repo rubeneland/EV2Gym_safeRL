@@ -136,7 +136,7 @@ def train_cvpo(args):
         # CVPO arguments
         estep_iter_num: int = 1
         estep_kl: float = 0.02
-        estep_dual_max: float = 20
+        estep_dual_max: float = 10 # was 20
         estep_dual_lr: float = 0.02
         sample_act_num: int = 16
         mstep_iter_num: int = 1
@@ -162,11 +162,11 @@ def train_cvpo(args):
         buffer_size: int = 200000
         worker: str = "ShmemVectorEnv"
         training_num: int = 8
-        testing_num: int = 16
+        testing_num: int = 8
         # general train params
         batch_size: int = 256
         reward_threshold: float = 10000  # for early stop purpose
-        save_interval: int = 1
+        save_interval: int = 2
         deterministic_eval: bool = True
         action_scaling: bool = True
         action_bound_method: str = "tanh"
@@ -178,7 +178,7 @@ def train_cvpo(args):
         # Use 1 task in example.sh! More tasks will create more runs...
 
         group_name: str = "TEST_FINAL"
-        run_name= f'no_loads_no_PV_no_DR_CVPO_5spawn_10cs_120kw_cost_lim_{int(cost_limit)}_usr_-5_100_NO_tr_train_envs_8_test_envs_16_run{random.randint(0, 1000)}'
+        run_name= f'e_max_10_no_loads_no_PV_no_DR_CVPO_5spawn_10cs_120kw_cost_lim_{int(cost_limit)}_usr_-3_100_0_6_200_NO_tr_train_envs_8_test_envs_8_run{random.randint(0, 1000)}'
 
         wandb.init(project='safeRL',
                         sync_tensorboard=True,
