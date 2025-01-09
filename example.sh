@@ -15,4 +15,4 @@ source "$(conda info --base)/etc/profile.d/conda.sh"
 
 conda activate EV2Gym_srl
 
-srun python train_safe_RL.py --train cvpo --cost_limit 90 --epoch 1000 --estep_lr 0.02 --estep_max 20
+srun python train_safe_RL.py --train cvpo --cost_limit 90 --epoch 1000 --estep_lr 0.02 --estep_max 20 --mstep_kl_mu 0.005 --mstep_kl_std 0.0005

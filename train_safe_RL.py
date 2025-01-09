@@ -140,8 +140,8 @@ def train_cvpo(args):
         estep_dual_lr: float = args.estep_lr # was 0.02
         sample_act_num: int = 16
         mstep_iter_num: int = 1
-        mstep_kl_mu: float = 0.005
-        mstep_kl_std: float = 0.0005
+        mstep_kl_mu: float = args.mstep_kl_mu # was 0.005
+        mstep_kl_std: float = args.mstep_kl_std # was 0.0005
         mstep_dual_max: float = 0.5
         mstep_dual_lr: float = 0.1
         actor_lr: float = 5e-4
@@ -277,6 +277,8 @@ if __name__ == "__main__":
         parser.add_argument("--epoch", type=int, default=1000, help="Number of epochs to train for")
         parser.add_argument("--estep_lr", type=float, default=0.02, help="Learning rate for the E-step")
         parser.add_argument("--estep_max", type=float, default=20, help="Maximum value for the E-step")
+        parser.add_argument("--mstep_kl_mu", type=float, default=0.005, help="KL divergence for the M-step")
+        parser.add_argument("--mstep_kl_std", type=float, default=0.0005, help="KL divergence for the M-step")
         args = parser.parse_args()
         if args.train == "cvpo":        
                 train_cvpo(args)
