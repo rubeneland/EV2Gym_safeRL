@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name="10cs_cost_lim_60_epochs_1000"
+#SBATCH --job-name="lr_0_02_10cs_cost_lim_100_epochs_1000"
 #SBATCH --partition=compute
 #SBATCH --time=3:00:00
 #SBATCH --ntasks=1
@@ -15,4 +15,4 @@ source "$(conda info --base)/etc/profile.d/conda.sh"
 
 conda activate EV2Gym_srl
 
-srun python train_safe_RL.py --train cvpo --cost_limit 70 --epoch 1000
+srun python train_safe_RL.py --train cvpo --cost_limit 150 --epoch 1000 --estep_lr 0.02 --estep_max 20
