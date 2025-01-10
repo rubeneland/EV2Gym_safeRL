@@ -157,12 +157,12 @@ def train_cvpo(args):
         # collecting params
         epoch: int = args.epoch
         episode_per_collect: int = 10
-        step_per_epoch: int = 3000
-        update_per_step: float = 0.1
+        step_per_epoch: int = 5000
+        update_per_step: float = 0.2
         buffer_size: int = 200000
         worker: str = "ShmemVectorEnv"
-        training_num: int = 4
-        testing_num: int = 32
+        training_num: int = args.train_num
+        testing_num: int = args.test_num
         # general train params
         batch_size: int = 256
         reward_threshold: float = 10000  # for early stop purpose
@@ -178,7 +178,7 @@ def train_cvpo(args):
         # Use 1 task in example.sh! More tasks will create more runs...
 
         group_name: str = "TEST_FINAL"
-        run_name= f'32_test_envs_no_loads_no_PV_no_DR_CVPO_5spawn_10cs_120kw_cost_lim_{int(cost_limit)}_usr_-4_100_NO_tr_train_envs_4_test_envs_32_run{random.randint(0, 1000)}'
+        run_name= f'0_1_update_no_loads_no_PV_no_DR_CVPO_5spawn_10cs_120kw_cost_lim_{int(cost_limit)}_usr_-4_100_NO_tr_train_envs_8_test_envs_16_run{random.randint(0, 1000)}'
 
         wandb.init(project='safeRL',
                         sync_tensorboard=True,
@@ -279,6 +279,8 @@ if __name__ == "__main__":
         parser.add_argument("--estep_max", type=float, default=20, help="Maximum value for the E-step")
         parser.add_argument("--mstep_kl_mu", type=float, default=0.005, help="KL divergence for the M-step")
         parser.add_argument("--mstep_kl_std", type=float, default=0.0005, help="KL divergence for the M-step")
+        parser.add_argument("--train_num", type=int, default=8, help="Number of training environments")
+        parser.add_argument("--test_num", type=int, default=16, help="Number of testing environments")
         args = parser.parse_args()
         if args.train == "cvpo":        
                 train_cvpo(args)
