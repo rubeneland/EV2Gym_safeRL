@@ -261,7 +261,7 @@ def evaluator():
 
                 task = "eval"
 
-                load_path = './fsrl_logs/5cs_30kw_7spawn/CPO_5_cs_7_spawn_cost_limit_30_usr_1000_train_envs_12_test_envs_8/checkpoint/model.pt'
+                load_path = './fsrl_logs/5cs_30kw_7spawn/32_test_envs_no_loads_no_PV_no_DR_CVPO_5spawn_10cs_120kw_cost_lim_90_usr_-4_100_NO_tr_train_envs_4_test_envs_32_run442/checkpoint/model_best.pt'
                 # init logger
                 logger = TensorboardLogger("logs", log_txt=True, name=task)
                 agent = CPO(env, logger)
@@ -411,6 +411,7 @@ def evaluator():
                                             'average_user_satisfaction': stats['average_user_satisfaction'],
                                             'power_tracker_violation': stats['power_tracker_violation'],
                                             'tracking_error': stats['tracking_error'],
+                                            'min_energy_user_satisfaction': stats['min_energy_user_satisfaction'],
                                             'total_steps_min_emergency_battery_capacity_violation': stats['total_steps_min_emergency_battery_capacity_violation'],
                                             'energy_tracking_error': stats['energy_tracking_error'],
                                             'energy_user_satisfaction': stats['energy_user_satisfaction'],

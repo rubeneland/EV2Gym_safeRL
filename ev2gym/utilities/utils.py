@@ -239,7 +239,7 @@ def spawn_single_EV(env,
     if env.heterogeneous_specs:
 
         # get charge efficiency from env.ev_specs dict
-        charge_efficiency_v = env.ev_specs[sampled_ev]["ch_efficiency"]
+        charge_efficiency_v = env.ev_specs[sampled_ev]["3ph_ch_efficiency"]
         current_levels = env.ev_specs[sampled_ev]["ch_current"]
         assert len(charge_efficiency_v) == len(current_levels)
         assert all([0 <= x <= 100 for x in charge_efficiency_v])
