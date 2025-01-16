@@ -1,5 +1,5 @@
 '''
-This file contains the cost  and reward functions for the EV2Gym safety environment.
+This file contains the cost and reward functions for the EV2Gym safety environment.
 '''
 import math
 
@@ -9,12 +9,13 @@ def transformer_overload_usrpenalty_cost(env, total_costs, user_satisfaction_lis
     """
     Returns the cost of a transformer overload.
     """
+
     cost = 0
-    # for tr in env.transformers:
-    #     cost += 50 * tr.get_how_overloaded()                        
+    for tr in env.transformers:
+        cost += 1 * tr.get_how_overloaded()                        
     
     for score in user_satisfaction_list:  
-        cost += 100*math.exp(-4*score) - 100*math.exp(-4)
+        cost += 100*math.exp(-3*score) - 100*math.exp(-3)
 
     # # For every charging station connected to the transformer
     # for cs in env.charging_stations:

@@ -177,8 +177,8 @@ def train_cvpo(args):
 
         # Use 1 task in example.sh! More tasks will create more runs...
 
-        group_name: str = "TEST_FINAL"
-        run_name= f'0_1_update_no_loads_no_PV_no_DR_CVPO_5spawn_10cs_120kw_cost_lim_{int(cost_limit)}_usr_-4_100_NO_tr_train_envs_8_test_envs_16_run{random.randint(0, 1000)}'
+        group_name: str = "Tr_cost"
+        run_name= f'tr_cost_loads_PV_no_DR_CVPO_5spawn_10cs_90kw_cost_lim_{int(cost_limit)}_usr_-3_100_tr_1_train_envs_2_test_envs_50_run{random.randint(0, 1000)}'
 
         wandb.init(project='safeRL',
                         sync_tensorboard=True,
@@ -279,8 +279,8 @@ if __name__ == "__main__":
         parser.add_argument("--estep_max", type=float, default=20, help="Maximum value for the E-step")
         parser.add_argument("--mstep_kl_mu", type=float, default=0.005, help="KL divergence for the M-step")
         parser.add_argument("--mstep_kl_std", type=float, default=0.0005, help="KL divergence for the M-step")
-        parser.add_argument("--train_num", type=int, default=8, help="Number of training environments")
-        parser.add_argument("--test_num", type=int, default=16, help="Number of testing environments")
+        parser.add_argument("--train_num", type=int, default=4, help="Number of training environments")
+        parser.add_argument("--test_num", type=int, default=50, help="Number of testing environments")
         args = parser.parse_args()
         if args.train == "cvpo":        
                 train_cvpo(args)
