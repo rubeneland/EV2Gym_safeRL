@@ -178,7 +178,7 @@ def train_cvpo(args):
         # Use 1 task in example.sh! More tasks will create more runs...
 
         group_name: str = "Tr_cost"
-        run_name= f'tr_cost_loads_PV_no_DR_CVPO_5spawn_10cs_90kw_cost_lim_{int(cost_limit)}_usr_-3_100_tr_1_train_envs_2_test_envs_50_run{random.randint(0, 1000)}'
+        run_name= f'v2g_cost_loads_PV_no_DR_CVPO_5spawn_10cs_90kw_cost_lim_{int(cost_limit)}_usr_-3_100_tr_0_train_envs_2_test_envs_50_run{random.randint(0, 1000)}'
 
         wandb.init(project='safeRL',
                         sync_tensorboard=True,
@@ -188,7 +188,7 @@ def train_cvpo(args):
                         )
 
         # init logger
-        logger = WandbLogger(log_dir="fsrl_logs/TEST_FINAL_10_cs_120kw", log_txt=True, group=group_name, name=run_name)
+        logger = WandbLogger(log_dir="fsrl_logs/TEST_FINAL_10_cs_90kw", log_txt=True, group=group_name, name=run_name)
 
         env = gym.make(task)
         # env.spec.max_episode_steps = env.env.env.simulation_length

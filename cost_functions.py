@@ -11,25 +11,23 @@ def transformer_overload_usrpenalty_cost(env, total_costs, user_satisfaction_lis
     """
 
     cost = 0
-    for tr in env.transformers:
-        cost += 1 * tr.get_how_overloaded()                        
+    # for tr in env.transformers:
+    #     cost += 1 * tr.get_how_overloaded()                        
     
     for score in user_satisfaction_list:  
         cost += 100*math.exp(-3*score) - 100*math.exp(-3)
 
-    # # For every charging station connected to the transformer
-    # for cs in env.charging_stations:
+    # For every charging station connected to the transformer
+    for cs in env.charging_stations:
 
-    #         # For every EV connected to the charging station
-    #         for EV in cs.evs_connected:
-    #             # If there is an EV connected
-    #             if EV is not None:
-    #                 # If the EV is charging and the SOC is at maximum
-    #                 if EV.current_capacity >= EV.desired_capacity and EV.actual_current > 0:
-    #                     cost += 4
-    #                 # If the EV is discharged and the SOC is at minimum
-    #                 if EV.current_capacity <= EV.min_battery_capacity and EV.actual_current < 0:
-    #                     cost += 4
+            # For every EV connected to the charging station
+            for EV in cs.evs_connected:
+                # If there is an EV connected
+                if EV is not None:
+                    # Add cost for discharging action when SOC below min V2G threshold: 40%
+                    if EV.get_SOC() <= 0.4 and EV.get_action() < 0:
+                        cost += (0.4 - EV.get_SOC()) * 100
+                    
 
 
     # cost for charging action when SOC at maximum
