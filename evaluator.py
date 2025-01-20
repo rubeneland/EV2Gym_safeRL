@@ -261,7 +261,7 @@ def evaluator():
 
                 task = "eval"
 
-                load_path = './fsrl_logs/5cs_30kw_7spawn/32_test_envs_no_loads_no_PV_no_DR_CVPO_5spawn_10cs_120kw_cost_lim_90_usr_-4_100_NO_tr_train_envs_4_test_envs_32_run442/checkpoint/model_best.pt'
+                load_path = './fsrl_logs/5cs_30kw_7spawn/50_test_envs_no_loads_no_PV_no_DR_CVPO_5spawn_10cs_120kw_cost_lim_90_usr_-4_100_NO_tr_train_envs_4_test_envs_50_run422/checkpoint/model_best.pt'
                 # init logger
                 logger = TensorboardLogger("logs", log_txt=True, name=task)
                 agent = CPO(env, logger)
@@ -300,7 +300,7 @@ def evaluator():
                 env = gym.make(task)
                 sim_length = env.env.env.simulation_length
 
-                load_path = 'fsrl_logs/TEST_FINAL_10_cs_120kw/no_loads_no_PV_no_DR_CVPO_5spawn_10cs_120kw_cost_lim_80_usr_-4_100_NO_tr_train_envs_8_test_envs_16_run791/checkpoint/model_best.pt'
+                load_path = 'fsrl_logs/TEST_FINAL_10_cs_90kw/no_tr_cost_loads_PV_no_DR_CVPO_5spawn_10cs_90kw_cost_lim_80_usr_-3_100_tr_0_train_envs_2_test_envs_50_run923/checkpoint/model_best.pt'
 
                 # init logger
                 logger = TensorboardLogger("logs", log_txt=True, name=task)
@@ -455,7 +455,7 @@ def evaluator():
     print(results_grouped[['total_transformer_overload', 'time']])
     print(results_grouped[['total_reward', 'total_profits', 'total_ev_served']])
     print(results_grouped[['total_energy_charged', 'total_energy_discharged']])
-    print(results_grouped[['average_user_satisfaction']])
+    print(results_grouped[['average_user_satisfaction', 'min_energy_user_satisfaction']])
     # input('Press Enter to continue')
 
     algorithm_names = []

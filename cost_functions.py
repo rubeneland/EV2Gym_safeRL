@@ -24,10 +24,10 @@ def transformer_overload_usrpenalty_cost(env, total_costs, user_satisfaction_lis
             for EV in cs.evs_connected:
                 # If there is an EV connected
                 if EV is not None:
-                    # Add cost for discharging action when SOC below min V2G threshold: 40%
-                    if EV.get_SOC() <= 0.4 and EV.get_action() < 0:
-                        cost += (0.4 - EV.get_SOC()) * 100
-                    
+                    # Add cost for discharging action when SOC below min V2G threshold: 40% + 5% for safety
+                    soc = EV.get_soc()
+                    if soc <= 0.45 and EV.actual_current < 0:
+                        cost += (0.45 - soc) * 10
 
 
     # cost for charging action when SOC at maximum
