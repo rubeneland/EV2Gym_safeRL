@@ -13,7 +13,7 @@ def transformer_overload_usrpenalty_cost(env, total_costs, user_satisfaction_lis
     cost = 0
 
     for tr in env.transformers:
-        cost += 20 * tr.get_how_overloaded()                        
+        cost += 100 * tr.get_how_overloaded()                        
     
     for score in user_satisfaction_list:  
         cost += 100*math.exp(-3*score) - 100*math.exp(-3)
@@ -28,7 +28,7 @@ def transformer_overload_usrpenalty_cost(env, total_costs, user_satisfaction_lis
                     # Add cost for discharging action when SOC below min V2G threshold: 40%
                     soc = EV.get_soc()
                     if soc <= 0.4 and EV.actual_current < 0:
-                        cost += (0.4 - soc) * 100
+                        cost += (0.4 - soc) * 200
 
 
     # cost for charging action when SOC at maximum
@@ -42,12 +42,6 @@ def transformer_overload_usrpenalty_cost(env, total_costs, user_satisfaction_lis
 
 def ProfitMax_TrPenalty_UserIncentives_safety(env, total_costs, user_satisfaction_list, *args):
     
-    reward = total_costs
-
-    # for tr in env.transformers:
-    #     reward -= 100 * tr.get_how_overloaded()                        
-    
-    # for score in user_satisfaction_list:        
-    #     reward -= 100 * math.exp(-10*score)        
+    reward = total_costs       
         
     return reward

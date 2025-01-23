@@ -1,7 +1,7 @@
 #!/bin/bash
-#SBATCH --job-name="v2gcost_10cs"
+#SBATCH --job-name="allcost_10cs"
 #SBATCH --partition=compute
-#SBATCH --time=6:00:00
+#SBATCH --time=8:00:00
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=1
 #SBATCH --mem-per-cpu=20G
@@ -15,4 +15,4 @@ source "$(conda info --base)/etc/profile.d/conda.sh"
 
 conda activate EV2Gym_srl
 
-srun python train_safe_RL.py --train ppol --cost_limit 60 --epoch 400 --train_num 2 --test_num 50
+srun python train_safe_RL.py --train sacl --cost_limit 80 --epoch 400 --train_num 10 --test_num 50

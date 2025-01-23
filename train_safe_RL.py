@@ -399,16 +399,16 @@ def train_sacl(args):
         lagrangian_pid: Tuple[float, ...] = (0.05, 0.0005, 0.1)
         rescaling: bool = True
         # Base policy common arguments
-        gamma: float = 0.97
+        gamma: float = 0.99
         deterministic_eval: bool = True
         action_scaling: bool = True
         action_bound_method: str = "clip"
         # collecting params
         epoch: int = args.epoch
         episode_per_collect: int = 2
-        step_per_epoch: int = 10000
+        step_per_epoch: int = 5000
         update_per_step: float = 0.2
-        buffer_size: int = 100000
+        buffer_size: int = 200000
         worker: str = "ShmemVectorEnv"
         training_num: int = args.train_num
         testing_num: int = args.test_num
@@ -423,7 +423,7 @@ def train_sacl(args):
 
         # logger params
         group_name: str = "all_cost"
-        run_name= f'v6_sacl_2023data_all_cost_100_v2g_cost_40_loads_PV_no_DR_5spawn_10cs_90kw_cost_lim_{int(cost_limit)}_usr_-3_100_tr_20_run{random.randint(0, 1000)}'
+        run_name= f'v8_gamma_098_sacl_2023data_all_cost_200_v2g_cost_40_loads_PV_no_DR_5spawn_10cs_90kw_cost_lim_{int(cost_limit)}_usr_-3_100_tr_100_train_envs_{training_num}_test_envs_{testing_num}_run{random.randint(0, 1000)}'
 
         wandb.init(project='safeRL',
                         sync_tensorboard=True,
