@@ -423,7 +423,7 @@ def train_sacl(args):
 
         # logger params
         group_name: str = "all_cost"
-        run_name= f'v9_gamma_098_sacl_2023data_all_cost_100_v2g_cost_40_loads_PV_no_DR_5spawn_10cs_90kw_cost_lim_{int(cost_limit)}_usr_-3_100_tr_50_train_envs_{training_num}_test_envs_{testing_num}_run{random.randint(0, 1000)}'
+        run_name= f'v10_new_state_gamma_098_sacl_2023data_all_cost_100_v2g_cost_40_loads_PV_no_DR_5spawn_10cs_90kw_cost_lim_{int(cost_limit)}_usr_-3_100_tr_50_train_envs_{training_num}_test_envs_{testing_num}_run{random.randint(0, 1000)}'
 
         wandb.init(project='safeRL',
                         sync_tensorboard=True,
