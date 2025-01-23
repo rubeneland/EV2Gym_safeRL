@@ -78,9 +78,9 @@ def V2G_profit_max(env, *args):
     state.append(env.current_power_usage[env.current_step-1])
 
     charge_prices = abs(env.charge_prices[0, env.current_step:
-        env.current_step+28]) # 28 steps = 7 hours, too many will make it to hard to learn for agent
+        env.current_step+36]) # 28 steps = 7 hours, too many will make it to hard to learn for agent. 32 = 8 hours
     
-    if len(charge_prices) < 28:
+    if len(charge_prices) < 36:
         charge_prices = np.append(charge_prices, np.zeros(28-len(charge_prices)))
     
     state.append(charge_prices)
@@ -102,7 +102,6 @@ def V2G_profit_max(env, *args):
                     if EV is not None:
                         state.append([
                             EV.get_soc(),
-                            EV.min_emergency_battery_capacity,
                             EV.time_of_departure - env.current_step,
                             ])
 
