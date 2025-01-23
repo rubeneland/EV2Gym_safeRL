@@ -131,7 +131,7 @@ def train_cvpo(args):
         task: str = "fsrl-v0"
         cost_limit: float = args.cost_limit
         device: str = "cpu"
-        thread: int = 8  # if use "cpu" to train
+        thread: int = 4  # if use "cpu" to train
         seed: int = 10
         # CVPO arguments
         estep_iter_num: int = 1
@@ -233,23 +233,6 @@ def train_cvpo(args):
         train_envs = worker([lambda: SpecMaxStepsWrapper(gym.make(task), sim_length) for _ in range(training_num)])
         test_envs = worker([lambda: SpecMaxStepsWrapper(gym.make(task), sim_length) for _ in range(testing_num)])
 
-        # train_envs = []
-        # test_envs = []  
-
-        # for i in range(training_num):
-        #         temp_train = gym.make(task)
-        #         temp_train.spec.max_episode_steps = env.env.env.simulation_length
-        #         train_envs.append(temp_train)
-
-        # train_envs = ShmemVectorEnv(train_envs)
-
-        # for i in range(testing_num):
-        #         temp_test = gym.make(task)
-        #         temp_test.spec.max_episode_steps = env.env.env.simulation_length
-        #         test_envs.append(temp_test)
-
-        # test_envs = ShmemVectorEnv(test_envs)
-
         # start training
         agent.learn(
                 train_envs=train_envs,
@@ -265,6 +248,131 @@ def train_cvpo(args):
                 save_interval=save_interval,
                 resume=resume,
                 save_ckpt=save_ckpt,  # set this to True to save the policy model,
+                verbose=verbose,
+        )
+
+def train_ppol(args):
+        # general task params
+        task: str = "fsrl-v0"
+        cost_limit: float = args.cost_limit
+        device: str = "cpu"
+        thread: int = 4  # if use "cpu" to train
+        seed: int = 10
+        # algorithm params
+        lr: float = 5e-4
+        hidden_sizes: Tuple[int, ...] = (128, 128)
+        unbounded: bool = False
+        last_layer_scale: bool = False
+        # PPO specific arguments
+        target_kl: float = 0.02
+        vf_coef: float = 0.25
+        max_grad_norm: float = 0.5
+        gae_lambda: float = 0.95
+        eps_clip: float = 0.2
+        dual_clip: float = None
+        value_clip: bool = False  # no need
+        norm_adv: bool = True  # good for improving training stability
+        recompute_adv: bool = False
+        # Lagrangian specific arguments
+        use_lagrangian: bool = True
+        lagrangian_pid: Tuple[float, ...] = (0.05, 0.0005, 0.1)
+        rescaling: bool = True
+        # Base policy common arguments
+        gamma: float = 0.99
+        max_batchsize: int = 100000
+        rew_norm: bool = False  # no need, it will slow down training and decrease final perf
+        deterministic_eval: bool = True
+        action_scaling: bool = True
+        action_bound_method: str = "clip"
+        # collecting params
+        epoch: int = args.epoch
+        episode_per_collect: int = 20
+        step_per_epoch: int = 5000
+        repeat_per_collect: int = 2  # increasing this can improve efficiency, but less stability
+        buffer_size: int = 100000
+        worker: str = "ShmemVectorEnv"
+        training_num: int = args.train_num
+        testing_num: int = args.test_num
+        # general params
+        batch_size: int = 256
+        reward_threshold: float = 10000  # for early stop purpose
+        save_interval: int = 1
+        resume: bool = False  # TODO
+        save_ckpt: bool = True  # set this to True to save the policy model
+        verbose: bool = True
+        render: bool = False
+        # logger params
+        
+        group_name: str = "all_cost"
+        run_name= f'v5_ppol_2023data_all_cost_estep_lr_0_001_100_v2g_cost_<40_loads_PV_no_DR_5spawn_10cs_90kw_cost_lim_{int(cost_limit)}_usr_-3_100_tr_20_run{random.randint(0, 1000)}'
+
+        wandb.init(project='safeRL',
+                        sync_tensorboard=True,
+                        group=group_name,
+                        name=run_name,
+                        save_code=True,
+                        )
+
+        # init logger
+        logger = WandbLogger(log_dir="fsrl_logs/TEST_FINAL_10_cs_90kw", log_txt=True, group=group_name, name=run_name)
+
+        env = gym.make(task)
+        # env.spec.max_episode_steps = env.env.env.simulation_length
+
+        sim_length = env.env.env.simulation_length
+
+        agent = PPOLagAgent(
+        env=env,
+        logger=logger,
+        device=device,
+        thread=thread,
+        seed=seed,
+        lr=lr,
+        hidden_sizes=hidden_sizes,
+        unbounded=unbounded,
+        last_layer_scale=last_layer_scale,
+        target_kl=target_kl,
+        vf_coef=vf_coef,
+        max_grad_norm=max_grad_norm,
+        gae_lambda=gae_lambda,
+        eps_clip=eps_clip,
+        dual_clip=dual_clip,
+        value_clip=value_clip,
+        advantage_normalization=norm_adv,
+        recompute_advantage=recompute_adv,
+        use_lagrangian=use_lagrangian,
+        lagrangian_pid=lagrangian_pid,
+        cost_limit=cost_limit,
+        rescaling=rescaling,
+        gamma=gamma,
+        max_batchsize=max_batchsize,
+        reward_normalization=rew_norm,
+        deterministic_eval=deterministic_eval,
+        action_scaling=action_scaling,
+        action_bound_method=action_bound_method,
+    )
+
+        training_num = min(training_num, episode_per_collect)
+        worker = eval(worker)
+        train_envs = worker([lambda: SpecMaxStepsWrapper(gym.make(task), sim_length) for _ in range(training_num)])
+        test_envs = worker([lambda: SpecMaxStepsWrapper(gym.make(task), sim_length) for _ in range(testing_num)])
+
+        # start training
+            # start training
+        agent.learn(
+                train_envs=train_envs,
+                test_envs=test_envs,
+                epoch=epoch,
+                episode_per_collect=episode_per_collect,
+                step_per_epoch=step_per_epoch,
+                repeat_per_collect=repeat_per_collect,
+                buffer_size=buffer_size,
+                testing_num=testing_num,
+                batch_size=batch_size,
+                reward_threshold=reward_threshold,
+                save_interval=save_interval,
+                resume=resume,
+                save_ckpt=save_ckpt,
                 verbose=verbose,
         )
 
