@@ -288,7 +288,7 @@ def train_ppol(args):
         epoch: int = args.epoch
         episode_per_collect: int = 20
         step_per_epoch: int = 5000
-        repeat_per_collect: int = 2  # increasing this can improve efficiency, but less stability
+        repeat_per_collect: int = 4  # increasing this can improve efficiency, but less stability
         buffer_size: int = 100000
         worker: str = "ShmemVectorEnv"
         training_num: int = args.train_num
@@ -394,5 +394,7 @@ if __name__ == "__main__":
                 train_cvpo(args)
         elif args.train == "cpo":
                 train_cpo(args)
+        elif args.train == "ppol":
+                train_ppol(args)
         else:   
                 print("Invalid training algorithm. Please choose either 'cpo' or 'cvpo'")
