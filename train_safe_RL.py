@@ -61,7 +61,7 @@ class SpecMaxStepsWrapper(Wrapper):
 # Environment configuration
 config_file = "V2GProfit_base.yaml"
 reward_function = ProfitMax_TrPenalty_UserIncentives_safety
-state_function = V2G_profit_max
+state_function = V2G_profit_max_loads
 cost_function = transformer_overload_usrpenalty_cost
 
 # Register the custom environment

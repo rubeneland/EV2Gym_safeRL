@@ -234,7 +234,7 @@ def spawn_single_EV(env,
     # min_emergency_battery_capacity = env.config["ev"]["min_emergency_battery_capacity"]
 
     # if min_emergency_battery_capacity > battery_capacity:
-    #     min_emergency_battery_capacity = 0.7*battery_capacity
+        # min_emergency_battery_capacity = 0.7*battery_capacity
 
     if env.heterogeneous_specs:
 

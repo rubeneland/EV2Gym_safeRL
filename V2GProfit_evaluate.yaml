@@ -132,7 +132,7 @@ ev:
   #The following values are also used if "heterogeneous_ev_specs = True"
   min_battery_capacity: 5 # in kWh
   min_time_of_stay: 60 # in minutes
-  min_emergency_battery_capacity: 25 # in kWh
+  # min_emergency_battery_capacity: 25 # in kWh
   desired_capacity: 1 # in (0-1) (0% - 100%)
   #if trasition_soc is < 1, the curve of the line is affected by:
   transition_soc_multiplier: 5 # default 1 (the higher the number the shorter the effect of CCCV region)

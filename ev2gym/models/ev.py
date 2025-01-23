@@ -51,7 +51,7 @@ class EV():
                  desired_capacity=None,  # kWh
                  battery_capacity=50,  # kWh
                  min_battery_capacity=10,  # kWh
-                 min_emergency_battery_capacity=25,  # kWh
+                #  min_emergency_battery_capacity=25,  # kWh
                  max_ac_charge_power=22,  # kW
                  min_ac_charge_power=0,  # kW
                  max_dc_charge_power=50,  # kW
@@ -78,7 +78,7 @@ class EV():
         # EV technical characteristics
         self.battery_capacity = battery_capacity  # kWh
         self.min_battery_capacity = min_battery_capacity  # kWh
-        self.min_emergency_battery_capacity = min_emergency_battery_capacity  # kWh
+        # self.min_emergency_battery_capacity = min_emergency_battery_capacity  # kWh
         self.max_ac_charge_power = max_ac_charge_power  # kW
         self.min_ac_charge_power = min_ac_charge_power  # kW
         self.max_discharge_power = max_discharge_power  # kW
@@ -102,7 +102,7 @@ class EV():
         self.total_energy_exchanged = 0
         self.max_energy_AFAP = 0
         # timesteps that the EV is discharged below the minimum emergency battery capacity
-        self.min_emergency_battery_capacity_metric = 0
+        # self.min_emergency_battery_capacity_metric = 0
 
         # Baterry degradation
         self.abs_total_energy_exchanged = 0
@@ -126,7 +126,7 @@ class EV():
         self.total_energy_exchanged = 0
         self.c_lost = 0
         self.max_energy_AFAP = 0
-        self.min_emergency_battery_capacity_metric = 0
+        # self.min_emergency_battery_capacity_metric = 0
 
         self.abs_total_energy_exchanged = 0
         self.historic_soc = []
@@ -395,8 +395,8 @@ class EV():
 
         self.required_energy = self.required_energy + self.current_energy
 
-        if prev_capacity > self.min_emergency_battery_capacity and self.current_capacity < self.min_emergency_battery_capacity:
-            self.min_emergency_battery_capacity_metric += 1        
+        # if prev_capacity > self.min_emergency_battery_capacity and self.current_capacity < self.min_emergency_battery_capacity:
+        #     self.min_emergency_battery_capacity_metric += 1        
 
         assert given_energy <= 0
         return given_energy*60/self.timescale * 1000 / voltage
