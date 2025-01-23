@@ -16,8 +16,8 @@ day: 17 # 1-31
 # Whether to get a random date every time the environment is reset
 random_day: True # True or False
 
-start_training_year: 2020
-training_years: 3.99 # 2020, 2021, 2022, 2023
+start_training_year: 2023
+training_years: 1 # 2023
 
 # Simulation Starting Time
 # Hour and minute do not change after the environment has been reset
@@ -102,7 +102,7 @@ ev_specs_file: ./ev2gym/data/ev_specs_v2g_enabled2024.json # path to the file wi
 
 # Default Transformer model
 transformer:
-  max_power: 90 # in kW
+  max_power: 120 # in kW
 
 # Default Charging Station model
 charging_station:  

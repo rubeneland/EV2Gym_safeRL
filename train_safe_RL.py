@@ -158,7 +158,7 @@ def train_cvpo(args):
         epoch: int = args.epoch
         episode_per_collect: int = 10
         step_per_epoch: int = 5000
-        update_per_step: float = 0.2
+        update_per_step: float = 0.1
         buffer_size: int = 200000
         worker: str = "ShmemVectorEnv"
         training_num: int = args.train_num
@@ -166,7 +166,7 @@ def train_cvpo(args):
         # general train params
         batch_size: int = 256
         reward_threshold: float = 10000  # for early stop purpose
-        save_interval: int = 2
+        save_interval: int = 1
         deterministic_eval: bool = True
         action_scaling: bool = True
         action_bound_method: str = "tanh"
@@ -177,8 +177,8 @@ def train_cvpo(args):
 
         # Use 1 task in example.sh! More tasks will create more runs...
 
-        group_name: str = "Tr_cost"
-        run_name= f'v2g_cost_loads_PV_no_DR_CVPO_5spawn_10cs_90kw_cost_lim_{int(cost_limit)}_usr_-3_100_tr_0_train_envs_{training_num}_test_envs_{testing_num}_run{random.randint(0, 1000)}'
+        group_name: str = "all_cost"
+        run_name= f'v4_2023data_all_cost_estep_lr_0_001_100_v2g_cost_<40_loads_PV_no_DR_CVPO_5spawn_10cs_90kw_cost_lim_{int(cost_limit)}_usr_-3_100_tr_20_run{random.randint(0, 1000)}'
 
         wandb.init(project='safeRL',
                         sync_tensorboard=True,
