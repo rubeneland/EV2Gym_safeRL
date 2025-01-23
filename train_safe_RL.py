@@ -264,7 +264,7 @@ def train_ppol(args):
         unbounded: bool = False
         last_layer_scale: bool = False
         # PPO specific arguments
-        target_kl: float = 0.02
+        target_kl: float = 0.05
         vf_coef: float = 0.25
         max_grad_norm: float = 0.5
         gae_lambda: float = 0.95
