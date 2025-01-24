@@ -146,7 +146,7 @@ def train_cvpo(args):
         mstep_dual_lr: float = 0.1
         actor_lr: float = 5e-4
         critic_lr: float = 1e-3
-        gamma: float = 0.97
+        gamma: float = 0.99
         n_step: int = 2
         tau: float = 0.05
         hidden_sizes: Tuple[int, ...] = (128, 128)
@@ -156,9 +156,9 @@ def train_cvpo(args):
         last_layer_scale: bool = False
         # collecting params
         epoch: int = args.epoch
-        episode_per_collect: int = args.train_num
+        episode_per_collect: int = 10
         step_per_epoch: int = 5000
-        update_per_step: float = 0.1
+        update_per_step: float = 0.2
         buffer_size: int = 200000
         worker: str = "ShmemVectorEnv"
         training_num: int = args.train_num
@@ -178,7 +178,7 @@ def train_cvpo(args):
         # Use 1 task in example.sh! More tasks will create more runs...
 
         group_name: str = "all_cost"
-        run_name= f'v4_2023data_all_cost_estep_lr_0_001_100_v2g_cost_<40_loads_PV_no_DR_CVPO_5spawn_10cs_90kw_cost_lim_{int(cost_limit)}_usr_-3_100_tr_20_run{random.randint(0, 1000)}'
+        run_name= f'CVPO_h20_1powerlimit_sacl_100_v2g_cost_40_loads_PV_no_DR_5spawn_10cs_90kw_cost_lim_{int(cost_limit)}_usr_-3_100_tr_30_train_envs_{training_num}_test_envs_{testing_num}_run{random.randint(0, 1000)}'
 
         wandb.init(project='safeRL',
                         sync_tensorboard=True,
@@ -228,7 +228,7 @@ def train_cvpo(args):
                 lr_scheduler=None
         )
 
-        # training_num = min(training_num, episode_per_collect)
+        training_num = min(training_num, episode_per_collect)
         worker = eval(worker)
         train_envs = worker([lambda: SpecMaxStepsWrapper(gym.make(task), sim_length) for _ in range(training_num)])
         test_envs = worker([lambda: SpecMaxStepsWrapper(gym.make(task), sim_length) for _ in range(testing_num)])
@@ -304,7 +304,7 @@ def train_ppol(args):
 
         # logger params
         group_name: str = "all_cost"
-        run_name= f'v5_ppol_2023data_all_cost_estep_lr_0_001_100_v2g_cost_<40_loads_PV_no_DR_5spawn_10cs_90kw_cost_lim_{int(cost_limit)}_usr_-3_100_tr_20_run{random.randint(0, 1000)}'
+        run_name= f'PPOL_h20_1powerlimit_sacl_100_v2g_cost_40_loads_PV_no_DR_5spawn_10cs_90kw_cost_lim_{int(cost_limit)}_usr_-3_100_tr_30_train_envs_{training_num}_test_envs_{testing_num}_run{random.randint(0, 1000)}'
 
         wandb.init(project='safeRL',
                         sync_tensorboard=True,
@@ -423,7 +423,7 @@ def train_sacl(args):
 
         # logger params
         group_name: str = "all_cost"
-        run_name= f'v13_loads_state_h20_h8_gamma_098_sacl_2023data_all_cost_100_v2g_cost_40_loads_PV_no_DR_5spawn_10cs_90kw_cost_lim_{int(cost_limit)}_usr_-3_100_tr_50_train_envs_{training_num}_test_envs_{testing_num}_run{random.randint(0, 1000)}'
+        run_name= f'v15_h20_h20_1powerlimit_sacl_100_v2g_cost_40_loads_PV_no_DR_5spawn_10cs_90kw_cost_lim_{int(cost_limit)}_usr_-3_100_tr_30_train_envs_{training_num}_test_envs_{testing_num}_run{random.randint(0, 1000)}'
 
         wandb.init(project='safeRL',
                         sync_tensorboard=True,
