@@ -143,9 +143,9 @@ def V2G_profit_max_loads(env, *args): #no Demand Respone ?
     # For every transformer
     for tr in env.transformers:
         loads, pv = tr.get_load_pv_forecast(step = env.current_step,
-                                            horizon = 8)
+                                            horizon = h)
         power_limits = tr.get_power_limits(step = env.current_step,
-                                           horizon = 8)
+                                           horizon = h)
         state.append(loads-pv)
         state.append(power_limits)
         

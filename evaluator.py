@@ -38,6 +38,7 @@ from cost_functions import transformer_overload_usrpenalty_cost, ProfitMax_TrPen
 
 from fsrl.agent import CPOAgent as CPO
 from fsrl.agent import CVPOAgent as CVPO
+from fsrl.agent import SACLagAgent as SACLag
 from fsrl.utils import TensorboardLogger
 
 import gymnasium as gym
@@ -125,7 +126,7 @@ def evaluator():
         cost_function = transformer_overload_usrpenalty_cost
     elif config_file == "V2GProfit_evaluate.yaml":
         reward_function = ProfitMax_TrPenalty_UserIncentives
-        state_function = V2G_profit_max
+        state_function = V2G_profit_max_loads
         cost_function = transformer_overload_usrpenalty_cost
     else:
         raise ValueError('Unknown config file')
@@ -169,7 +170,8 @@ def evaluator():
         # V2GProfitMaxOracle,
         # PowerTrackingErrorrMin
         # CPO,
-        CVPO
+        # CVPO,
+        SACLag
     ]
 
 
@@ -323,6 +325,45 @@ def evaluator():
                 timer = time.time()
                 state, _ = env.reset()
 
+            elif algorithm == SACLag:
+                gym.envs.register(id='eval', entry_point='ev2gym.models.ev2gym_env:EV2Gym',
+                      kwargs={'config_file': config_file,
+                              'verbose': False,
+                              'save_plots': False,
+                              'generate_rnd_game': True,
+                              'reward_function': reward_function,
+                              'state_function': state_function,
+                              'cost_function': cost_function,
+                              })
+
+                task = "eval"
+
+                env = gym.make(task)
+                sim_length = env.env.env.simulation_length
+
+                load_path = 'fsrl_logs/TEST_FINAL_10_cs_90kw/v12/checkpoint/model_best.pt'
+
+                # init logger
+                logger = TensorboardLogger("logs", log_txt=True, name=task)
+                agent = SACLag(SpecMaxStepsWrapper(env, sim_length), logger)
+                model = agent.policy
+                state_dict = (torch.load(load_path))
+                model.load_state_dict(state_dict['model'])
+                model = model.actor
+                model.eval()
+
+                env = ev2gym_env.EV2Gym(
+                    config_file=config_file,
+                    load_from_replay_path=replay_path,
+                    generate_rnd_game=True,
+                    state_function=state_function,
+                    reward_function=reward_function,
+                )
+
+                # initialize the timer
+                timer = time.time()
+                state, _ = env.reset()
+
             else:
                 env = ev2gym_env.EV2Gym(
                     config_file=config_file,
@@ -382,7 +423,7 @@ def evaluator():
 
                     stats = stats[0]
                     print(stats)
-                elif algorithm == CPO or algorithm == CVPO:
+                elif algorithm == CPO or algorithm == CVPO or algorithm == SACLag:
                     
                     # reshape the state to 1 x n_features
                     state = state.reshape(1, -1)
@@ -412,7 +453,7 @@ def evaluator():
                                             'power_tracker_violation': stats['power_tracker_violation'],
                                             'tracking_error': stats['tracking_error'],
                                             'min_energy_user_satisfaction': stats['min_energy_user_satisfaction'],
-                                            'total_steps_min_emergency_battery_capacity_violation': stats['total_steps_min_emergency_battery_capacity_violation'],
+                                            # 'total_steps_min_emergency_battery_capacity_violation': stats['total_steps_min_emergency_battery_capacity_violation'],
                                             'energy_tracking_error': stats['energy_tracking_error'],
                                             'energy_user_satisfaction': stats['energy_user_satisfaction'],
                                             'total_transformer_overload': stats['total_transformer_overload'],
