@@ -134,20 +134,20 @@ def V2G_profit_max_loads(env, *args): #no Demand Respone ?
     
     state.append(charge_prices)
 
-    # for tr in env.transformers:
-    #     if env.current_step < env.simulation_length:
-    #         state.append(tr.max_power[env.current_step])
-    #     else:
-    #         state.append(0)
+    for tr in env.transformers:
+        if env.current_step < env.simulation_length:
+            state.append(tr.max_power[env.current_step])
+        else:
+            state.append(0)
     
     # For every transformer
     for tr in env.transformers:
         loads, pv = tr.get_load_pv_forecast(step = env.current_step,
                                             horizon = h)
-        power_limits = tr.get_power_limits(step = env.current_step,
-                                           horizon = h)
+        # power_limits = tr.get_power_limits(step = env.current_step,
+        #                                    horizon = h)
         state.append(loads-pv)
-        state.append(power_limits)
+        # state.append(power_limits)
         
         # For every charging station connected to the transformer
         for cs in env.charging_stations:
