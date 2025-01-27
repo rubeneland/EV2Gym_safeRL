@@ -81,7 +81,7 @@ def evaluator():
     timescale = config["timescale"]
     simulation_length = config["simulation_length"]
 
-    n_test_cycles = 50
+    n_test_cycles = 100
 
     scenario = config_file.split("/")[-1].split(".")[0]
     eval_replay_path = f'./replay/CPO_base/min_c_1_usr_1000/{number_of_charging_stations}cs_{n_transformers}tr_{scenario}/'
@@ -170,7 +170,7 @@ def evaluator():
         # V2GProfitMaxOracle,
         # PowerTrackingErrorrMin
         # CPO,
-        # CVPO,
+        CVPO,
         SACLag
     ]
 
@@ -302,7 +302,7 @@ def evaluator():
                 env = gym.make(task)
                 sim_length = env.env.env.simulation_length
 
-                load_path = 'fsrl_logs/TEST_FINAL_10_cs_90kw/v2_all_cost_v2g_cost_45_loads_PV_no_DR_CVPO_5spawn_10cs_90kw_cost_lim_90_usr_-3_100_tr_20_train_envs_2_test_envs_50_run805/checkpoint/model_best.pt'
+                load_path = 'fsrl_logs/TEST_FINAL_10_cs_90kw/CVPO_h20_1powerlimit_sacl_100_v2g_cost_40_loads_PV_no_DR_5spawn_10cs_90kw_cost_lim_80_usr_-3_100_tr_30_train_envs_10_test_envs_50_run512/checkpoint/model_best.pt'
 
                 # init logger
                 logger = TensorboardLogger("logs", log_txt=True, name=task)
@@ -341,7 +341,7 @@ def evaluator():
                 env = gym.make(task)
                 sim_length = env.env.env.simulation_length
 
-                load_path = 'fsrl_logs/TEST_FINAL_10_cs_90kw/v12/checkpoint/model_best.pt'
+                load_path = 'fsrl_logs/TEST_FINAL_10_cs_90kw/v15/checkpoint/model_best.pt'
 
                 # init logger
                 logger = TensorboardLogger("logs", log_txt=True, name=task)
