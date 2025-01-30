@@ -156,7 +156,7 @@ def train_cvpo(args):
         last_layer_scale: bool = False
         # collecting params
         epoch: int = args.epoch
-        episode_per_collect: int = 4
+        episode_per_collect: int = 10
         step_per_epoch: int = 5000
         update_per_step: float = 0.2
         buffer_size: int = 200000
@@ -178,7 +178,7 @@ def train_cvpo(args):
         # Use 1 task in example.sh! More tasks will create more runs...
 
         group_name: str = "all_cost"
-        run_name= f'cvpo_v4_add_cost_0_7_40_h20_100_v2g_cost_40_loads_PV_5spawn_10cs_90kw_cost_lim_{int(cost_limit)}_usr_-3_100_tr_30_train_envs_{training_num}_test_envs_{testing_num}_run{random.randint(0, 1000)}'
+        run_name= f'cvpo_v5_add_cost_0_6_40_h20_100_v2g_cost_40_loads_1.3_PV_5spawn_10cs_90kw_cost_lim_{int(cost_limit)}_usr_-3_100_tr_30_train_envs_{training_num}_test_envs_{testing_num}_run{random.randint(0, 1000)}'
 
         wandb.init(project='safeRL',
                         sync_tensorboard=True,
@@ -399,7 +399,7 @@ def train_sacl(args):
         lagrangian_pid: Tuple[float, ...] = (0.05, 0.0005, 0.1)
         rescaling: bool = True
         # Base policy common arguments
-        gamma: float = 0.98
+        gamma: float = 0.97
         deterministic_eval: bool = True
         action_scaling: bool = True
         action_bound_method: str = "clip"
@@ -423,7 +423,7 @@ def train_sacl(args):
 
         # logger params
         group_name: str = "all_cost"
-        run_name= f'sacl_v17_h20_100_v2g_cost_40_loads_mean_err_20_PV_5spawn_10cs_90kw_cost_lim_{int(cost_limit)}_usr_-3_100_tr_30_train_envs_{training_num}_test_envs_{testing_num}_run{random.randint(0, 1000)}'
+        run_name= f'sacl_v19_add_cost_0_6_40_h20_100_v2g_cost_40_loads_1_2_PV_5spawn_10cs_90kw_cost_lim_{int(cost_limit)}_usr_-3_100_tr_500_train_envs_{training_num}_test_envs_{testing_num}_run{random.randint(0, 1000)}'
 
         wandb.init(project='safeRL',
                         sync_tensorboard=True,
