@@ -82,7 +82,7 @@ class EV2Gym(gym.Env):
 
         if seed is None:
             self.seed = np.random.randint(0, 1000000)
-            # print(f"Random seed: {self.seed}")
+            print(f"Random seed: {self.seed}")
         else:
             self.seed = seed
         # set random seed

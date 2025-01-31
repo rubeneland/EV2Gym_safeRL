@@ -139,6 +139,10 @@ def generate_residential_inflexible_loads(env) -> np.ndarray:
     # replace the year of the simulation date with the year of the data
     simulation_date = f'{year}-{simulation_date.split("-")[1]}-{simulation_date.split("-")[2]}'
 
+    # February 29th is not a valid date for every year
+    if simulation_date.split("-")[1] == "02" and simulation_date.split("-")[2].split(" ")[0] == "29":
+        simulation_date = f'{year}-03-01'
+        
     simulation_index = data[data['date'] == simulation_date].index[0]
 
     # select the data for the simulation date
@@ -204,6 +208,10 @@ def generate_pv_generation(env) -> np.ndarray:
     year = int(dataset_starting_date.split('-')[0])
     # replace the year of the simulation date with the year of the data
     simulation_date = f'{year}-{simulation_date.split("-")[1]}-{simulation_date.split("-")[2]}'
+    
+    # February 29th is not a valid date for every year
+    if simulation_date.split("-")[1] == "02" and simulation_date.split("-")[2].split(" ")[0] == "29":
+        simulation_date = f'{year}-03-01'
 
     simulation_index = data[data['date'] == simulation_date].index[0]
 

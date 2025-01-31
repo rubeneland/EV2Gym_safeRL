@@ -31,14 +31,12 @@ def eval():
     replay_path = None
 
     # config_file = "ev2gym/example_config_files/V2G_MPC2.yaml"
-    config_file = "V2GProfit_base.yaml"
-    # config_file = "ev2gym/example_config_files/PublicPST.yaml"
-    # config_file = "ev2gym/example_config_files/BusinessPST.yaml"
-    # config_file = "ev2gym/example_config_files/V2GProfitPlusLoads.yaml"
+    config_file = "V2GProfit_evaluate.yaml"
 
     env = EV2Gym(config_file=config_file,
                  load_from_replay_path=replay_path,
                  verbose=False,
+                 seed=184692,
                  save_replay=False,
                  save_plots=False,
                  )
@@ -71,7 +69,7 @@ def eval():
     agent = ChargeAsFastAsPossible()
     # agent = ChargeAsFastAsPossibleToDesiredCapacity()
     rewards = []
-
+    print(f'date: {env.sim_date}')
     for t in range(env.simulation_length):
         actions = agent.get_action(env)
                 
@@ -122,6 +120,9 @@ def eval():
 
 
 if __name__ == "__main__":
+    counter = 0
     while True:
+        print(f'============================= Counter: {counter}')
         eval()
+        counter += 1
         # exit()
