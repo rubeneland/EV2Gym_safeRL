@@ -246,10 +246,18 @@ def spawn_single_EV(env,
 
         # extend the dictionary to take values from 0 amps to 100 amps
         for i in range(0, 101):
-            if i not in charge_efficiency:
-                # take the closest value
-                charge_efficiency[i] = charge_efficiency[min(
-                    charge_efficiency, key=lambda x: abs(x-i))]
+            if i not in charge_efficiency or charge_efficiency[i] == 0:
+                nonzero_keys = [k for k, v in charge_efficiency.items() if v != 0]
+                if nonzero_keys:
+                    closest = min(nonzero_keys, key=lambda x: abs(x - i))
+                    charge_efficiency[i] = charge_efficiency[closest]
+                # else:
+                #     charge_efficiency[i] = 0
+        
+        # charge_efficiency = dict(sorted(charge_efficiency.items()))
+        # print(f"Charge efficiency: {charge_efficiency}")
+        #sort the dictionary
+        
 
         discharge_efficiency = charge_efficiency.copy()
 

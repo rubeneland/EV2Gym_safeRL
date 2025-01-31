@@ -11,7 +11,7 @@ from ev2gym.baselines.mpc.eMPC_v2 import eMPC_V2G_v2, eMPC_G2V_v2
 
 from ev2gym.baselines.mpc.V2GProfitMax import V2GProfitMaxOracle
 
-from ev2gym.baselines.heuristics import RoundRobin, ChargeAsLateAsPossible, ChargeAsFastAsPossible
+from ev2gym.baselines.heuristics import RoundRobin, RoundRobin_1transformer_powerlimit, ChargeAsFastAsPossible
 from ev2gym.baselines.heuristics import ChargeAsFastAsPossibleToDesiredCapacity
 
 import numpy as np
@@ -36,9 +36,9 @@ def eval():
     env = EV2Gym(config_file=config_file,
                  load_from_replay_path=replay_path,
                  verbose=False,
-                 seed=184692,
+                #  seed=184692,
                  save_replay=False,
-                 save_plots=False,
+                 save_plots=True,
                  )
 
 
@@ -66,7 +66,7 @@ def eval():
     # agent = eMPC_V2G_v2(env, control_horizon=10, verbose=False)        
     # agent = RoundRobin(env, verbose=False)
     # agent = ChargeAsLateAsPossible(verbose=False)
-    agent = ChargeAsFastAsPossible()
+    agent = RoundRobin_1transformer_powerlimit(env, verbose=True)
     # agent = ChargeAsFastAsPossibleToDesiredCapacity()
     rewards = []
     print(f'date: {env.sim_date}')
@@ -74,7 +74,8 @@ def eval():
         actions = agent.get_action(env)
                 
         #do random actions from -1--1
-        actions = np.random.uniform(-1,1,len(actions))
+        # actions = np.random.uniform(-1,1,len(actions))
+        actions = agent.get_action(env)
         
         
 
@@ -125,4 +126,4 @@ if __name__ == "__main__":
         print(f'============================= Counter: {counter}')
         eval()
         counter += 1
-        # exit()
+        exit()

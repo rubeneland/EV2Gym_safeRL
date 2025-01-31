@@ -93,6 +93,103 @@ class RoundRobin():
             print(f'Evs to charge: {evs_to_charge}')
 
         return action_list
+    
+
+class RoundRobin_1transformer_powerlimit():
+    '''
+    This is a class that contains the Round Robin heuristic algorithm for the power setpoint tracking problem.
+    It does not consider multiple transfomer constraints. 
+    And it assumes all chargers have the same number of ports
+    '''
+    algo_name = "Round Robin 1tr"
+
+    def __init__(self, env, verbose=False,  **kwargs):
+
+        self.verbose = verbose
+        self.env = env
+        # find average charging power of the simulation
+        self.average_power = 0
+        for cs in env.charging_stations:
+            self.average_power += cs.max_charge_current * \
+                cs.voltage * math.sqrt(cs.phases) / cs.n_ports
+        self.average_power /= len(env.charging_stations)
+
+        self.number_of_ports_per_cs = env.number_of_ports_per_cs
+        # list with the ids of EVs that were already served in this round
+        self.ev_buffer = []
+
+    def get_env(self):
+        return self.env
+
+    def update_ev_buffer(self, env) -> None:
+        '''
+        This function updates the EV buffer list with the EVs that are currently parked by adding or removing them.
+        '''
+        counter = 0
+        # iterate over all ports
+        for cs in env.charging_stations:
+            for port in range(cs.n_ports):
+                if cs.evs_connected[port] is not None:
+                    if cs.evs_connected[port].get_soc() < 1:
+
+                        if counter not in self.ev_buffer:
+                            self.ev_buffer.insert(0, counter)
+                    else:
+                        if counter in self.ev_buffer:
+                            self.ev_buffer.remove(counter)
+                else:
+                    if counter in self.ev_buffer:
+                        self.ev_buffer.remove(counter)
+                counter += 1
+
+    def get_action(self, env) -> np.ndarray:
+
+        # this function returns the action list based on the round robin algorithm
+        tr = env.transformers[0]
+        # total_power = env.power_setpoints[env.current_step] * 1000  # in W   
+        total_power =tr.get_power_limits(env.current_step, horizon=1) * 1000  # in W
+        data = tr.get_load_pv_forecast(env.current_step, horizon=1) * 1000  # in W
+        inflexible_load, pv_forecast = data[0], data[1]
+        
+        total_power = total_power[0] - pv_forecast[0]*1000 - inflexible_load[0]*1000    
+                            
+    
+        number_of_EVs_to_charge = total_power / self.average_power
+
+        if self.verbose:
+            print("-------------------Round Robin-------------------")            
+            print(
+                f'Number of EVs to charge: {number_of_EVs_to_charge:.2f},\
+                total power: {total_power:.2f}, average power: {self.average_power:.2f}')
+
+        # get currently parked EVs
+        self.update_ev_buffer(env)
+        max_number_of_EVs_to_charge = len(self.ev_buffer)
+
+        if self.verbose:
+            print(f'EV buffer: {self.ev_buffer}')
+
+        # get the EVs to charge in this round
+        evs_to_charge = self.ev_buffer[:min(
+            int(np.ceil(number_of_EVs_to_charge)), max_number_of_EVs_to_charge)]
+        self.ev_buffer = self.ev_buffer[min(
+            int(np.ceil(number_of_EVs_to_charge)), max_number_of_EVs_to_charge):]
+
+        self.ev_buffer.extend(evs_to_charge)
+
+        # create action list
+        action_list = np.zeros(env.number_of_ports)
+
+        # set the action for the EVs to charge
+        for i, ev in enumerate(evs_to_charge):
+            action_list[ev] = 1 / env.number_of_ports_per_cs
+            if i == len(evs_to_charge) - 1 and number_of_EVs_to_charge < len(evs_to_charge):
+                action_list[ev] = (number_of_EVs_to_charge - i)
+
+        if self.verbose:
+            print(f'Evs to charge: {evs_to_charge}')
+
+        return action_list
 
 
 class ChargeAsLateAsPossible():
