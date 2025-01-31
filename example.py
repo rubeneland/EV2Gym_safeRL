@@ -36,11 +36,10 @@ def eval():
     env = EV2Gym(config_file=config_file,
                  load_from_replay_path=replay_path,
                  verbose=False,
-                #  seed=184692,
-                 save_replay=False,
+                 #  seed=184692,
+                 save_replay=True,
                  save_plots=True,
                  )
-
 
     new_replay_path = f"replay/replay_{env.sim_name}.pkl"
 
@@ -55,7 +54,7 @@ def eval():
     print(f'Number of EVs: {len(ev_profiles)}')
     print(f'Max time of stay: {max_time_of_stay}')
     print(f'Min time of stay: {min_time_of_stay}')
-    
+
     # exit()
     # agent = OCMF_V2G(env, control_horizon=30, verbose=True)
     # agent = OCMF_G2V(env, control_horizon=25, verbose=True)
@@ -63,21 +62,18 @@ def eval():
     # agent = V2GProfitMaxOracle(env,verbose=True)
     # agent = PowerTrackingErrorrMin(new_replay_path)
     # agent = eMPC_G2V(env, control_horizon=15, verbose=False)
-    # agent = eMPC_V2G_v2(env, control_horizon=10, verbose=False)        
+    # agent = eMPC_V2G_v2(env, control_horizon=10, verbose=False)
     # agent = RoundRobin(env, verbose=False)
-    # agent = ChargeAsLateAsPossible(verbose=False)
-    agent = RoundRobin_1transformer_powerlimit(env, verbose=True)
+    agent = ChargeAsFastAsPossible(verbose=False)
     # agent = ChargeAsFastAsPossibleToDesiredCapacity()
     rewards = []
     print(f'date: {env.sim_date}')
     for t in range(env.simulation_length):
         actions = agent.get_action(env)
-                
-        #do random actions from -1--1
+
+        # do random actions from -1--1
         # actions = np.random.uniform(-1,1,len(actions))
         actions = agent.get_action(env)
-        
-        
 
         new_state, reward, done, truncated, stats = env.step(
             actions)  # takes action
@@ -91,33 +87,34 @@ def eval():
     # exit()
     # Solve optimally
     # Power tracker optimizer
-    # agent = PowerTrackingErrorrMin(replay_path=new_replay_path)
+    agent = V2GProfitMaxOracleGB(replay_path=new_replay_path)
     # # Profit maximization optimizer
     # # agent = V2GProfitMaxOracleGB(replay_path=new_replay_path)
     # # Simulate in the gym environment and get the rewards
 
-    # env = ev2gym(config_file=config_file,
-    #                    load_from_replay_path=new_replay_path,
-    #                    verbose=True,
-    #                    save_plots=True,
-    #                    )
-    # state, _ = env.reset()
-    # rewards_opt = []
+    env = EV2Gym(config_file=config_file,
+                 load_from_replay_path=new_replay_path,
+                 verbose=True,
+                 save_plots=True,
+                 )
+    state, _ = env.reset()
+    rewards_opt = []
 
-    # for t in range(env.simulation_length):
-    #     actions = agent.get_action(env)
-    #     if verbose:
-    #         print(f' OptimalActions: {actions}')
+    for t in range(env.simulation_length):
+        actions = agent.get_action(env)
+        if verbose:
+            print(f' OptimalActions: {actions}')
 
-    #     new_state, reward, done, truncated, _ = env.step(
-    #         actions, visualize=True)  # takes action
-    #     rewards_opt.append(reward)
+        new_state, reward, done, truncated, stats = env.step(
+            actions, visualize=True)  # takes action
+        rewards_opt.append(reward)
 
-    #     if verbose:
-    #         print(f'Reward: {reward} \t Done: {done}')
+        if verbose:
+            print(stats)
+            print(f'Reward: {reward} \t Done: {done}')
 
-    #     if done:
-    #         break
+        if done:
+            break
 
 
 if __name__ == "__main__":
