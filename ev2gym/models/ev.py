@@ -51,7 +51,7 @@ class EV():
                  desired_capacity=None,  # kWh
                  battery_capacity=50,  # kWh
                  min_battery_capacity=10,  # kWh
-                #  min_emergency_battery_capacity=25,  # kWh
+                 min_v2g_soc=0.4,  # soc
                  max_ac_charge_power=22,  # kW
                  min_ac_charge_power=0,  # kW
                  max_dc_charge_power=50,  # kW
@@ -78,7 +78,7 @@ class EV():
         # EV technical characteristics
         self.battery_capacity = battery_capacity  # kWh
         self.min_battery_capacity = min_battery_capacity  # kWh
-        # self.min_emergency_battery_capacity = min_emergency_battery_capacity  # kWh
+        self.min_v2g_soc = min_v2g_soc  # kWh
         self.max_ac_charge_power = max_ac_charge_power  # kW
         self.min_ac_charge_power = min_ac_charge_power  # kW
         self.max_discharge_power = max_discharge_power  # kW
@@ -102,7 +102,7 @@ class EV():
         self.total_energy_exchanged = 0
         self.max_energy_AFAP = 0
         # timesteps that the EV is discharged below the minimum emergency battery capacity
-        # self.min_emergency_battery_capacity_metric = 0
+        self.min_v2g_soc_metric = 0
 
         # Baterry degradation
         self.abs_total_energy_exchanged = 0
@@ -126,7 +126,7 @@ class EV():
         self.total_energy_exchanged = 0
         self.c_lost = 0
         self.max_energy_AFAP = 0
-        # self.min_emergency_battery_capacity_metric = 0
+        self.min_v2g_soc_metric = 0
 
         self.abs_total_energy_exchanged = 0
         self.historic_soc = []
@@ -181,7 +181,7 @@ class EV():
 
         # round up to the nearest 0.01 the current capacity
         self.current_capacity = self.my_ceil(self.current_capacity, 2)
-
+        self.min_v2g_soc_metric += self.get_min_v2g_soc_metric()
         self.active_steps.append(1 if self.actual_current != 0 else 0)
         return self.current_energy, self.actual_current
 
@@ -213,12 +213,16 @@ class EV():
         else:
             return 1
 
-    def min_SoC_when_discharging_metric(self) -> float:
+    def get_min_v2g_soc_metric(self) -> float:
         """
         This metric monitors how often the EV is discharged below the minimum state of charge (SoC) threshold.        
         It is calculated in every step of the simulation and is used to determine the EV's satisfaction metric.
         """
-        return 1 if self.current_capacity >= self.min_emergency_battery_capacity else 0
+        soc = self.get_soc()
+        if soc < self.min_v2g_soc and self.actual_current < 0:
+            return 1
+        else:
+            return 0
 
     def get_soc(self) -> float:
         '''
@@ -393,10 +397,7 @@ class EV():
             self.prev_capacity = self.current_capacity
             self.current_capacity += given_energy
 
-        self.required_energy = self.required_energy + self.current_energy
-
-        # if prev_capacity > self.min_emergency_battery_capacity and self.current_capacity < self.min_emergency_battery_capacity:
-        #     self.min_emergency_battery_capacity_metric += 1        
+        self.required_energy = self.required_energy + self.current_energy  
 
         assert given_energy <= 0
         return given_energy*60/self.timescale * 1000 / voltage

@@ -54,13 +54,13 @@ def get_statistics(env) -> Dict:
     battery_degradation_cycling = battery_degradation[:, 1].sum()
     battery_degradation = battery_degradation.sum()
 
-    # total_steps_min_emergency_battery_capacity_violation = 0
+    total_steps_min_v2g_soc_violation = 0
     energy_user_satisfaction = np.zeros((len(env.EVs)))
     for i, ev in enumerate(env.EVs):
         e_actual = ev.current_capacity
         e_max = ev.max_energy_AFAP
         energy_user_satisfaction[i] = (e_actual / e_max) * 100
-        # total_steps_min_emergency_battery_capacity_violation += ev.min_emergency_battery_capacity_metric
+        total_steps_min_v2g_soc_violation += ev.min_v2g_soc_metric
 
     stats = {'total_ev_served': total_ev_served,
              'total_profits': total_profits,
@@ -73,7 +73,7 @@ def get_statistics(env) -> Dict:
              'energy_user_satisfaction': np.mean(energy_user_satisfaction),
              'std_energy_user_satisfaction': np.std(energy_user_satisfaction),
              'min_energy_user_satisfaction': np.min(energy_user_satisfaction),
-            #  'total_steps_min_emergency_battery_capacity_violation': total_steps_min_emergency_battery_capacity_violation,
+             'total_steps_min_v2g_soc_violation': total_steps_min_v2g_soc_violation,
              'total_transformer_overload': total_transformer_overload,
              'battery_degradation': battery_degradation,
              'battery_degradation_calendar': battery_degradation_calendar,
@@ -231,10 +231,7 @@ def spawn_single_EV(env,
     else:
         transition_soc_multiplier = 1
 
-    # min_emergency_battery_capacity = env.config["ev"]["min_emergency_battery_capacity"]
-
-    # if min_emergency_battery_capacity > battery_capacity:
-        # min_emergency_battery_capacity = 0.7*battery_capacity
+    min_v2g_soc = env.config["ev"]["min_v2g_soc"]
 
     if env.heterogeneous_specs:
 
@@ -263,7 +260,7 @@ def spawn_single_EV(env,
                   max_dc_charge_power=env.ev_specs[sampled_ev]["max_dc_charge_power"],
                   max_discharge_power=-
                   env.ev_specs[sampled_ev]["max_dc_discharge_power"],
-                #   min_emergency_battery_capacity=min_emergency_battery_capacity,
+                  min_v2g_soc=min_v2g_soc,
                   charge_efficiency=charge_efficiency,
                   discharge_efficiency=discharge_efficiency,
 
@@ -286,7 +283,7 @@ def spawn_single_EV(env,
                   battery_capacity=battery_capacity,
                   desired_capacity=env.config["ev"]['desired_capacity'] *
                   battery_capacity,
-                #   min_emergency_battery_capacity=min_emergency_battery_capacity,
+                  min_v2g_soc=min_v2g_soc,
                   max_ac_charge_power=env.config["ev"]['max_ac_charge_power'],
                   min_ac_charge_power=env.config["ev"]['min_ac_charge_power'],
                   max_dc_charge_power=env.config["ev"]['max_dc_charge_power'],

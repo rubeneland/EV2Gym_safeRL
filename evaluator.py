@@ -81,7 +81,7 @@ def evaluator():
     timescale = config["timescale"]
     simulation_length = config["simulation_length"]
 
-    n_test_cycles = 100
+    n_test_cycles = 50
 
     scenario = config_file.split("/")[-1].split(".")[0]
     eval_replay_path = f'./replay/CPO_base/min_c_1_usr_1000/{number_of_charging_stations}cs_{n_transformers}tr_{scenario}/'
@@ -121,11 +121,11 @@ def evaluator():
         state_function = V2G_profit_max_loads
 
     elif config_file == "V2GProfit_base.yaml":
-        reward_function = ProfitMax_TrPenalty_UserIncentives
-        state_function = V2G_profit_max
+        reward_function = ProfitMax_TrPenalty_UserIncentives_safety
+        state_function = V2G_profit_max_loads
         cost_function = transformer_overload_usrpenalty_cost
     elif config_file == "V2GProfit_evaluate.yaml":
-        reward_function = ProfitMax_TrPenalty_UserIncentives
+        reward_function = ProfitMax_TrPenalty_UserIncentives_safety
         state_function = V2G_profit_max_loads
         cost_function = transformer_overload_usrpenalty_cost
     else:
@@ -139,6 +139,7 @@ def evaluator():
             replay_save_path=f"replay/{evaluation_name}/",
         )
         replay_path = f"replay/{evaluation_name}/replay_{env.sim_name}.pkl"
+        print(env.sim_starting_date)
 
         for _ in range(env.simulation_length):
             actions = np.ones(env.cs)
@@ -170,7 +171,7 @@ def evaluator():
         # V2GProfitMaxOracle,
         # PowerTrackingErrorrMin
         # CPO,
-        CVPO,
+        # CVPO,
         SACLag
     ]
 
@@ -302,7 +303,7 @@ def evaluator():
                 env = gym.make(task)
                 sim_length = env.env.env.simulation_length
 
-                load_path = 'fsrl_logs/TEST_FINAL_10_cs_90kw/CVPO_h20_1powerlimit_sacl_100_v2g_cost_40_loads_PV_no_DR_5spawn_10cs_90kw_cost_lim_80_usr_-3_100_tr_30_train_envs_10_test_envs_50_run512/checkpoint/model_best.pt'
+                load_path = 'fsrl_logs/TEST_FINAL_10_cs_90kw/cvpo_v3/checkpoint/model_best.pt'
 
                 # init logger
                 logger = TensorboardLogger("logs", log_txt=True, name=task)
@@ -341,7 +342,7 @@ def evaluator():
                 env = gym.make(task)
                 sim_length = env.env.env.simulation_length
 
-                load_path = 'fsrl_logs/TEST_FINAL_10_cs_90kw/v15/checkpoint/model_best.pt'
+                load_path = 'fsrl_logs/TEST_FINAL_10_cs_90kw/sacl_v18/checkpoint/model.pt'
 
                 # init logger
                 logger = TensorboardLogger("logs", log_txt=True, name=task)
@@ -453,7 +454,7 @@ def evaluator():
                                             'power_tracker_violation': stats['power_tracker_violation'],
                                             'tracking_error': stats['tracking_error'],
                                             'min_energy_user_satisfaction': stats['min_energy_user_satisfaction'],
-                                            # 'total_steps_min_emergency_battery_capacity_violation': stats['total_steps_min_emergency_battery_capacity_violation'],
+                                            'total_steps_min_v2g_soc_violation': stats['total_steps_min_v2g_soc_violation'],
                                             'energy_tracking_error': stats['energy_tracking_error'],
                                             'energy_user_satisfaction': stats['energy_user_satisfaction'],
                                             'total_transformer_overload': stats['total_transformer_overload'],
@@ -493,7 +494,7 @@ def evaluator():
 
     # results_grouped.to_csv('results_grouped.csv')
     # print(results_grouped[['tracking_error', 'energy_tracking_error']])
-    print(results_grouped[['total_transformer_overload', 'time']])
+    print(results_grouped[['total_transformer_overload', 'time', 'total_steps_min_v2g_soc_violation']])
     print(results_grouped[['total_reward', 'total_profits', 'total_ev_served']])
     print(results_grouped[['total_energy_charged', 'total_energy_discharged']])
     print(results_grouped[['average_user_satisfaction', 'min_energy_user_satisfaction']])

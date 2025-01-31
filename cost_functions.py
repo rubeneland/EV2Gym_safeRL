@@ -13,9 +13,9 @@ def transformer_overload_usrpenalty_cost(env, total_costs, user_satisfaction_lis
     cost = 0
 
     for tr in env.transformers:
-        # cost += 30 * tr.get_how_overloaded()    
-        if tr.get_how_overloaded() > 0:
-            cost += 500                    
+        cost += 30 * tr.get_how_overloaded()    
+        # if tr.get_how_overloaded() > 0:
+        #     cost += 500                    
     
     for score in user_satisfaction_list:  
         cost += 100*math.exp(-3*score) - 100*math.exp(-3)
