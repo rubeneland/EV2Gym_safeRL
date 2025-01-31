@@ -169,7 +169,7 @@ def train_cvpo(args):
         save_interval: int = 1
         deterministic_eval: bool = True
         action_scaling: bool = True
-        action_bound_method: str = "tanh"
+        action_bound_method: str = "clip"
         resume: bool = False  # TODO
         save_ckpt: bool = True  # set this to True to save the policy model
         verbose: bool = False
@@ -423,7 +423,7 @@ def train_sacl(args):
 
         # logger params
         group_name: str = "all_cost"
-        run_name= f'sacl_v19_add_cost_0_6_40_h20_100_v2g_cost_40_loads_1_2_PV_5spawn_10cs_90kw_cost_lim_{int(cost_limit)}_usr_-3_100_tr_500_train_envs_{training_num}_test_envs_{testing_num}_run{random.randint(0, 1000)}'
+        run_name= f'sacl_v2_add_cost_0_6_40_h20_100_v2g_cost_40_loads_0.8_5spawn_10cs_90kw_cost_lim_{int(cost_limit)}_usr_-3_100_tr_500_train_envs_{training_num}_test_envs_{testing_num}_run{random.randint(0, 1000)}'
 
         wandb.init(project='safeRL',
                         sync_tensorboard=True,
@@ -433,7 +433,7 @@ def train_sacl(args):
                         )
 
         # init logger
-        logger = WandbLogger(log_dir="fsrl_logs/TEST_FINAL_10_cs_90kw", log_txt=True, group=group_name, name=run_name)
+        logger = WandbLogger(log_dir="fsrl_logs/Test_Final_10_cs_90_kw_NO_PV", log_txt=True, group=group_name, name=run_name)
 
         env = gym.make(task)
         # env.spec.max_episode_steps = env.env.env.simulation_length
