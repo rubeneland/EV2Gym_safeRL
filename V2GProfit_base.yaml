@@ -61,7 +61,7 @@ power_setpoint_flexiblity: 20 # (in percentage +/- %)
 tr_seed: -1 # seed for the random number generator of transformer loads(-1 for random seed)
 
 inflexible_loads: # Offices, homes
-  include: True # True or False
+  include: False # True or False
   inflexible_loads_capacity_multiplier_mean: 0.8 # 1 is default, the higher the number the more inflexible loads
   forecast_mean: 20 # in percentage of load at time t%
   forecast_std: 5 # in percentage of load at time t%
@@ -134,6 +134,6 @@ ev:
   min_time_of_stay: 60 # in minutes
   min_v2g_soc: 0.4 # 40%
   desired_capacity: 1 # in (0-1) (0% - 100%)
-  #if trasition_soc is < 1, the curve of the line is affected by:
+  #if transition_soc is < 1, the curve of the line is affected by:
   transition_soc_multiplier: 5 # default 1 (the higher the number the shorter the effect of CCCV region)
   # @ Stavros: what does this last one mean?

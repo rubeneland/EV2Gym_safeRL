@@ -68,20 +68,22 @@ def V2G_profit_max(env, *args):
     '''
     
     state = [
-        # (env.current_step/env.simulation_length),
+        (env.current_step/env.simulation_length),
         # env.sim_date.weekday() / 7,
         # turn hour and minutes in sin and cos
-        math.sin(env.sim_date.hour/24*2*math.pi),
-        math.cos(env.sim_date.hour/24*2*math.pi),
+        # math.sin(env.sim_date.hour/24*2*math.pi),
+        # math.cos(env.sim_date.hour/24*2*math.pi),
     ]
 
     state.append(env.current_power_usage[env.current_step-1])
 
+    h = 32 # was 28 steps = 7 hours, too many will make it to hard to learn for agent.
+
     charge_prices = abs(env.charge_prices[0, env.current_step:
-        env.current_step+28]) # was 28 steps = 7 hours, too many will make it to hard to learn for agent. 36 = 9 hours
+        env.current_step+h])
     
-    if len(charge_prices) < 28:
-        charge_prices = np.append(charge_prices, np.zeros(28-len(charge_prices)))
+    if len(charge_prices) < h:
+        charge_prices = np.append(charge_prices, np.zeros(h-len(charge_prices)))
     
     state.append(charge_prices)
     
@@ -119,7 +121,8 @@ def V2G_profit_max_loads(env, *args): #no Demand Respone ?
     '''
     
     state = [
-        (env.current_step),        
+        # (env.current_step),  
+        (env.current_step/env.simulation_length),      
     ]
 
     state.append(env.current_power_usage[env.current_step-1])

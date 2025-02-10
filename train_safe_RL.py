@@ -61,7 +61,7 @@ class SpecMaxStepsWrapper(Wrapper):
 # Environment configuration
 config_file = "V2GProfit_base.yaml"
 reward_function = ProfitMax_TrPenalty_UserIncentives_safety
-state_function = V2G_profit_max_loads
+state_function = V2G_profit_max
 cost_function = transformer_overload_usrpenalty_cost
 
 # Register the custom environment
@@ -136,17 +136,17 @@ def train_cvpo(args):
         # CVPO arguments
         estep_iter_num: int = 1
         estep_kl: float = 0.02
-        estep_dual_max: float = args.estep_max # was 20
-        estep_dual_lr: float = args.estep_lr # was 0.02
+        estep_dual_max: float = 20
+        estep_dual_lr: float = 0.02
         sample_act_num: int = 16
         mstep_iter_num: int = 1
-        mstep_kl_mu: float = args.mstep_kl_mu # was 0.005
-        mstep_kl_std: float = args.mstep_kl_std # was 0.0005
+        mstep_kl_mu: float = 0.005
+        mstep_kl_std: float = 0.0005
         mstep_dual_max: float = 0.5
         mstep_dual_lr: float = 0.1
         actor_lr: float = 5e-4
         critic_lr: float = 1e-3
-        gamma: float = 0.97
+        gamma: float = 0.99 # was 0.97
         n_step: int = 2
         tau: float = 0.05
         hidden_sizes: Tuple[int, ...] = (128, 128)
@@ -178,9 +178,9 @@ def train_cvpo(args):
         # Use 1 task in example.sh! More tasks will create more runs...
 
         group_name: str = "all_cost"
-        run_name= f'cvpo_v1_add_cost_0_6_40_h20_100_v2g_cost_40_loads_0.8_5spawn_10cs_90kw_cost_lim_{int(cost_limit)}_usr_-3_100_tr_30_train_envs_{training_num}_test_envs_{testing_num}_run{random.randint(0, 1000)}'
+        run_name= f'cvpo_v1_cost_0_7_45_h32_100_v2g_cost_40_5spawn_10cs_90kw_cost_lim_{int(cost_limit)}_train_envs_{training_num}_test_envs_{testing_num}_run{random.randint(0, 1000)}'
 
-        wandb.init(project='safeRL',
+        wandb.init(project='experiments',
                         sync_tensorboard=True,
                         group=group_name,
                         name=run_name,
@@ -188,7 +188,7 @@ def train_cvpo(args):
                         )
 
         # init logger
-        logger = WandbLogger(log_dir="fsrl_logs/Test_Final_10_cs_90_kw_NO_PV", log_txt=True, group=group_name, name=run_name)
+        logger = WandbLogger(log_dir="fsrl_logs/exp_1_no_loads_no_pv_10_cs_spawn_5", log_txt=True, group=group_name, name=run_name)
 
         env = gym.make(task)
         # env.spec.max_episode_steps = env.env.env.simulation_length
@@ -501,13 +501,9 @@ if __name__ == "__main__":
         #create an argument parser to adjust cost limit and define training algorithm
         parser = argparse.ArgumentParser() 
         parser.add_argument("--train", type=str, default="cvpo", help="Training algorithm to use")
-        parser.add_argument("--cost_limit", type=float, default=250, help="Cost limit for the environment")
+        parser.add_argument("--cost_limit", type=float, default=40, help="Cost limit for the environment")
         parser.add_argument("--epoch", type=int, default=1000, help="Number of epochs to train for")
-        parser.add_argument("--estep_lr", type=float, default=0.02, help="Learning rate for the E-step")
-        parser.add_argument("--estep_max", type=float, default=20, help="Maximum value for the E-step")
-        parser.add_argument("--mstep_kl_mu", type=float, default=0.005, help="KL divergence for the M-step")
-        parser.add_argument("--mstep_kl_std", type=float, default=0.0005, help="KL divergence for the M-step")
-        parser.add_argument("--train_num", type=int, default=2, help="Number of training environments")
+        parser.add_argument("--train_num", type=int, default=10, help="Number of training environments")
         parser.add_argument("--test_num", type=int, default=50, help="Number of testing environments")
         args = parser.parse_args()
         if args.train == "cvpo":        
@@ -519,4 +515,4 @@ if __name__ == "__main__":
         elif args.train == "sacl":
                 train_sacl(args)
         else:   
-                print("Invalid training algorithm. Please choose either 'cpo' or 'cvpo'")
+                print("Invalid training algorithm. Please choose either 'cpo', 'cvpo', 'ppol' or 'sacl'")
