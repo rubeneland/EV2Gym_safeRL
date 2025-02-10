@@ -156,7 +156,7 @@ def train_cvpo(args):
         last_layer_scale: bool = False
         # collecting params
         epoch: int = args.epoch
-        episode_per_collect: int = 10
+        episode_per_collect: int = 4
         step_per_epoch: int = 5000
         update_per_step: float = 0.2
         buffer_size: int = 200000
@@ -178,7 +178,7 @@ def train_cvpo(args):
         # Use 1 task in example.sh! More tasks will create more runs...
 
         group_name: str = "all_cost"
-        run_name= f'cvpo_v1_cost_0_7_45_h32_100_v2g_cost_40_5spawn_10cs_90kw_cost_lim_{int(cost_limit)}_train_envs_{training_num}_test_envs_{testing_num}_run{random.randint(0, 1000)}'
+        run_name= f'cvpo_v2_cost_0_6_45_h28_100_v2g_cost_40_5spawn_10cs_90kw_cost_lim_{int(cost_limit)}_train_envs_{training_num}_test_envs_{testing_num}_run{random.randint(0, 1000)}'
 
         wandb.init(project='experiments',
                         sync_tensorboard=True,
@@ -423,9 +423,9 @@ def train_sacl(args):
 
         # logger params
         group_name: str = "all_cost"
-        run_name= f'sacl_v2_add_cost_0_6_40_h20_100_v2g_cost_40_loads_0.8_5spawn_10cs_90kw_cost_lim_{int(cost_limit)}_usr_-3_100_tr_500_train_envs_{training_num}_test_envs_{testing_num}_run{random.randint(0, 1000)}'
+        run_name= f'sacl_v1_cost_0_7_45_h32_100_v2g_cost_40_5spawn_10cs_90kw_cost_lim_{int(cost_limit)}_train_envs_{training_num}_test_envs_{testing_num}_run{random.randint(0, 1000)}'
 
-        wandb.init(project='safeRL',
+        wandb.init(project='experiments',
                         sync_tensorboard=True,
                         group=group_name,
                         name=run_name,
@@ -433,7 +433,7 @@ def train_sacl(args):
                         )
 
         # init logger
-        logger = WandbLogger(log_dir="fsrl_logs/Test_Final_10_cs_90_kw_NO_PV", log_txt=True, group=group_name, name=run_name)
+        logger = WandbLogger(log_dir="fsrl_logs/exp_1_no_loads_no_pv_10_cs_spawn_5", log_txt=True, group=group_name, name=run_name)
 
         env = gym.make(task)
         # env.spec.max_episode_steps = env.env.env.simulation_length

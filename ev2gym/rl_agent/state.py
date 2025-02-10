@@ -75,9 +75,9 @@ def V2G_profit_max(env, *args):
         # math.cos(env.sim_date.hour/24*2*math.pi),
     ]
 
-    state.append(env.current_power_usage[env.current_step-1])
+    # state.append(env.current_power_usage[env.current_step-1])
 
-    h = 32 # was 28 steps = 7 hours, too many will make it to hard to learn for agent.
+    h = 28 # was 28 steps = 7 hours, too many will make it too hard to learn for agent.
 
     charge_prices = abs(env.charge_prices[0, env.current_step:
         env.current_step+h])
@@ -89,10 +89,10 @@ def V2G_profit_max(env, *args):
     
     # For every transformer
     for tr in env.transformers:
-        if env.current_step < env.simulation_length:
-            state.append(tr.max_power[env.current_step])
-        else:
-            state.append(0)
+        # if env.current_step < env.simulation_length:
+        #     state.append(tr.max_power[env.current_step])
+        # else:
+        #     state.append(0)
 
         # For every charging station connected to the transformer
         for cs in env.charging_stations:
@@ -109,7 +109,7 @@ def V2G_profit_max(env, *args):
 
                     # else if there is no EV connected put zeros
                     else:
-                        state.append(np.zeros(3))
+                        state.append(np.zeros(2))
 
     state = np.array(np.hstack(state))
 
