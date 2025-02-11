@@ -32,8 +32,8 @@ def transformer_overload_usrpenalty_cost(env, total_costs, user_satisfaction_lis
                 if EV is not None:
                     # Add cost for discharging action when SOC below min V2G threshold: 40%
                     soc = EV.get_soc()
-                    if soc <= 0.4 and EV.actual_current < 0:
-                        cost += (0.4 - soc) * 100
+                    if soc <= 0.40 and EV.actual_current < 0:
+                        cost += (0.40 - soc) * 100
 
 
     # cost for charging action when SOC at maximum

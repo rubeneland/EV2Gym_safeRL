@@ -127,10 +127,11 @@ class EV2Gym(gym.Env):
                         self.config['hour'] = random.randint(5, 15)
 
                 start_training_year = self.config['start_training_year']
+                start_training_month = self.config['start_training_month']
                 yrs = self.config['training_years']
 
                 self.sim_date = datetime.datetime(start_training_year,
-                                                  1,
+                                                  start_training_month,
                                                   1,
                                                   self.config['hour'],
                                                   self.config['minute'],
@@ -302,10 +303,11 @@ class EV2Gym(gym.Env):
 
             
             start_training_year = self.config['start_training_year']
+            start_training_month = self.config['start_training_month']
             yrs = self.config['training_years']
 
             self.sim_date = datetime.datetime(start_training_year,
-                                                  1,
+                                                  start_training_month,
                                                   1,
                                                   self.config['hour'],
                                                   self.config['minute'],

@@ -68,16 +68,16 @@ def V2G_profit_max(env, *args):
     '''
     
     state = [
-        (env.current_step/env.simulation_length),
+        # (env.current_step/env.simulation_length),
         # env.sim_date.weekday() / 7,
         # turn hour and minutes in sin and cos
-        # math.sin(env.sim_date.hour/24*2*math.pi),
-        # math.cos(env.sim_date.hour/24*2*math.pi),
+        math.sin(env.sim_date.hour/24*2*math.pi),
+        math.cos(env.sim_date.hour/24*2*math.pi),
     ]
 
     # state.append(env.current_power_usage[env.current_step-1])
 
-    h = 28 # was 28 steps = 7 hours, too many will make it too hard to learn for agent.
+    h = 20 # was 28 steps = 7 hours, too many will make it too hard to learn for agent.
 
     charge_prices = abs(env.charge_prices[0, env.current_step:
         env.current_step+h])
