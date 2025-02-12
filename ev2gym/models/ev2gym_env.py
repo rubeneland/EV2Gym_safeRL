@@ -312,8 +312,6 @@ class EV2Gym(gym.Env):
                                                   self.config['hour'],
                                                   self.config['minute'],
                                                   ) + datetime.timedelta(days=random.randint(0, int(yrs*365)))
-            
-            print(self.sim_date)
 
             if self.scenario == 'workplace':
                 # dont simulate weekends

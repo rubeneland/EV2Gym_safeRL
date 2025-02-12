@@ -157,7 +157,7 @@ def train_cvpo(args):
         # collecting params
         epoch: int = args.epoch
         episode_per_collect: int = 2
-        step_per_epoch: int = 2000
+        step_per_epoch: int = 3000
         update_per_step: float = 0.2
         buffer_size: int = 200000
         worker: str = "ShmemVectorEnv"
