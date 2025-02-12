@@ -223,6 +223,7 @@ class EV2Gym(gym.Env):
         self.EVs = []
 
         # Load Electricity prices for every charging station
+        self.price_data = None
         self.charge_prices, self.discharge_prices = load_electricity_prices(
             self)
 
