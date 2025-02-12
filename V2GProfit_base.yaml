@@ -18,7 +18,7 @@ random_day: True # True or False
 
 start_training_year: 2023
 start_training_month: 1
-training_years: 1 # summer
+training_years: 1 # full year
 
 # Simulation Starting Time
 # Hour and minute do not change after the environment has been reset
@@ -103,7 +103,7 @@ ev_specs_file: ./ev2gym/data/ev_specs_v2g_enabled2024.json # path to the file wi
 
 # Default Transformer model
 transformer:
-  max_power: 120 # in kW
+  max_power: 90 # in kW
 
 # Default Charging Station model
 charging_station:  
@@ -113,8 +113,6 @@ charging_station:
   max_discharge_current: -16 # Amperes (actual value <=0)
   voltage: 400 # Volts
   phases: 3 # 1,2, or 3
-
-# Stavros does not yet have minimum emergency SoC. We can include it in the cost / reward function. Also can make evaluation metric.
 
 # Default EV model
 ev:

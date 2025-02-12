@@ -156,8 +156,8 @@ def train_cvpo(args):
         last_layer_scale: bool = False
         # collecting params
         epoch: int = args.epoch
-        episode_per_collect: int = 4
-        step_per_epoch: int = 5000
+        episode_per_collect: int = 2
+        step_per_epoch: int = 2000
         update_per_step: float = 0.2
         buffer_size: int = 200000
         worker: str = "ShmemVectorEnv"
@@ -178,7 +178,7 @@ def train_cvpo(args):
         # Use 1 task in example.sh! More tasks will create more runs...
 
         group_name: str = "all_cost"
-        run_name= f'cvpo_v8_cos_sin_h20_100_v2g_40_cost_40_5spawn_10cs_90kw_cost_lim_{int(cost_limit)}_train_envs_{training_num}_test_envs_{testing_num}_run{random.randint(0, 1000)}'
+        run_name= f'cvpo_v10_random_prices_h20_100_v2g_cost_40_5spawn_10cs_90kw_cost_lim_{int(cost_limit)}_train_envs_{training_num}_test_envs_{testing_num}_run{random.randint(0, 1000)}'
 
         wandb.init(project='experiments',
                         sync_tensorboard=True,
