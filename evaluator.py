@@ -83,7 +83,7 @@ def evaluator():
     timescale = config["timescale"]
     simulation_length = config["simulation_length"]
 
-    n_test_cycles = 50
+    n_test_cycles = 100
 
     scenario = config_file.split("/")[-1].split(".")[0]
     eval_replay_path = f'./replay/CPO_base/min_c_1_usr_1000/{number_of_charging_stations}cs_{n_transformers}tr_{scenario}/'
@@ -129,7 +129,7 @@ def evaluator():
         cost_function = transformer_overload_usrpenalty_cost
     elif config_file == "V2GProfit_evaluate.yaml":
         reward_function = ProfitMax_TrPenalty_UserIncentives_safety
-        state_function = V2G_profit_max_loads
+        state_function = V2G_profit_max
         cost_function = transformer_overload_usrpenalty_cost
     else:
         raise ValueError('Unknown config file')
@@ -142,7 +142,7 @@ def evaluator():
             replay_save_path=f"replay/{evaluation_name}/",
         )
         replay_path = f"replay/{evaluation_name}/replay_{env.sim_name}.pkl"
-        print(env.sim_starting_date)
+        # print(env.sim_starting_date)
 
         for _ in range(env.simulation_length):
             actions = np.ones(env.cs)
@@ -173,8 +173,8 @@ def evaluator():
         # V2GProfitMaxOracle,
         # PowerTrackingErrorrMin
         # CPO,
-        # CVPO,
-        SACLag
+        CVPO
+        # SACLag
     ]
 
     # algorithms = [
@@ -300,7 +300,7 @@ def evaluator():
                 env = gym.make(task)
                 sim_length = env.env.env.simulation_length
 
-                load_path = 'fsrl_logs/TEST_FINAL_10_cs_90kw/cvpo_v3/checkpoint/model_best.pt'
+                load_path = 'fsrl_logs/exp_1_no_loads_no_pv_10_cs_spawn_5/cvpo_v9/checkpoint/model_best.pt'
 
                 # init logger
                 logger = TensorboardLogger("logs", log_txt=True, name=task)
@@ -339,7 +339,7 @@ def evaluator():
                 env = gym.make(task)
                 sim_length = env.env.env.simulation_length
 
-                load_path = 'fsrl_logs/TEST_FINAL_10_cs_90kw/sacl_v18/checkpoint/model.pt'
+                load_path = 'fsrl_logs/exp_1_no_loads_no_pv_10_cs_spawn_5/sacl_v1/checkpoint/model_best.pt'
 
                 # init logger
                 logger = TensorboardLogger("logs", log_txt=True, name=task)

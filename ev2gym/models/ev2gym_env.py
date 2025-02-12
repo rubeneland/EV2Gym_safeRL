@@ -312,6 +312,8 @@ class EV2Gym(gym.Env):
                                                   self.config['hour'],
                                                   self.config['minute'],
                                                   ) + datetime.timedelta(days=random.randint(0, int(yrs*365)))
+            
+            print(self.sim_date)
 
             if self.scenario == 'workplace':
                 # dont simulate weekends
@@ -331,6 +333,7 @@ class EV2Gym(gym.Env):
         self.EVs_profiles = load_ev_profiles(self)
         self.power_setpoints = load_power_setpoints(self)
         self.EVs = []
+        self.charge_prices, self.discharge_prices = load_electricity_prices(self)
 
         # print(f'Simulation starting date: {self.sim_date}')
 
