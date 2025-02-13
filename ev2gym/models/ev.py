@@ -214,10 +214,10 @@ class EV():
         #     return 1
 
         soc = self.get_soc()
-        if soc < 1.0:
-            return 1.0 - soc
-        else:
+        if soc > 0.99:
             return 1
+        else:
+            return soc
 
     def get_min_v2g_soc_metric(self) -> float:
         """
