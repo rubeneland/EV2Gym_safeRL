@@ -131,7 +131,7 @@ ev:
   transition_soc: 1 # 0-1 (0% - 100%)
 
   #The following values are also used if "heterogeneous_ev_specs = True"
-  min_battery_capacity: 5 # in kWh
+  min_battery_capacity: 20 # in kWh
   min_time_of_stay: 60 # in minutes
   min_v2g_soc: 0.4 # in SOC
   desired_capacity: 1 # in (0-1) (0% - 100%)
