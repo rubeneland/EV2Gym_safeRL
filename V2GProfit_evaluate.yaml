@@ -18,7 +18,7 @@ random_day: True # True or False
 
 start_training_year: 2024
 start_training_month: 1 #january
-training_years: 1 # summer
+training_years: 1 # full year
 
 # Simulation Starting Time
 # Hour and minute do not change after the environment has been reset
