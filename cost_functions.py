@@ -18,7 +18,7 @@ def transformer_overload_usrpenalty_cost(env, total_costs, user_satisfaction_lis
         #     cost += 500                    
     
     for score in user_satisfaction_list:  
-        cost += 100*math.exp(-3*score) - 100*math.exp(-3)
+        cost += 10*math.exp(-3*score) - 10*math.exp(-3)
 
         # if score < 0.6:
         #      cost += 45
@@ -33,7 +33,7 @@ def transformer_overload_usrpenalty_cost(env, total_costs, user_satisfaction_lis
                     # Add cost for discharging action when SOC below min V2G threshold: 40%
                     soc = EV.get_soc()
                     if soc <= 0.40 and EV.actual_current < 0:
-                        cost += (0.40 - soc) * 100
+                        cost += (0.40 - soc) * 10
 
 
     # cost for charging action when SOC at maximum
@@ -49,15 +49,15 @@ def ProfitMax_TrPenalty_UserIncentives_safety(env, total_costs, user_satisfactio
     
     reward = total_costs     
 
-    for cs in env.charging_stations:
+    # for cs in env.charging_stations:
 
-            # For every EV connected to the charging station
-            for EV in cs.evs_connected:
-                # If there is an EV connected
-                if EV is not None:
-                    # Add cost for discharging action when SOC below min V2G threshold: 40%
-                    soc = EV.get_soc()
-                    if soc >= 0.5 and EV.actual_current < 0 and (EV.time_of_departure - env.current_step) > 20:
-                        reward += 0.01
+    #         # For every EV connected to the charging station
+    #         for EV in cs.evs_connected:
+    #             # If there is an EV connected
+    #             if EV is not None:
+    #                 # Add reward for discharging action when EV = full and still a long time until departure to stimulate V2G
+    #                 soc = EV.get_soc()
+    #                 if soc >= 0.5 and EV.actual_current < 0 and (EV.time_of_departure - env.current_step) > 20:
+    #                     reward += 0.01
         
     return reward

@@ -1,9 +1,9 @@
 #!/bin/bash
 #SBATCH --job-name="exp1"
 #SBATCH --partition=compute
-#SBATCH --time=6:00:00
+#SBATCH --time=3:30:00
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=2
+#SBATCH --cpus-per-task=1
 #SBATCH --mem-per-cpu=6G
 #SBATCH --account=education-eemcs-msc-ee
 
@@ -15,4 +15,4 @@ source "$(conda info --base)/etc/profile.d/conda.sh"
 
 conda activate EV2Gym_srl
 
-srun python train_safe_RL.py --train cvpo --cost_limit 20 --epoch 400 --train_num 2 --test_num 10
+srun python train_safe_RL.py --train cvpo --cost_limit 3 --epoch 150 --train_num 1 --test_num 50
