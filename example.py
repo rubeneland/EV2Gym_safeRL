@@ -14,6 +14,8 @@ from ev2gym.baselines.mpc.V2GProfitMax import V2GProfitMaxOracle
 from ev2gym.baselines.heuristics import RoundRobin, RoundRobin_1transformer_powerlimit, ChargeAsFastAsPossible
 from ev2gym.baselines.heuristics import ChargeAsFastAsPossibleToDesiredCapacity
 
+from cost_functions import transformer_overload_usrpenalty_cost, ProfitMax_TrPenalty_UserIncentives_safety
+
 import numpy as np
 import matplotlib.pyplot as plt
 import pkg_resources
@@ -37,6 +39,8 @@ def eval():
                  load_from_replay_path=replay_path,
                  verbose=False,
                  #  seed=184692,
+                 reward_function=ProfitMax_TrPenalty_UserIncentives_safety,
+                 cost_function=transformer_overload_usrpenalty_cost,
                  save_replay=True,
                  save_plots=True,
                  )
@@ -73,18 +77,20 @@ def eval():
 
         # do random actions from -1--1
         # actions = np.random.uniform(-1,1,len(actions))
-        actions = agent.get_action(env)
+        # actions = agent.get_action(env)
 
         new_state, reward, done, truncated, stats = env.step(
             actions)  # takes action
         rewards.append(reward)
+
+        print(stats['cost'])
 
         if done:
             print(stats)
             print(f'End of simulation at step {env.current_step}')
             break
 
-    # exit()
+    exit()
     # Solve optimally
     # Power tracker optimizer
     agent = V2GProfitMaxOracleGB(replay_path=new_replay_path)

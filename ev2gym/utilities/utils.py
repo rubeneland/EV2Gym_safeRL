@@ -195,8 +195,8 @@ def spawn_single_EV(env,
     if initial_battery_capacity > env.config["ev"]['desired_capacity']:
         initial_battery_capacity = np.random.randint(1, battery_capacity)
 
-    if initial_battery_capacity < env.config["ev"]['min_battery_capacity'] and battery_capacity > 2*env.config["ev"]['min_battery_capacity']:
-        initial_battery_capacity = env.config["ev"]['min_battery_capacity']
+    # if initial_battery_capacity < env.config["ev"]['min_battery_capacity'] and battery_capacity > 2*env.config["ev"]['min_battery_capacity']:
+    #     initial_battery_capacity = env.config["ev"]['min_battery_capacity']
 
     # time of stay dependent on time of arrival
     time_of_stay_mean = env.df_time_of_stay_vs_arrival[(
@@ -269,6 +269,7 @@ def spawn_single_EV(env,
                   max_discharge_power=-
                   env.ev_specs[sampled_ev]["max_dc_discharge_power"],
                   min_v2g_soc=min_v2g_soc,
+                  min_battery_capacity=env.config["ev"]['min_battery_capacity'],
                   charge_efficiency=charge_efficiency,
                   discharge_efficiency=discharge_efficiency,
 
@@ -366,8 +367,8 @@ def spawn_single_EV_GF(env,
     if initial_battery_capacity > env.config["ev"]['desired_capacity']:
         initial_battery_capacity = np.random.randint(1, battery_capacity)
 
-    if initial_battery_capacity < env.config["ev"]['min_battery_capacity'] and battery_capacity > 2*env.config["ev"]['min_battery_capacity']:
-        initial_battery_capacity = env.config["ev"]['min_battery_capacity']
+    # if initial_battery_capacity < env.config["ev"]['min_battery_capacity'] and battery_capacity > 2*env.config["ev"]['min_battery_capacity']:
+    #     initial_battery_capacity = env.config["ev"]['min_battery_capacity']
 
     # turn from minutes to steps
     time_of_stay = time_of_stay // env.timescale + 1

@@ -20,6 +20,11 @@ def transformer_overload_usrpenalty_cost(env, total_costs, user_satisfaction_lis
     for score in user_satisfaction_list:  
         cost += 10*math.exp(-3*score) - 10*math.exp(-3)
 
+    # invalid_actions = 0
+    # for cs in env.charging_stations:
+    #     invalid_actions += cs.invalid_action_punishment
+    # cost += invalid_actions
+
         # if score < 0.6:
         #      cost += 45
 

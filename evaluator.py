@@ -83,10 +83,10 @@ def evaluator():
     timescale = config["timescale"]
     simulation_length = config["simulation_length"]
 
-    n_test_cycles = 100
+    n_test_cycles = 2
 
     scenario = config_file.split("/")[-1].split(".")[0]
-    eval_replay_path = f'./replay/CPO_base/min_c_1_usr_1000/{number_of_charging_stations}cs_{n_transformers}tr_{scenario}/'
+    eval_replay_path = f'./replay/{number_of_charging_stations}cs_{n_transformers}tr_{scenario}/'
     print(f'Looking for replay files in {eval_replay_path}')
     try:
         eval_replay_files = [f for f in os.listdir(
@@ -135,13 +135,15 @@ def evaluator():
         raise ValueError('Unknown config file')
 
     def generate_replay(evaluation_name):
+        # replay_path = evaluation_name.split('/')[-1]
         env = ev2gym_env.EV2Gym(
             config_file=config_file,
             generate_rnd_game=True,
             save_replay=True,
-            replay_save_path=f"replay/{evaluation_name}/",
+            replay_save_path=f"{evaluation_name}/",
         )
-        replay_path = f"replay/{evaluation_name}/replay_{env.sim_name}.pkl"
+        replay_path = evaluation_name.split('/')[-1]
+        replay_path = f"./replay{replay_path}/replay_{env.sim_name}.pkl"
         # print(env.sim_starting_date)
 
         for _ in range(env.simulation_length):
@@ -206,7 +208,7 @@ def evaluator():
 
     if not replays_exist:
         eval_replay_files = [generate_replay(
-            evaluation_name) for _ in range(n_test_cycles)]
+            eval_replay_path) for _ in range(n_test_cycles)]
 
     plot_results_dict = {}
     counter = 0
@@ -218,10 +220,12 @@ def evaluator():
             counter += 1
             h = -1
 
-            if replays_exist:
-                replay_path = eval_replay_path + eval_replay_files[k]
-            else:
-                replay_path = eval_replay_files[k]
+            # if replays_exist:
+            #     replay_path = eval_replay_path + eval_replay_files[k]
+            # else:
+            #     replay_path = eval_replay_files[k]
+
+            replay_path = f'./replay/{number_of_charging_stations}cs_{n_transformers}tr_{scenario}/' + eval_replay_files[k].split('/')[-1]
 
             if algorithm in [PPO, A2C, DDPG, SAC, TD3, TQC, TRPO, ARS, RecurrentPPO]:
                 gym.envs.register(id='evs-v0', entry_point='ev2gym.models.ev2gym_env:EV2Gym',
@@ -300,7 +304,7 @@ def evaluator():
                 env = gym.make(task)
                 sim_length = env.env.env.simulation_length
 
-                load_path = 'fsrl_logs/exp_1_no_loads_no_pv_10_cs_spawn_5/cvpo_v14/checkpoint/model_best.pt'
+                load_path = 'fsrl_logs/exp_1_no_loads_no_pv_10_cs_spawn_5/cvpo_v16/checkpoint/model_best.pt'
 
                 # init logger
                 logger = TensorboardLogger("logs", log_txt=True, name=task)

@@ -132,11 +132,11 @@ class EV_Charger:
 
         assert (len(actions) == self.n_ports)
         # if no EV is connected, set action to 0
-        invalid_action_punishment = 0
+        self.invalid_action_punishment = 0
         for i in range(len(actions)):
             if self.evs_connected[i] is None:
                 actions[i] = 0
-                invalid_action_punishment += 1
+                # invalid_action_punishment += 1
 
         # normalize actions to sum to 1 for charging surplass or -1 for discharging surplass
         if sum(actions) > 1:
@@ -173,6 +173,9 @@ class EV_Charger:
                     self.voltage,
                     phases=self.phases,
                     type=self.charger_type)
+                
+                if actual_energy == 0:
+                    self.invalid_action_punishment += 1
 
                 profit += abs(actual_energy) * charge_price
                 self.total_energy_charged += abs(actual_energy)
@@ -189,6 +192,9 @@ class EV_Charger:
                     self.voltage,
                     phases=self.phases,
                     type=self.charger_type)
+                
+                if actual_energy == 0:
+                    self.invalid_action_punishment += 1
 
                 profit += abs(actual_energy) * discharge_price
                 self.total_energy_discharged += abs(actual_energy)
@@ -226,7 +232,7 @@ class EV_Charger:
 
         self.current_step += 1
 
-        return profit, user_satisfaction, invalid_action_punishment, departing_evs
+        return profit, user_satisfaction, self.invalid_action_punishment, departing_evs
 
     def __str__(self) -> str:
 
