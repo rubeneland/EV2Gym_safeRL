@@ -192,11 +192,11 @@ def spawn_single_EV(env,
     else:
         initial_battery_capacity = battery_capacity - required_energy
 
-    if initial_battery_capacity > env.config["ev"]['desired_capacity']:
+    if initial_battery_capacity > battery_capacity:
         initial_battery_capacity = np.random.randint(1, battery_capacity)
 
-    # if initial_battery_capacity < env.config["ev"]['min_battery_capacity'] and battery_capacity > 2*env.config["ev"]['min_battery_capacity']:
-    #     initial_battery_capacity = env.config["ev"]['min_battery_capacity']
+    if initial_battery_capacity < env.config["ev"]['min_battery_capacity'] and battery_capacity > 2*env.config["ev"]['min_battery_capacity']:
+        initial_battery_capacity = env.config["ev"]['min_battery_capacity']
 
     # time of stay dependent on time of arrival
     time_of_stay_mean = env.df_time_of_stay_vs_arrival[(
@@ -270,6 +270,7 @@ def spawn_single_EV(env,
                   env.ev_specs[sampled_ev]["max_dc_discharge_power"],
                   min_v2g_soc=min_v2g_soc,
                   min_battery_capacity=env.config["ev"]['min_battery_capacity'],
+                  min_v2g_capacity = env.config["ev"]['min_v2g_capacity'],
                   charge_efficiency=charge_efficiency,
                   discharge_efficiency=discharge_efficiency,
 
@@ -277,8 +278,7 @@ def spawn_single_EV(env,
                                           (np.random.rand()+0.00001)/5, 3),  # [0.7-0.9]
                   transition_soc_multiplier=transition_soc_multiplier,
                   battery_capacity=battery_capacity,
-                  desired_capacity=env.config["ev"]['desired_capacity'] * \
-                  battery_capacity,
+                  desired_capacity=env.config["ev"]['desired_capacity'],
                   time_of_arrival=step+1,
                   time_of_departure=int(
                       time_of_stay + step + 3),
@@ -290,8 +290,7 @@ def spawn_single_EV(env,
                   location=cs_id,
                   battery_capacity_at_arrival=initial_battery_capacity,
                   battery_capacity=battery_capacity,
-                  desired_capacity=env.config["ev"]['desired_capacity'] *
-                  battery_capacity,
+                  desired_capacity=env.config["ev"]['desired_capacity'],
                   min_v2g_soc=min_v2g_soc,
                   max_ac_charge_power=env.config["ev"]['max_ac_charge_power'],
                   min_ac_charge_power=env.config["ev"]['min_ac_charge_power'],
@@ -364,11 +363,11 @@ def spawn_single_EV_GF(env,
     else:
         initial_battery_capacity = battery_capacity - required_energy
 
-    if initial_battery_capacity > env.config["ev"]['desired_capacity']:
+    if initial_battery_capacity > battery_capacity:
         initial_battery_capacity = np.random.randint(1, battery_capacity)
 
-    # if initial_battery_capacity < env.config["ev"]['min_battery_capacity'] and battery_capacity > 2*env.config["ev"]['min_battery_capacity']:
-    #     initial_battery_capacity = env.config["ev"]['min_battery_capacity']
+    if initial_battery_capacity < env.config["ev"]['min_battery_capacity'] and battery_capacity > 2*env.config["ev"]['min_battery_capacity']:
+        initial_battery_capacity = env.config["ev"]['min_battery_capacity']
 
     # turn from minutes to steps
     time_of_stay = time_of_stay // env.timescale + 1
@@ -405,8 +404,7 @@ def spawn_single_EV_GF(env,
                                           (np.random.rand()+0.00001)/5, 3),  # [0.7-0.9]
                   transition_soc_multiplier=transition_soc_multiplier,
                   battery_capacity=battery_capacity,
-                  desired_capacity=env.config["ev"]['desired_capacity'] * \
-                  battery_capacity,
+                  desired_capacity=env.config["ev"]['desired_capacity'],
                   time_of_arrival=step+1,
                   time_of_departure=int(
                       time_of_stay + step + 3),
@@ -418,8 +416,7 @@ def spawn_single_EV_GF(env,
                   location=cs_id,
                   battery_capacity_at_arrival=initial_battery_capacity,
                   battery_capacity=battery_capacity,
-                  desired_capacity=env.config["ev"]['desired_capacity'] *
-                  battery_capacity,
+                  desired_capacity=env.config["ev"]['desired_capacity'],
                   max_ac_charge_power=env.config["ev"]['max_ac_charge_power'],
                   min_ac_charge_power=env.config["ev"]['min_ac_charge_power'],
                   max_dc_charge_power=env.config["ev"]['max_dc_charge_power'],

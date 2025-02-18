@@ -178,7 +178,7 @@ def train_cvpo(args):
         # Use 1 task in example.sh! More tasks will create more runs...
 
         group_name: str = "all_cost"
-        run_name= f'cvpo_v16_new_user_satisfaction_min_20kwh_h20_no_v2g_cost_5spawn_10cs_90kw_cost_lim_{cost_limit}_train_envs_{training_num}_test_envs_{testing_num}_run{random.randint(0, 1000)}'
+        run_name= f'cvpo_v17_ACTUAL_min_20kwh_h20_no_v2g_cost_5spawn_10cs_90kw_cost_lim_{cost_limit}_train_envs_{training_num}_test_envs_{testing_num}_run{random.randint(0, 1000)}'
 
         wandb.init(project='experiments',
                         sync_tensorboard=True,

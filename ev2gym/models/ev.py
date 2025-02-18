@@ -20,7 +20,7 @@ class EV():
         - battery_capacity_at_arrival: the battery capacity of the EV at arrival time in kWh
         - time_of_arrival: the time of arrival of the EV in the charging station in simulation timesteps
         - time_of_departure: the earliest time of departure of the EV in the charging station in simulation timesteps (if use_probabilistic_time_of_departure is False, then time_of_departure is equal to time_of_departure)
-        - desired_capacity: the desired capacity of the EV at departure time in kWh
+        - desired_capacity: the desired capacity of the EV at departure time in soc
         - use_probabilistic_time_of_departure: whether the EV will use a probabilistic time of departure or not
         - battery_capacity: the battery capacity of the EV in kWh
         - min_desired_capacity: the minimum desired capacity of the EV in kWh to maximize battery life
@@ -48,9 +48,10 @@ class EV():
                  battery_capacity_at_arrival,
                  time_of_arrival,
                  time_of_departure,
-                 desired_capacity=None,  # kWh
+                 desired_capacity=None,  # soc
                  battery_capacity=50,  # kWh
-                 min_battery_capacity=10,  # kWh
+                 min_battery_capacity=5,  # kWh
+                 min_v2g_capacity=20, #kwh
                  min_v2g_soc=0.4,  # soc
                  max_ac_charge_power=22,  # kW
                  min_ac_charge_power=0,  # kW
@@ -72,12 +73,13 @@ class EV():
         # EV simulation characteristics
         self.time_of_arrival = time_of_arrival
         self.time_of_departure = time_of_departure
-        self.desired_capacity = battery_capacity if desired_capacity is None else desired_capacity
+        self.desired_capacity = 1 if desired_capacity is None else desired_capacity
         self.battery_capacity_at_arrival = battery_capacity_at_arrival  # kWh
 
         # EV technical characteristics
         self.battery_capacity = battery_capacity  # kWh
         self.min_battery_capacity = min_battery_capacity  # kWh
+        self.min_v2g_capacity = min_v2g_capacity  # kWh
         self.min_v2g_soc = min_v2g_soc  # kWh
         self.max_ac_charge_power = max_ac_charge_power  # kW
         self.min_ac_charge_power = min_ac_charge_power  # kW
@@ -214,10 +216,7 @@ class EV():
         #     return 1
 
         soc = self.get_soc()
-        if soc >= self.desired_capacity:
-            return 1
-        else:
-            return soc / self.desired_capacity
+        return soc / self.desired_capacity
 
     def get_min_v2g_soc_metric(self) -> float:
         """
@@ -386,18 +385,18 @@ class EV():
             discharge_efficiency = self.discharge_efficiency
         
         given_energy = given_power * discharge_efficiency * self.timescale / 60
-        if self.current_capacity + given_energy < self.min_battery_capacity:
-            if self.current_capacity > self.min_battery_capacity:
+        if self.current_capacity + given_energy < self.min_v2g_capacity:
+            if self.current_capacity > self.min_v2g_capacity:
                 self.current_energy = - \
-                    (self.current_capacity - self.min_battery_capacity)
+                    (self.current_capacity - self.min_v2g_capacity)
                 given_energy = self.current_energy
                 self.prev_capacity = self.current_capacity
-                self.current_capacity = self.min_battery_capacity
+                self.current_capacity = self.min_v2g_capacity
             else:
                 self.current_energy = 0
                 given_energy = 0
                 self.prev_capacity = self.current_capacity
-                self.current_capacity = self.min_battery_capacity
+                self.current_capacity = self.min_v2g_capacity
         else:
             self.current_energy = given_energy  # * 60 / self.timescale
             self.prev_capacity = self.current_capacity
