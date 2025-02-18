@@ -177,8 +177,8 @@ def spawn_single_EV(env,
     required_energy = np.random.normal(
         required_energy_mean, 0.5*required_energy_mean)  # kWh
 
-    if required_energy < 5:
-        required_energy = np.random.randint(5, 10)
+    if required_energy < 1:
+        required_energy = np.random.randint(1, 3)
 
     if env.heterogeneous_specs:
         sampled_ev = np.random.choice(
