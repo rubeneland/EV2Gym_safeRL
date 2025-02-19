@@ -100,7 +100,7 @@ class EV():
         self.actual_current = 0  # A
         self.charging_cycles = 0
         self.previous_power = 0
-        self.required_energy = self.battery_capacity - self.battery_capacity_at_arrival
+        self.required_energy = self.battery_capacity - self.battery_capacity_at_arrival # Not possible to do target soc < 1.0 ?
         self.total_energy_exchanged = 0
         self.max_energy_AFAP = 0
         # timesteps that the EV is discharged below the minimum emergency battery capacity

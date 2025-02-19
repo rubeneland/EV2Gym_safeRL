@@ -83,10 +83,11 @@ def evaluator():
     timescale = config["timescale"]
     simulation_length = config["simulation_length"]
 
-    n_test_cycles = 2
+    n_test_cycles = 100
 
     scenario = config_file.split("/")[-1].split(".")[0]
-    eval_replay_path = f'./replay/{number_of_charging_stations}cs_{n_transformers}tr_{scenario}/'
+    # eval_replay_path = f'./replay/{number_of_charging_stations}cs_{n_transformers}tr_{scenario}/'
+    eval_replay_path = f'./replay/exp1/'
     print(f'Looking for replay files in {eval_replay_path}')
     try:
         eval_replay_files = [f for f in os.listdir(
@@ -197,9 +198,10 @@ def evaluator():
     #             #   eMPC_G2V,
     #             ]
 
-    evaluation_name = f'eval_{number_of_charging_stations}cs_{n_transformers}tr_{scenario}_{len(algorithms)}_algos' +\
-        f'_{n_test_cycles}_exp_' +\
-        f'{datetime.datetime.now().strftime("%Y_%m_%d_%f")}'
+    # evaluation_name = f'eval_{number_of_charging_stations}cs_{n_transformers}tr_{scenario}_{len(algorithms)}_algos' +\
+    #     f'_{n_test_cycles}_exp_' +\
+        # f'{datetime.datetime.now().strftime("%Y_%m_%d_%f")}'
+    evaluation_name = f'exp1' + f'{datetime.datetime.now().strftime("%Y_%m_%d_%f")}'
 
     # make a directory for the evaluation
     save_path = f'./results/{evaluation_name}/'
@@ -225,7 +227,8 @@ def evaluator():
             # else:
             #     replay_path = eval_replay_files[k]
 
-            replay_path = f'./replay/{number_of_charging_stations}cs_{n_transformers}tr_{scenario}/' + eval_replay_files[k].split('/')[-1]
+            # replay_path = f'./replay/{number_of_charging_stations}cs_{n_transformers}tr_{scenario}/' + eval_replay_files[k].split('/')[-1]
+            replay_path = f'./replay/exp1/' + eval_replay_files[k].split('/')[-1]
 
             if algorithm in [PPO, A2C, DDPG, SAC, TD3, TQC, TRPO, ARS, RecurrentPPO]:
                 gym.envs.register(id='evs-v0', entry_point='ev2gym.models.ev2gym_env:EV2Gym',
@@ -304,7 +307,7 @@ def evaluator():
                 env = gym.make(task)
                 sim_length = env.env.env.simulation_length
 
-                load_path = 'fsrl_logs/exp_1_no_loads_no_pv_10_cs_spawn_5/cvpo_v16/checkpoint/model_best.pt'
+                load_path = 'fsrl_logs/exp_1_no_loads_no_pv_10_cs_spawn_5/cvpo_v19/checkpoint/model_best.pt'
 
                 # init logger
                 logger = TensorboardLogger("logs", log_txt=True, name=task)
