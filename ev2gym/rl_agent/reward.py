@@ -34,11 +34,11 @@ def ProfitMax_TrPenalty_UserIncentives(env, total_costs, user_satisfaction_list,
     
     reward = total_costs
     
-    for tr in env.transformers:
-        reward -= 100 * tr.get_how_overloaded()                        
+    # for tr in env.transformers:
+    #     reward -= 100 * tr.get_how_overloaded()                        
     
     for score in user_satisfaction_list:        
-        reward -= 100 * math.exp(-10*score)
+        reward -= 20*math.exp(-3*score) - 20*math.exp(-3)
         
     return reward
 

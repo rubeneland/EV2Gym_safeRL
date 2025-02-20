@@ -64,11 +64,15 @@ if __name__ == "__main__":
 
     reward_function = ProfitMax_TrPenalty_UserIncentives
     state_function = V2G_profit_max
-    group_name = f'{config["number_of_charging_stations"]}cs_V2GProfit_TEST'
-                
-    run_name += f'{algorithm}_{reward_function.__name__}_{state_function.__name__}'
+    # group_name = f'{config["number_of_charging_stations"]}cs_V2GProfit_TEST'
 
-    run = wandb.init(project='ev2gym',
+    group_name = 'exp1_baselines'
+                
+    # run_name += f'{algorithm}_{reward_function.__name__}_{state_function.__name__}'
+
+    run_name = f'{algorithm}_exp1_v1_20_usr_cost'
+
+    run = wandb.init(project='experiments_baselines',
                      sync_tensorboard=True,
                      group=group_name,
                      name=run_name,
@@ -160,12 +164,12 @@ if __name__ == "__main__":
                 progress_bar=True,
                 callback=[
                     WandbCallback(
-                        # gradient_save_freq=10_000,
-                        # model_save_path=f"saved_models/{group_name}/{run_name}.best",
+                        gradient_save_freq=10_000,
+                        model_save_path=f"saved_models/{group_name}/{run_name}.best",
                         verbose=2),
                     eval_callback])
 
-    # model.save(f"./saved_models/{group_name}/{run_name}.last")
+    model.save(f"./saved_models/{group_name}/{run_name}.last")
     print(f'Finished training {algorithm} algorithm, {run_name} saving model at ./saved_models/{group_name}/{run_name}')   
 
     env = model.get_env()
