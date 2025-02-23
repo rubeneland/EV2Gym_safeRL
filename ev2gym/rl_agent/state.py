@@ -115,7 +115,7 @@ def V2G_profit_max(env, *args):
 
     return state
 
-def V2G_profit_max_loads(env, *args): #no Demand Respone ?
+def V2G_profit_max_loads(env, *args):
     '''
     This is the state function for the V2GProfitMax scenario with loads
     '''
@@ -125,23 +125,24 @@ def V2G_profit_max_loads(env, *args): #no Demand Respone ?
         (env.current_step/env.simulation_length),      
     ]
 
-    state.append(env.current_power_usage[env.current_step-1])
-
     h = 20
 
-    charge_prices = abs(env.charge_prices[0, env.current_step:
-        env.current_step+h])
+    charge_prices = abs(env.charge_prices[0, env.current_step: env.current_step+h])
     
     if len(charge_prices) < h:
         charge_prices = np.append(charge_prices, np.zeros(h-len(charge_prices)))
     
     state.append(charge_prices)
 
+
+
     for tr in env.transformers:
         if env.current_step < env.simulation_length:
             state.append(tr.max_power[env.current_step])
         else:
             state.append(0)
+
+    state.append(env.current_power_usage[env.current_step-1])
     
     # For every transformer
     for tr in env.transformers:

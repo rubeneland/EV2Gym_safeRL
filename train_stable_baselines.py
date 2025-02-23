@@ -70,7 +70,7 @@ if __name__ == "__main__":
                 
     # run_name += f'{algorithm}_{reward_function.__name__}_{state_function.__name__}'
 
-    run_name = f'{algorithm}_exp1_v1_20_usr_cost'
+    run_name = f'{algorithm}_exp1_v1_20_usr_cost_h20'
 
     run = wandb.init(project='experiments_baselines',
                      sync_tensorboard=True,
@@ -112,7 +112,7 @@ if __name__ == "__main__":
     eval_callback = EvalCallback(eval_env,
                                     best_model_save_path=save_path,
                                     log_path=eval_log_dir,
-                                    eval_freq=config['simulation_length']*100, #50
+                                    eval_freq=config['simulation_length']*50, #50
                                     n_eval_episodes=50, # 40
                                     deterministic=True,
                                     render=False)
@@ -165,11 +165,13 @@ if __name__ == "__main__":
                 callback=[
                     WandbCallback(
                         gradient_save_freq=10_000,
-                        model_save_path=f"saved_models/{group_name}/{run_name}.best",
+                        # model_save_path=f"saved_models/{group_name}/{run_name}.best",
+                        model_save_path=f"saved_models/{algorithm}_v1/{run_name}.best",
                         verbose=2),
                     eval_callback])
 
-    model.save(f"./saved_models/{group_name}/{run_name}.last")
+    # model.save(f"./saved_models/{group_name}/{run_name}.last")
+    model.save(f"saved_models/{algorithm}_v1/{run_name}.last")
     print(f'Finished training {algorithm} algorithm, {run_name} saving model at ./saved_models/{group_name}/{run_name}')   
 
     env = model.get_env()
