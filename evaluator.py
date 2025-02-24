@@ -69,7 +69,8 @@ class SpecMaxStepsWrapper(Wrapper):
 def evaluator():
 
     # config_file = "ev2gym/example_config_files/V2G_MPC2.yaml"
-    config_file = "V2GProfit_evaluate.yaml"
+    config_file = "V2GProfit_eval_loads.yaml"
+    # config_file = "V2GProfit_eval_loads.yaml"
     # config_file = "ev2gym/example_config_files/PublicPST.yaml"
     # config_file = "ev2gym/example_config_files/BusinessPST.yaml"
     # config_file = "ev2gym/example_config_files/V2GProfitPlusLoads.yaml"
@@ -87,7 +88,11 @@ def evaluator():
 
     scenario = config_file.split("/")[-1].split(".")[0]
     # eval_replay_path = f'./replay/{number_of_charging_stations}cs_{n_transformers}tr_{scenario}/'
-    eval_replay_path = f'./replay/exp1/'
+    # eval_replay_path = f'./replay/exp1/'
+    # eval_replay_path = f'./replay/exp1_baselines/'
+    # eval_replay_path = f'./replay/exp2_0_6_tr_120kw/'
+    eval_replay_path = f'./replay/exp2_0_7_tr_120kw/'
+    # eval_replay_path = f'./replay/exp2_0_8_tr_120kw/'
     print(f'Looking for replay files in {eval_replay_path}')
     try:
         eval_replay_files = [f for f in os.listdir(
@@ -128,9 +133,15 @@ def evaluator():
         reward_function = ProfitMax_TrPenalty_UserIncentives_safety
         state_function = V2G_profit_max_loads
         cost_function = transformer_overload_usrpenalty_cost
-    elif config_file == "V2GProfit_evaluate.yaml":
+
+    elif config_file == "V2GProfit_eval_base.yaml":
         reward_function = ProfitMax_TrPenalty_UserIncentives_safety
         state_function = V2G_profit_max
+        cost_function = transformer_overload_usrpenalty_cost
+
+    elif config_file == "V2GProfit_eval_loads.yaml":
+        reward_function = ProfitMax_TrPenalty_UserIncentives_safety
+        state_function = V2G_profit_max_loads
         cost_function = transformer_overload_usrpenalty_cost
     else:
         raise ValueError('Unknown config file')
@@ -201,7 +212,7 @@ def evaluator():
     # evaluation_name = f'eval_{number_of_charging_stations}cs_{n_transformers}tr_{scenario}_{len(algorithms)}_algos' +\
     #     f'_{n_test_cycles}_exp_' +\
         # f'{datetime.datetime.now().strftime("%Y_%m_%d_%f")}'
-    evaluation_name = f'exp1' + f'{datetime.datetime.now().strftime("%Y_%m_%d_%f")}'
+    evaluation_name = f'exp2_' + f'{datetime.datetime.now().strftime("%Y_%m_%d_%f")}'
 
     # make a directory for the evaluation
     save_path = f'./results/{evaluation_name}/'
@@ -228,7 +239,12 @@ def evaluator():
             #     replay_path = eval_replay_files[k]
 
             # replay_path = f'./replay/{number_of_charging_stations}cs_{n_transformers}tr_{scenario}/' + eval_replay_files[k].split('/')[-1]
-            replay_path = f'./replay/exp1/' + eval_replay_files[k].split('/')[-1]
+            # replay_path = f'./replay/exp1/' + eval_replay_files[k].split('/')[-1]
+            # replay_path = f'./replay/exp1_baselines/' + eval_replay_files[k].split('/')[-1]
+            # replay_path = f'./replay/exp2_0_5_tr_120kw/' + eval_replay_files[k].split('/')[-1]
+            # replay_path = f'./replay/exp2_0_6_tr_120kw/' + eval_replay_files[k].split('/')[-1]
+            replay_path = f'./replay/exp2_0_7_tr_120kw/' + eval_replay_files[k].split('/')[-1]
+            # replay_path = f'./replay/exp2_0_8_tr_120kw/' + eval_replay_files[k].split('/')[-1]
 
             if algorithm in [PPO, A2C, DDPG, SAC, TD3, TQC, TRPO, ARS, RecurrentPPO]:
                 gym.envs.register(id='evs-v0', entry_point='ev2gym.models.ev2gym_env:EV2Gym',
@@ -245,8 +261,14 @@ def evaluator():
                         f"rppo_{reward_function.__name__}_{state_function.__name__}"
 
                 else:
-                    load_path = f'./saved_models/{number_of_charging_stations}cs_{scenario}/' + \
-                        f"{algorithm.__name__.lower()}_{reward_function.__name__}_{state_function.__name__}/best_model.zip"
+                    # load_path = f'./saved_models/{number_of_charging_stations}cs_{scenario}/' + \
+                        # f"{algorithm.__name__.lower()}_{reward_function.__name__}_{state_function.__name__}/best_model.zip"
+
+
+                    if algorithm == TD3:
+                        load_path = f"./saved_models/td3_v1/td3_exp1_v1_20_usr_cost/best_model.zip"
+                    if algorithm == SAC:
+                        load_path = f"./saved_models/sac_v1/sac_exp1_v1_20_usr_cost_best/model.zip" 
 
                 # initialize the timer
                 timer = time.time()
@@ -307,7 +329,7 @@ def evaluator():
                 env = gym.make(task)
                 sim_length = env.env.env.simulation_length
 
-                load_path = 'fsrl_logs/exp_1_no_loads_no_pv_10_cs_spawn_5/cvpo_v26/checkpoint/model_best.pt'
+                load_path = 'fsrl_logs/exp_2_loads_no_PV/cvpo_v9/checkpoint/model_best.pt'
 
                 # init logger
                 logger = TensorboardLogger("logs", log_txt=True, name=task)
@@ -419,7 +441,7 @@ def evaluator():
                 ################# Evaluation ##############################
                 if algorithm in [PPO, A2C, DDPG, SAC, TD3, TQC, TRPO, ARS, RecurrentPPO]:
                     action, _ = model.predict(state, deterministic=True)
-                    obs, reward, done, _, stats = env.step(action)
+                    obs, reward, done, stats = env.step(action)
                     # if CPO == True:
                     #     action = policy.predict(state, deterministic=True)
                     #     obs, reward, done, stats = env.step(action)
