@@ -33,7 +33,7 @@ def eval():
     replay_path = None
 
     # config_file = "ev2gym/example_config_files/V2G_MPC2.yaml"
-    config_file = "V2GProfit_evaluate.yaml"
+    config_file = "V2GProfit_eval_base.yaml"
 
     env = EV2Gym(config_file=config_file,
                  load_from_replay_path=replay_path,
@@ -79,11 +79,13 @@ def eval():
         # actions = np.random.uniform(-1,1,len(actions))
         # actions = agent.get_action(env)
 
+        actions = actions * -1
+
         new_state, reward, done, truncated, stats = env.step(
             actions)  # takes action
         rewards.append(reward)
 
-        print(stats['cost'])
+        # print(stats['cost'])
 
         if done:
             print(stats)

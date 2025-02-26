@@ -394,12 +394,12 @@ class EV():
                     (self.current_capacity - min_v2g)
                 given_energy = self.current_energy
                 self.prev_capacity = self.current_capacity
-                self.current_capacity = min_v2g
+                # self.current_capacity = min_v2g # have to remove this when using min_v2g_capacity > min_battery_capacity !
             else:
                 self.current_energy = 0
                 given_energy = 0
                 self.prev_capacity = self.current_capacity
-                self.current_capacity = min_v2g
+                self.current_capacity = self.current_capacity
         else:
             self.current_energy = given_energy  # * 60 / self.timescale
             self.prev_capacity = self.current_capacity

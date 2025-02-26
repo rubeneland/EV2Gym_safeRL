@@ -69,8 +69,8 @@ class SpecMaxStepsWrapper(Wrapper):
 def evaluator():
 
     # config_file = "ev2gym/example_config_files/V2G_MPC2.yaml"
-    config_file = "V2GProfit_eval_loads.yaml"
     # config_file = "V2GProfit_eval_loads.yaml"
+    config_file = "V2GProfit_eval_base.yaml"
     # config_file = "ev2gym/example_config_files/PublicPST.yaml"
     # config_file = "ev2gym/example_config_files/BusinessPST.yaml"
     # config_file = "ev2gym/example_config_files/V2GProfitPlusLoads.yaml"
@@ -88,10 +88,9 @@ def evaluator():
 
     scenario = config_file.split("/")[-1].split(".")[0]
     # eval_replay_path = f'./replay/{number_of_charging_stations}cs_{n_transformers}tr_{scenario}/'
-    # eval_replay_path = f'./replay/exp1/'
-    # eval_replay_path = f'./replay/exp1_baselines/'
+    eval_replay_path = f'./replay/exp1/'
     # eval_replay_path = f'./replay/exp2_0_6_tr_120kw/'
-    eval_replay_path = f'./replay/exp2_0_7_tr_120kw/'
+    # eval_replay_path = f'./replay/exp2_0_7_tr_120kw/'
     # eval_replay_path = f'./replay/exp2_0_8_tr_120kw/'
     print(f'Looking for replay files in {eval_replay_path}')
     try:
@@ -175,7 +174,7 @@ def evaluator():
         ChargeAsFastAsPossible,
         # ChargeAsLateAsPossible,
         # PPO, A2C, DDPG, SAC, TD3, TQC, TRPO, ARS, RecurrentPPO,
-        # SAC,
+        SAC,
         # TQC,
         # TD3,
         # # ARS,
@@ -185,10 +184,10 @@ def evaluator():
         # # V2GProfitMaxLoadsOracle,
         V2GProfitMaxOracleGB,
         # V2GProfitMaxOracle,
-        # PowerTrackingErrorrMin
+        # PowerTrackingErrorrMin,
         # CPO,
-        CVPO
-        # SACLag
+        # CVPO,
+        # SACLag,
     ]
 
     # algorithms = [
@@ -239,11 +238,10 @@ def evaluator():
             #     replay_path = eval_replay_files[k]
 
             # replay_path = f'./replay/{number_of_charging_stations}cs_{n_transformers}tr_{scenario}/' + eval_replay_files[k].split('/')[-1]
-            # replay_path = f'./replay/exp1/' + eval_replay_files[k].split('/')[-1]
-            # replay_path = f'./replay/exp1_baselines/' + eval_replay_files[k].split('/')[-1]
+            replay_path = f'./replay/exp1/' + eval_replay_files[k].split('/')[-1]
             # replay_path = f'./replay/exp2_0_5_tr_120kw/' + eval_replay_files[k].split('/')[-1]
             # replay_path = f'./replay/exp2_0_6_tr_120kw/' + eval_replay_files[k].split('/')[-1]
-            replay_path = f'./replay/exp2_0_7_tr_120kw/' + eval_replay_files[k].split('/')[-1]
+            # replay_path = f'./replay/exp2_0_7_tr_120kw/' + eval_replay_files[k].split('/')[-1]
             # replay_path = f'./replay/exp2_0_8_tr_120kw/' + eval_replay_files[k].split('/')[-1]
 
             if algorithm in [PPO, A2C, DDPG, SAC, TD3, TQC, TRPO, ARS, RecurrentPPO]:
@@ -268,7 +266,7 @@ def evaluator():
                     if algorithm == TD3:
                         load_path = f"./saved_models/td3_v1/td3_exp1_v1_20_usr_cost/best_model.zip"
                     if algorithm == SAC:
-                        load_path = f"./saved_models/sac_v1/sac_exp1_v1_20_usr_cost_best/model.zip" 
+                        load_path = f"./saved_models/sac_v2/model.zip" 
 
                 # initialize the timer
                 timer = time.time()
