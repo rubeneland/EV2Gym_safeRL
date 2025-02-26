@@ -59,7 +59,8 @@ class SpecMaxStepsWrapper(Wrapper):
         self.spec.max_episode_steps = spec_max_steps
 
 # Environment configuration
-config_file = "V2GProfit_loads.yaml"
+# config_file = "V2GProfit_loads.yaml"
+config_file = "V2GProfit_base.yaml"
 reward_function = ProfitMax_TrPenalty_UserIncentives_safety
 state_function = V2G_profit_max_loads
 cost_function = transformer_overload_usrpenalty_cost
@@ -177,10 +178,11 @@ def train_cvpo(args):
 
         # Use 1 task in example.sh! More tasks will create more runs...
 
-        group_name: str = "exp"
-        run_name= f'cvpo_v12_h16_0_5_tr_cost_10_usr_5spawn_10cs_120kw_0_6_tr_once_in_state_cost_lim_{cost_limit}_train_envs_{training_num}_test_envs_{testing_num}_run{random.randint(0, 1000)}'
+        group_name: str = "exp1"
+        # run_name= f'cvpo_v33_hard_constraint_0_5_SOC_h20_0_5_tr_cost_10_usr_5spawn_10cs_120kw_0_7_tr_once_in_state_cost_lim_{cost_limit}_train_envs_{training_num}_test_envs_{testing_num}_run{random.randint(0, 1000)}'
+        run_name= f'cvpo_v35_hard_constraint_0_4_SOC_h20_100_usr_5spawn_10cs_cost_lim_{cost_limit}_train_envs_{training_num}_test_envs_{testing_num}_run{random.randint(0, 1000)}'
 
-        wandb.init(project='experiment_2',
+        wandb.init(project='experiments',
                         sync_tensorboard=True,
                         group=group_name,
                         name=run_name,
@@ -188,7 +190,7 @@ def train_cvpo(args):
                         )
 
         # init logger
-        logger = WandbLogger(log_dir="fsrl_logs/exp_2_loads_no_PV", log_txt=True, group=group_name, name=run_name)
+        logger = WandbLogger(log_dir="fsrl_logs/exp_1_no_loads_no_pv_10_cs_spawn_5", log_txt=True, group=group_name, name=run_name)
 
         env = gym.make(task)
         # env.spec.max_episode_steps = env.env.env.simulation_length

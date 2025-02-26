@@ -385,18 +385,21 @@ class EV():
             discharge_efficiency = self.discharge_efficiency
         
         given_energy = given_power * discharge_efficiency * self.timescale / 60
-        if self.current_capacity + given_energy < self.min_v2g_capacity:
-            if self.current_capacity > self.min_v2g_capacity:
+        # if self.current_capacity + given_energy < self.min_v2g_capacity:
+        min_v2g = 0
+        min_v2g = self.min_v2g_soc * self.battery_capacity # min capacity of V2G calculated from min V2G soc
+        if self.current_capacity + given_energy < min_v2g:
+            if self.current_capacity > min_v2g:
                 self.current_energy = - \
-                    (self.current_capacity - self.min_v2g_capacity)
+                    (self.current_capacity - min_v2g)
                 given_energy = self.current_energy
                 self.prev_capacity = self.current_capacity
-                self.current_capacity = self.min_v2g_capacity
+                self.current_capacity = min_v2g
             else:
                 self.current_energy = 0
                 given_energy = 0
                 self.prev_capacity = self.current_capacity
-                self.current_capacity = self.min_v2g_capacity
+                self.current_capacity = min_v2g
         else:
             self.current_energy = given_energy  # * 60 / self.timescale
             self.prev_capacity = self.current_capacity

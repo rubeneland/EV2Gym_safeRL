@@ -134,7 +134,8 @@ def V2G_profit_max_loads(env, *args):
     
     state.append(charge_prices)
 
-
+    # for tr in env.transformers:
+    #     state.append(tr.max_power[env.current_step])
 
     for tr in env.transformers:
         if env.current_step < env.simulation_length:
@@ -142,7 +143,7 @@ def V2G_profit_max_loads(env, *args):
         else:
             state.append(0)
 
-    state.append(env.current_power_usage[env.current_step-1])
+    # state.append(env.current_power_usage[env.current_step-1])
     
     # For every transformer
     for tr in env.transformers:

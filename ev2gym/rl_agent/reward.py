@@ -38,7 +38,7 @@ def ProfitMax_TrPenalty_UserIncentives(env, total_costs, user_satisfaction_list,
     #     reward -= 100 * tr.get_how_overloaded()                        
     
     for score in user_satisfaction_list:        
-        reward -= 20*math.exp(-3*score) - 20*math.exp(-3)
+        reward -= 100*math.exp(-3*score) + 100*math.exp(-3)
         
     return reward
 
