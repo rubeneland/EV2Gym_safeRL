@@ -135,7 +135,7 @@ def evaluator():
 
     elif config_file == "V2GProfit_eval_base.yaml":
         reward_function = ProfitMax_TrPenalty_UserIncentives_safety
-        state_function = V2G_profit_max
+        state_function = V2G_profit_max_loads
         cost_function = transformer_overload_usrpenalty_cost
 
     elif config_file == "V2GProfit_eval_loads.yaml":
@@ -174,7 +174,7 @@ def evaluator():
         ChargeAsFastAsPossible,
         # ChargeAsLateAsPossible,
         # PPO, A2C, DDPG, SAC, TD3, TQC, TRPO, ARS, RecurrentPPO,
-        SAC,
+        # SAC,
         # TQC,
         # TD3,
         # # ARS,
@@ -186,7 +186,7 @@ def evaluator():
         # V2GProfitMaxOracle,
         # PowerTrackingErrorrMin,
         # CPO,
-        # CVPO,
+        CVPO,
         # SACLag,
     ]
 
@@ -211,7 +211,7 @@ def evaluator():
     # evaluation_name = f'eval_{number_of_charging_stations}cs_{n_transformers}tr_{scenario}_{len(algorithms)}_algos' +\
     #     f'_{n_test_cycles}_exp_' +\
         # f'{datetime.datetime.now().strftime("%Y_%m_%d_%f")}'
-    evaluation_name = f'exp2_' + f'{datetime.datetime.now().strftime("%Y_%m_%d_%f")}'
+    evaluation_name = f'exp1_' + f'{datetime.datetime.now().strftime("%Y_%m_%d_%f")}'
 
     # make a directory for the evaluation
     save_path = f'./results/{evaluation_name}/'
@@ -327,7 +327,7 @@ def evaluator():
                 env = gym.make(task)
                 sim_length = env.env.env.simulation_length
 
-                load_path = 'fsrl_logs/exp_2_loads_no_PV/cvpo_v9/checkpoint/model_best.pt'
+                load_path = 'fsrl_logs/exp_1_no_loads_no_pv_10_cs_spawn_5/cvpo_v38/checkpoint/model_best.pt'
 
                 # init logger
                 logger = TensorboardLogger("logs", log_txt=True, name=task)
