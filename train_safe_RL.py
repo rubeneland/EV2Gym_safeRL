@@ -180,7 +180,7 @@ def train_cvpo(args):
 
         group_name: str = "exp1"
         # run_name= f'cvpo_v33_hard_constraint_0_5_SOC_h20_0_5_tr_cost_10_usr_5spawn_10cs_120kw_0_7_tr_once_in_state_cost_lim_{cost_limit}_train_envs_{training_num}_test_envs_{testing_num}_run{random.randint(0, 1000)}'
-        run_name= f'cvpo_v48_hard_con_0_5_SOC_h20_50_usr_5spawn_10cs_cost_lim_{cost_limit}_train_envs_{training_num}_test_envs_{testing_num}_run{random.randint(0, 1000)}'
+        run_name= f'cvpo_v57_trad_state_step_departure_norm_hard_0_5_SOC_h24_20_usr_5spawn_10cs_cost_lim_{cost_limit}_train_envs_{training_num}_test_envs_{testing_num}_run{random.randint(0, 1000)}'
 
         wandb.init(project='experiments',
                         sync_tensorboard=True,

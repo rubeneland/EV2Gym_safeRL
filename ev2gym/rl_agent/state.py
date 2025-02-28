@@ -68,6 +68,7 @@ def V2G_profit_max(env, *args):
     '''
     
     state = [
+        # env.current_step
         (env.current_step/env.simulation_length),
         # env.sim_date.weekday() / 7,
         # turn hour and minutes in sin and cos
@@ -75,9 +76,9 @@ def V2G_profit_max(env, *args):
         # math.cos(env.sim_date.hour/24*2*math.pi),
     ]
 
-    state.append(env.current_power_usage[env.current_step-1]) # in kW
+    # state.append(env.current_power_usage[env.current_step-1]) # in kW
 
-    h = 20 # was 28 steps = 7 hours, too many will make it too hard to learn for agent.
+    h = 24 # was 28 steps = 7 hours, too many will make it too hard to learn for agent.
 
     charge_prices = abs(env.charge_prices[0, env.current_step:env.current_step+h])
     
@@ -88,10 +89,10 @@ def V2G_profit_max(env, *args):
     
     # For every transformer
     for tr in env.transformers:
-        if env.current_step < env.simulation_length:
-            state.append(tr.max_power[env.current_step]) # in kW
-        else:
-            state.append(0)
+        # if env.current_step < env.simulation_length:
+        #     state.append(tr.max_power[env.current_step]) # in kW
+        # else:
+        #     state.append(0)
 
         # For every charging station connected to the transformer
         for cs in env.charging_stations:
@@ -103,8 +104,7 @@ def V2G_profit_max(env, *args):
                     if EV is not None:
                         state.append([
                             EV.get_soc(),
-                            # EV.battery_capacity - EV.get_soc() * EV.battery_capacity,
-                            EV.time_of_departure - env.current_step,
+                            (EV.time_of_departure - env.current_step) / env.simulation_length,
                             ])
 
                     # else if there is no EV connected put zeros
@@ -125,27 +125,17 @@ def V2G_profit_max_loads(env, *args):
         (env.current_step/env.simulation_length),      
     ]
 
+    for tr in env.transformers:
+        # if env.current_step < env.simulation_length:
+        tr_max = tr.max_power[env.current_step]
+        #     state.append(tr_max)
+        # else:
+        #     state.append(0)
+
+    state.append(env.current_power_usage[env.current_step-1]) / tr_max
+
     h = 20
 
-    charge_prices = abs(env.charge_prices[0, env.current_step: env.current_step+h])
-    
-    if len(charge_prices) < h:
-        charge_prices = np.append(charge_prices, np.zeros(h-len(charge_prices)))
-    
-    state.append(charge_prices)
-
-    # for tr in env.transformers:
-    #     state.append(tr.max_power[env.current_step])
-
-    for tr in env.transformers:
-        if env.current_step < env.simulation_length:
-            state.append(tr.max_power[env.current_step])
-        else:
-            state.append(0)
-
-    state.append(env.current_power_usage[env.current_step-1])
-    
-    # For every transformer
     for tr in env.transformers:
 
         # loads = tr.inflexible_load[env.current_step-1]
@@ -156,7 +146,8 @@ def V2G_profit_max_loads(env, *args):
                                             horizon = h)
         # power_limits = tr.get_power_limits(step = env.current_step,
         #                                    horizon = h)
-        state.append(load_forecast-pv_forecast)
+        load_pv_forecast_norm = (load_forecast-pv_forecast) / tr_max
+        state.append(load_pv_forecast_norm)
         # state.append(power_limits)
         
         # For every charging station connected to the transformer
@@ -169,12 +160,19 @@ def V2G_profit_max_loads(env, *args):
                     if EV is not None:
                         state.append([
                             EV.get_soc(),
-                            EV.time_of_departure - env.current_step,
+                            (EV.time_of_departure - env.current_step) / env.simulation_length,
                             ])
 
                     # else if there is no EV connected put zeros
                     else:
                         state.append(np.zeros(2))
+
+    charge_prices = abs(env.charge_prices[0, env.current_step: env.current_step+h])
+    
+    if len(charge_prices) < h:
+        charge_prices = np.append(charge_prices, np.zeros(h-len(charge_prices)))
+    
+    state.append(charge_prices)
 
     state = np.array(np.hstack(state))
 
