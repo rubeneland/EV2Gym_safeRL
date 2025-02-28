@@ -79,11 +79,12 @@ def V2G_profit_max(env, *args):
 
     h = 20 # was 28 steps = 7 hours, too many will make it too hard to learn for agent.
 
-    charge_prices = abs(env.charge_prices[0, env.current_step:
-        env.current_step+h])
+    charge_prices = abs(env.charge_prices[0, env.current_step:env.current_step+h])
     
     if len(charge_prices) < h:
         charge_prices = np.append(charge_prices, np.zeros(h-len(charge_prices)))
+
+    print(charge_prices)
     
     state.append(charge_prices)
     
@@ -143,7 +144,7 @@ def V2G_profit_max_loads(env, *args):
         else:
             state.append(0)
 
-    # state.append(env.current_power_usage[env.current_step-1])
+    state.append(env.current_power_usage[env.current_step-1])
     
     # For every transformer
     for tr in env.transformers:
@@ -169,6 +170,7 @@ def V2G_profit_max_loads(env, *args):
                     if EV is not None:
                         state.append([
                             EV.get_soc(),
+                            EV.battery_capacity - EV.get_soc() * EV.battery_capacity,
                             EV.time_of_departure - env.current_step,
                             ])
 

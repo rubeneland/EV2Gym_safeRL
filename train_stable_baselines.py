@@ -70,7 +70,7 @@ if __name__ == "__main__":
                 
     # run_name += f'{algorithm}_{reward_function.__name__}_{state_function.__name__}'
 
-    run_name = f'{algorithm}_exp1_v3_100_usr_cost_h20'
+    run_name = f'{algorithm}_exp1_v3_bug_fix_20_usr_cost_h20_min_v2g_0_5'
 
     run = wandb.init(project='experiments_baselines',
                      sync_tensorboard=True,
@@ -166,12 +166,12 @@ if __name__ == "__main__":
                     WandbCallback(
                         gradient_save_freq=10_000,
                         # model_save_path=f"saved_models/{group_name}/{run_name}.best",
-                        model_save_path=f"saved_models/{algorithm}_v3/{run_name}.best",
+                        model_save_path=f"saved_models/{algorithm}/{run_name}.best",
                         verbose=2),
                     eval_callback])
 
     # model.save(f"./saved_models/{group_name}/{run_name}.last")
-    model.save(f"saved_models/{algorithm}_v3/{run_name}.last")
+    model.save(f"saved_models/{algorithm}/{run_name}.last")
     print(f'Finished training {algorithm} algorithm, {run_name} saving model at ./saved_models/{group_name}/{run_name}')   
 
     env = model.get_env()
