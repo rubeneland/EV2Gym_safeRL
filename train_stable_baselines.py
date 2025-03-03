@@ -70,7 +70,7 @@ if __name__ == "__main__":
                 
     # run_name += f'{algorithm}_{reward_function.__name__}_{state_function.__name__}'
 
-    run_name = f'{algorithm}_exp1_v3_bug_fix_20_usr_cost_h20_min_v2g_0_5'
+    run_name = f'{algorithm}_exp1_v9_new_state_bug_fix_200_usr_cost_h20_min_v2g_0_5'
 
     run = wandb.init(project='experiments_baselines',
                      sync_tensorboard=True,

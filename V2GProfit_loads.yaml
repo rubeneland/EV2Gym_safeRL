@@ -63,7 +63,7 @@ tr_seed: -1 # seed for the random number generator of transformer loads(-1 for r
 
 inflexible_loads: # Offices, homes
   include: True # True or False
-  inflexible_loads_capacity_multiplier_mean: 0.7 # 1 is default, the higher the number the more inflexible loads. Mean = 0.7 --> 
+  inflexible_loads_capacity_multiplier_mean: 0.7 # 1 is default, the higher the number the more inflexible loads.
   forecast_mean: 20 # in percentage of load at time t%
   forecast_std: 5 # in percentage of load at time t%
 
@@ -132,7 +132,7 @@ ev:
   min_battery_capacity: 5 # in kWh
   min_v2g_capacity: 20 # in kwh
   min_time_of_stay: 120 # in minutes
-  min_v2g_soc: 0.4 # 40%
+  min_v2g_soc: 0.5 # 50%
   desired_capacity: 1 # in (0-1) (0% - 100%)
   #if transition_soc is < 1, the curve of the line is affected by:
   transition_soc_multiplier: 5 # default 1 (the higher the number the shorter the effect of CCCV region)

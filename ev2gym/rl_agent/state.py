@@ -78,7 +78,7 @@ def V2G_profit_max(env, *args):
 
     # state.append(env.current_power_usage[env.current_step-1]) # in kW
 
-    h = 24 # was 28 steps = 7 hours, too many will make it too hard to learn for agent.
+    h = 28 # was 28 steps = 7 hours, too many will make it too hard to learn for agent.
 
     charge_prices = abs(env.charge_prices[0, env.current_step:env.current_step+h])
     
@@ -125,14 +125,20 @@ def V2G_profit_max_loads(env, *args):
         (env.current_step/env.simulation_length),      
     ]
 
+    tr_max = 120
+
     for tr in env.transformers:
-        # if env.current_step < env.simulation_length:
-        tr_max = tr.max_power[env.current_step]
+        # if env.current_step == 0:
+        #     tr_max = tr.max_power[env.current_step]
+        # elif env.current_step < env.simulation_length:
+        #     tr_max = tr.max_power[env.current_step-1] #should be previous step, because transformer loading is of previous step.
+        if env.current_step < env.simulation_length:
+            tr_max = tr.max_power[env.current_step]
         #     state.append(tr_max)
         # else:
         #     state.append(0)
 
-    state.append(env.current_power_usage[env.current_step-1]) / tr_max
+    state.append(env.current_power_usage[env.current_step-1] / tr_max)
 
     h = 20
 
@@ -142,11 +148,15 @@ def V2G_profit_max_loads(env, *args):
         # pv = tr.solar_power[env.current_step-1]
         # state.append(loads-pv)
 
+        if env.current_step < env.simulation_length:
+            tr_max = tr.max_power[env.current_step]
+
         load_forecast, pv_forecast = tr.get_load_pv_forecast(step = env.current_step,
                                             horizon = h)
         # power_limits = tr.get_power_limits(step = env.current_step,
         #                                    horizon = h)
         load_pv_forecast_norm = (load_forecast-pv_forecast) / tr_max
+        # load_pv_forecast_norm = (load_forecast-pv_forecast) / power_limits
         state.append(load_pv_forecast_norm)
         # state.append(power_limits)
         
