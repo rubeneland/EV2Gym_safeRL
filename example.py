@@ -63,11 +63,10 @@ def eval():
     # agent = OCMF_V2G(env, control_horizon=30, verbose=True)
     # agent = OCMF_G2V(env, control_horizon=25, verbose=True)
     # agent = eMPC_V2G(env, control_horizon=15, verbose=False)
-    # agent = V2GProfitMaxOracle(env,verbose=True)
     # agent = PowerTrackingErrorrMin(new_replay_path)
     # agent = eMPC_G2V(env, control_horizon=15, verbose=False)
     # agent = eMPC_V2G_v2(env, control_horizon=10, verbose=False)
-    # agent = RoundRobin(env, verbose=False)
+    # agent = V2GProfitMaxOracleGB(replay_path=new_replay_path)
     agent = ChargeAsFastAsPossible(verbose=False)
     # agent = ChargeAsFastAsPossibleToDesiredCapacity()
     rewards = []
@@ -75,34 +74,26 @@ def eval():
     for t in range(env.simulation_length):
         actions = agent.get_action(env)
 
-        # do random actions from -1--1
-        # actions = np.random.uniform(-1,1,len(actions))
-        # actions = agent.get_action(env)
-
-        actions = actions * -1
-
         new_state, reward, done, truncated, stats = env.step(
-            actions)  # takes action
+            actions, visualize=False)  # takes action
         rewards.append(reward)
 
         # print(stats['cost'])
 
         if done:
             print(stats)
+            print(f'total_profits: {stats["total_profits"]}')
+            print(f'average_user_satisfaction: {stats["average_user_satisfaction"]}')
             print(f'End of simulation at step {env.current_step}')
             break
 
-    exit()
+    # exit()
     # Solve optimally
-    # Power tracker optimizer
     agent = V2GProfitMaxOracleGB(replay_path=new_replay_path)
-    # # Profit maximization optimizer
-    # # agent = V2GProfitMaxOracleGB(replay_path=new_replay_path)
-    # # Simulate in the gym environment and get the rewards
 
     env = EV2Gym(config_file=config_file,
                  load_from_replay_path=new_replay_path,
-                 verbose=True,
+                 verbose=False,
                  save_plots=True,
                  )
     state, _ = env.reset()
@@ -110,15 +101,17 @@ def eval():
 
     for t in range(env.simulation_length):
         actions = agent.get_action(env)
-        if verbose:
-            print(f' OptimalActions: {actions}')
+        # if verbose:
+        #     print(f' OptimalActions: {actions}')
 
         new_state, reward, done, truncated, stats = env.step(
-            actions, visualize=True)  # takes action
+            actions, visualize=False)  # takes action
         rewards_opt.append(reward)
 
-        if verbose:
-            print(stats)
+        if done:
+            # print(stats)
+            print(f'total_profits: {stats["total_profits"]}')
+            print(f'average_user_satisfaction: {stats["average_user_satisfaction"]}')
             print(f'Reward: {reward} \t Done: {done}')
 
         if done:

@@ -185,3 +185,5 @@ tests/
 *.sh
 
 MPC EVCS V2G - v2/
+
+model.lp

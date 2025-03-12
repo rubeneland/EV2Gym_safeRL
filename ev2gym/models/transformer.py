@@ -2,7 +2,7 @@
 This file contains the Transformer class which is used to model the transformer in the ev_city environment
 '''
 import numpy as np
-
+import math
 
 class Transformer():
     """
@@ -35,7 +35,7 @@ class Transformer():
         """
 
         self.id = id
-        max_current = max_power * 1000 / 400
+        max_current = max_power * 1000 / (400 * math.sqrt(3))
         self.max_current = np.ones(simulation_length)*max_current
         self.min_current = np.ones(simulation_length) * -max_current
         self.max_power = np.ones(simulation_length)*max_power
@@ -260,7 +260,7 @@ class Transformer():
         self.current_power = self.inflexible_load[step] + \
             self.solar_power[step]
 
-        self.current_amps = (self.current_power * 1000) / 400
+        self.current_amps = (self.current_power * 1000) / (400 * math.sqrt(3))
 
     def step(self, amps, power) -> None:
         '''
