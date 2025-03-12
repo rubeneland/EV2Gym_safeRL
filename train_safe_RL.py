@@ -4,7 +4,7 @@ from ev2gym.models.ev2gym_env import EV2Gym
 from ev2gym.rl_agent.reward import SquaredTrackingErrorReward, ProfitMax_TrPenalty_UserIncentives
 from ev2gym.rl_agent.reward import profit_maximization
 
-from cost_functions import transformer_overload_usrpenalty_cost, ProfitMax_TrPenalty_UserIncentives_safety
+from cost_functions import tr_overload_usrpenalty_cost, usrpenalty_cost, ProfitMax_TrPenalty_UserIncentives_safety
 
 from ev2gym.rl_agent.state import V2G_profit_max, PublicPST, V2G_profit_max_loads
 
@@ -59,11 +59,13 @@ class SpecMaxStepsWrapper(Wrapper):
         self.spec.max_episode_steps = spec_max_steps
 
 # Environment configuration
-config_file = "V2GProfit_loads.yaml"
 # config_file = "V2GProfit_base.yaml"
-reward_function = ProfitMax_TrPenalty_UserIncentives_safety
+config_file = "V2GProfit_loads.yaml"
+# state_function = V2G_profit_max
 state_function = V2G_profit_max_loads
-cost_function = transformer_overload_usrpenalty_cost
+# cost_function = usrpenalty_cost
+cost_function = tr_overload_usrpenalty_cost
+reward_function = ProfitMax_TrPenalty_UserIncentives_safety
 
 # Register the custom environment
 gym.envs.register(
@@ -132,7 +134,9 @@ def train_cvpo(args):
         task: str = "fsrl-v0"
         cost_limit: float = args.cost_limit
         device: str = "cpu"
-        thread: int = 4  # if use "cpu" to train
+        thread: int = 1  # was 4, if use "cpu" to train
+        # seed: int = random.randint(0, 1000)
+        # seed: int = 549
         seed: int = 10
         # CVPO arguments
         estep_iter_num: int = 1
@@ -157,10 +161,10 @@ def train_cvpo(args):
         last_layer_scale: bool = False
         # collecting params
         epoch: int = args.epoch
-        episode_per_collect: int = 1
+        episode_per_collect: int = args.train_num
         step_per_epoch: int = 3000
         update_per_step: float = 0.2
-        buffer_size: int = 600000
+        buffer_size: int = 400000
         worker: str = "ShmemVectorEnv"
         training_num: int = args.train_num
         testing_num: int = args.test_num
@@ -179,8 +183,8 @@ def train_cvpo(args):
         # Use 1 task in example.sh! More tasks will create more runs...
 
         group_name: str = "exp2"
-        run_name= f'cvpo_v21_norm_state_hard_constraint_0_5_SOC_h20_5_tr_cost_20_usr_5spawn_10cs_120kw_0_7_tr_cost_lim_{cost_limit}_train_envs_{training_num}_test_envs_{testing_num}_run{random.randint(0, 1000)}'
-        # run_name= f'cvpo_v65_trad_state_step_departure_norm_hard_0_5_SOC_h28_20_usr_5spawn_10cs_cost_lim_{cost_limit}_train_envs_{training_num}_test_envs_{testing_num}_run{random.randint(0, 1000)}'
+        run_name= f'cvpo_v32_buff_400k_h20_5_tr_cost_20_usr_10spawn_10cs_120kw_loads_0_6_seed{seed}_cost_lim_{cost_limit}_train_envs_{training_num}_test_envs_{testing_num}_run{random.randint(0, 1000)}'
+        # run_name= f'cvpo_v67_6_h28_20_usr_5spawn_10cs_seed_{seed}_cost_lim_{cost_limit}_train_envs_{training_num}_test_envs_{testing_num}_run{random.randint(0, 1000)}'
 
         wandb.init(project='experiment_2',
                         sync_tensorboard=True,
@@ -188,7 +192,6 @@ def train_cvpo(args):
                         name=run_name,
                         save_code=True,
                         )
-
         # init logger
         logger = WandbLogger(log_dir="fsrl_logs/exp_2_loads_no_PV", log_txt=True, group=group_name, name=run_name)
 
@@ -259,6 +262,7 @@ def train_ppol(args):
         cost_limit: float = args.cost_limit
         device: str = "cpu"
         thread: int = 4  # if use "cpu" to train
+        # seed: int = random.randint(0, 1000)
         seed: int = 10
         # algorithm params
         lr: float = 5e-4
@@ -306,7 +310,7 @@ def train_ppol(args):
 
         # logger params
         group_name: str = "all_cost"
-        run_name= f'PPOL_h20_1powerlimit_sacl_100_v2g_cost_40_loads_PV_no_DR_5spawn_10cs_90kw_cost_lim_{int(cost_limit)}_usr_-3_100_tr_30_train_envs_{training_num}_test_envs_{testing_num}_run{random.randint(0, 1000)}'
+        run_name= f'PPOL_h20_1powerlimit_sacl_100_v2g_cost_40_loads_PV_no_DR_5spawn_10cs_90kw_seed_{seed}_cost_lim_{int(cost_limit)}_usr_-3_100_tr_30_train_envs_{training_num}_test_envs_{testing_num}_run{random.randint(0, 1000)}'
 
         wandb.init(project='safeRL',
                         sync_tensorboard=True,

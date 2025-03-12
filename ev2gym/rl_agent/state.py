@@ -78,7 +78,7 @@ def V2G_profit_max(env, *args):
 
     # state.append(env.current_power_usage[env.current_step-1]) # in kW
 
-    h = 28 # was 28 steps = 7 hours, too many will make it too hard to learn for agent.
+    h = 28 # 28 steps = 7 hours, too many will make it too hard to learn for agent.
 
     charge_prices = abs(env.charge_prices[0, env.current_step:env.current_step+h])
     
