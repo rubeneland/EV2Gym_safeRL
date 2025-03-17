@@ -34,7 +34,7 @@ from ev2gym.visuals.evaluator_plot import plot_total_power, plot_comparable_EV_S
 from ev2gym.visuals.evaluator_plot import plot_total_power_V2G, plot_actual_power_vs_setpoint
 from ev2gym.visuals.evaluator_plot import plot_comparable_EV_SoC_single, plot_prices
 
-from cost_functions import transformer_overload_usrpenalty_cost, ProfitMax_TrPenalty_UserIncentives_safety
+from cost_functions import usrpenalty_cost, tr_overload_usrpenalty_cost, ProfitMax_TrPenalty_UserIncentives_safety
 
 from fsrl.agent import CPOAgent as CPO
 from fsrl.agent import CVPOAgent as CVPO
@@ -84,14 +84,17 @@ def evaluator():
     timescale = config["timescale"]
     simulation_length = config["simulation_length"]
 
-    n_test_cycles = 100
+    n_test_cycles = 20
 
     scenario = config_file.split("/")[-1].split(".")[0]
     # eval_replay_path = f'./replay/{number_of_charging_stations}cs_{n_transformers}tr_{scenario}/'
     # eval_replay_path = f'./replay/exp1/'
     # eval_replay_path = f'./replay/exp2_0_6_tr_0_5_PV_120kw/'
+    # eval_replay_path = f'./replay/exp2_0_5_tr_90kw_5spawn/'
+    # eval_replay_path = f'./replay/exp2_0_6_tr_90kw_5spawn/'
+    eval_replay_path = f'./replay/exp2_0_6_tr_120kw_5spawn_new/'
     # eval_replay_path = f'./replay/exp2_0_6_tr_120kw_5spawn/'
-    eval_replay_path = f'./replay/exp2_0_6_tr_120kw_10spawn/'
+    # eval_replay_path = f'./replay/exp2_0_6_tr_120kw_10spawn/'
     # eval_replay_path = f'./replay/exp2_0_7_tr_120kw/'
     # eval_replay_path = f'./replay/exp2_0_8_tr_120kw/'
     print(f'Looking for replay files in {eval_replay_path}')
@@ -133,17 +136,17 @@ def evaluator():
     elif config_file == "V2GProfit_base.yaml":
         reward_function = ProfitMax_TrPenalty_UserIncentives_safety
         state_function = V2G_profit_max
-        cost_function = transformer_overload_usrpenalty_cost
+        cost_function = usrpenalty_cost
 
     elif config_file == "V2GProfit_eval_base.yaml":
         reward_function = ProfitMax_TrPenalty_UserIncentives_safety
         state_function = V2G_profit_max
-        cost_function = transformer_overload_usrpenalty_cost
+        cost_function = usrpenalty_cost
 
     elif config_file == "V2GProfit_eval_loads.yaml":
         reward_function = ProfitMax_TrPenalty_UserIncentives_safety
         state_function = V2G_profit_max_loads
-        cost_function = transformer_overload_usrpenalty_cost
+        cost_function = tr_overload_usrpenalty_cost
     else:
         raise ValueError('Unknown config file')
 
@@ -173,7 +176,7 @@ def evaluator():
     # Algorithms to compare:
 
     algorithms = [
-        ChargeAsFastAsPossible,
+        # ChargeAsFastAsPossible,
         # ChargeAsLateAsPossible,
         # PPO, A2C, DDPG, SAC, TD3, TQC, TRPO, ARS, RecurrentPPO,
         # SAC,
@@ -181,14 +184,14 @@ def evaluator():
         # TD3,
         # # ARS,
         # # RecurrentPPO,
-        RoundRobin_1transformer_powerlimit,
+        # RoundRobin_1transformer_powerlimit,
         # eMPC_V2G,
         # # V2GProfitMaxLoadsOracle,
         V2GProfitMaxOracleGB,
         # V2GProfitMaxOracle,
         # PowerTrackingErrorrMin,
         # CPO,
-        CVPO,
+        # CVPO,
         # SACLag,
     ]
 
@@ -243,8 +246,11 @@ def evaluator():
             # replay_path = f'./replay/exp1/' + eval_replay_files[k].split('/')[-1]
             # replay_path = f'./replay/exp2_0_6_tr_0_5_PV_120kw/' + eval_replay_files[k].split('/')[-1]
             # replay_path = f'./replay/exp2_0_5_tr_120kw/' + eval_replay_files[k].split('/')[-1]
+            # replay_path = f'./replay/exp2_0_5_tr_90kw_5spawn/' + eval_replay_files[k].split('/')[-1]
+            # replay_path = f'./replay/exp2_0_6_tr_90kw_5spawn/' + eval_replay_files[k].split('/')[-1]
             # replay_path = f'./replay/exp2_0_6_tr_120kw_5spawn/' + eval_replay_files[k].split('/')[-1]
-            replay_path = f'./replay/exp2_0_6_tr_120kw_10spawn/' + eval_replay_files[k].split('/')[-1]
+            replay_path = f'./replay/exp2_0_6_tr_120kw_5spawn_new/' + eval_replay_files[k].split('/')[-1]
+            # replay_path = f'./replay/exp2_0_6_tr_120kw_10spawn/' + eval_replay_files[k].split('/')[-1]
             # replay_path = f'./replay/exp2_0_7_tr_120kw/' + eval_replay_files[k].split('/')[-1]
             # replay_path = f'./replay/exp2_0_8_tr_120kw/' + eval_replay_files[k].split('/')[-1]
 
@@ -331,7 +337,7 @@ def evaluator():
                 env = gym.make(task)
                 sim_length = env.env.env.simulation_length
 
-                load_path = 'fsrl_logs/exp_2_loads_no_PV/cvpo_v29/checkpoint/model_best.pt'
+                load_path = 'fsrl_logs/exp_2_loads_no_PV/cvpo_v41/checkpoint/model_best.pt'
 
                 # init logger
                 logger = TensorboardLogger("logs", log_txt=True, name=task)

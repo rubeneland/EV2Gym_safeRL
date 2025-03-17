@@ -30,7 +30,7 @@ simulation_days: weekdays # weekdays, weekends, or both
 
 # EV Spawn Behavior
 scenario: workplace # public, private, or workplace
-spawn_multiplier: 10 # 1 is default, the higher the number the more EVs spawn. Play somewhere between 3-7. With 1 often only 1/5 EVs show up.
+spawn_multiplier: 5 # 1 is default, the higher the number the more EVs spawn. Play somewhere between 3-7. With 1 often only 1/5 EVs show up.
 
 ##############################################################################
 # Prices

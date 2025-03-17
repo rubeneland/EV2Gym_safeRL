@@ -190,6 +190,8 @@ class Transformer():
         if env.config['solar_power']['include']:
             mult = env.config['solar_power']['solar_power_capacity_multiplier_mean']
             mult = env.tr_rng.normal(mult, 0.1)
+            if mult < 0:
+                mult = 0
             self.solar_power = -self.solar_power * \
                 mult * max(self.max_power)
 
@@ -216,6 +218,8 @@ class Transformer():
         if env.config['inflexible_loads']['include']:
             mult = env.config['inflexible_loads']['inflexible_loads_capacity_multiplier_mean']
             mult = env.tr_rng.normal(mult, 0.1)
+            if mult < 0:
+                mult = 0
 
             # scale up the data to match the max_power of the transformers
             self.inflexible_load = self.inflexible_load * \
