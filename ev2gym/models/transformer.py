@@ -185,11 +185,11 @@ class Transformer():
 
     def normalize_pv_generation(self, env) -> None:
         '''
-        Normalize the solar_power using the configuration file and teh max_power of the transformer
+        Normalize the solar_power using the configuration file and the max_power of the transformer
         '''
         if env.config['solar_power']['include']:
             mult = env.config['solar_power']['solar_power_capacity_multiplier_mean']
-            mult = env.tr_rng.normal(mult, 0.1)
+            mult = env.tr_rng.normal(mult, 0.05)
             if mult < 0:
                 mult = 0
             self.solar_power = -self.solar_power * \

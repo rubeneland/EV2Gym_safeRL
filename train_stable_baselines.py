@@ -8,7 +8,7 @@ from sb3_contrib import TQC, TRPO, ARS, RecurrentPPO
 #from GF.action_wrapper import ThreeStep_Action_DiscreteActionSpace, mask_fn, Fully_Discrete
 
 from ev2gym.models.ev2gym_env import EV2Gym
-from ev2gym.rl_agent.reward import SquaredTrackingErrorReward, ProfitMax_TrPenalty_UserIncentives
+from ev2gym.rl_agent.reward import SquaredTrackingErrorReward, ProfitMax_TrPenalty_UserIncentives, ProfitMax_UserIncentives
 from ev2gym.rl_agent.reward import profit_maximization
 
 from ev2gym.rl_agent.state import V2G_profit_max, PublicPST, V2G_profit_max_loads
@@ -36,10 +36,13 @@ if __name__ == "__main__":
                          #default="ev2gym/example_config_files/V2GProfitMax.yaml")
     default="V2GProfit_base.yaml")
 
+    config_file = "V2GProfit_base.yaml"
+    # config_file = "V2GProfit_loads.yaml"
+
     algorithm = parser.parse_args().algorithm
     device = parser.parse_args().device
     run_name = parser.parse_args().run_name
-    config_file = parser.parse_args().config_file
+    # config_file = parser.parse_args().config_file
     discrete_actions = parser.parse_args().discrete_actions
 
     config = yaml.load(open(config_file, 'r'), Loader=yaml.FullLoader)
@@ -62,15 +65,24 @@ if __name__ == "__main__":
     #     state_function = V2G_profit_max_loads
     #     group_name = f'{config["number_of_charging_stations"]}cs_V2GProfitPlusLoads'
 
-    reward_function = ProfitMax_TrPenalty_UserIncentives
-    state_function = V2G_profit_max
+    if config_file == "V2GProfit_base.yaml":
+        reward_function = ProfitMax_UserIncentives
+        state_function = V2G_profit_max
+    elif config_file == "V2GProfit_loads.yaml":
+        reward_function = ProfitMax_TrPenalty_UserIncentives
+        state_function = V2G_profit_max_loads
+    else:
+        raise ValueError("Unknown config file")
+    
     # group_name = f'{config["number_of_charging_stations"]}cs_V2GProfit_TEST'
 
-    group_name = 'exp1_baselines'
+    group_name = 'EXP1_1'
                 
     # run_name += f'{algorithm}_{reward_function.__name__}_{state_function.__name__}'
 
-    run_name = f'{algorithm}_exp1_v9_new_state_bug_fix_200_usr_cost_h20_min_v2g_0_5'
+    seed = 1025
+
+    run_name = f'{algorithm}_exp1_1_seed_{seed}'
 
     run = wandb.init(project='experiments_baselines',
                      sync_tensorboard=True,
@@ -112,8 +124,8 @@ if __name__ == "__main__":
     eval_callback = EvalCallback(eval_env,
                                     best_model_save_path=save_path,
                                     log_path=eval_log_dir,
-                                    eval_freq=config['simulation_length']*50, #50
-                                    n_eval_episodes=50, # 40
+                                    eval_freq=config['simulation_length']*50, # was 50
+                                    n_eval_episodes=100, # was 40
                                     deterministic=True,
                                     render=False)
 
@@ -130,18 +142,16 @@ if __name__ == "__main__":
                     gamma = 0.99,                     
                      device=device, tensorboard_log="./logs/")
     elif algorithm == "td3":
-        model = TD3("MlpPolicy", env, verbose=1,
+        model = TD3("MlpPolicy", env, verbose=1, seed=seed,
                     device=device, tensorboard_log="./logs/")
     elif algorithm == "sac":
-        model = SAC("MlpPolicy", env, verbose=1,
+        model = SAC("MlpPolicy", env, verbose=1, seed=seed,
                     device=device, tensorboard_log="./logs/")
     elif algorithm == "a2c":
         model = A2C("MlpPolicy", env, verbose=1,
                     device=device, tensorboard_log="./logs/")
     elif algorithm == "ppo":
-        model = PPO("MlpPolicy", env, verbose=1,
-                    batch_size = 64,
-                    policy_kwargs = dict(net_arch=net_pi),
+        model = PPO("MlpPolicy", env, verbose=1, seed=seed,
                     device=device, tensorboard_log="./logs/")
     elif algorithm == "tqc":
         model = TQC("MlpPolicy", env, verbose=1,
@@ -164,14 +174,14 @@ if __name__ == "__main__":
                 progress_bar=True,
                 callback=[
                     WandbCallback(
-                        gradient_save_freq=10_000,
+                        gradient_save_freq=10_000, # was 10_000, 300 for seed 1918!
                         # model_save_path=f"saved_models/{group_name}/{run_name}.best",
-                        model_save_path=f"saved_models/{algorithm}/{run_name}.best",
+                        model_save_path=f"saved_models/EXP1_1/{algorithm}/{run_name}.best",
                         verbose=2),
                     eval_callback])
 
     # model.save(f"./saved_models/{group_name}/{run_name}.last")
-    model.save(f"saved_models/{algorithm}/{run_name}.last")
+    # model.save(f"saved_models/EXP1_1/{algorithm}/{run_name}.last")
     print(f'Finished training {algorithm} algorithm, {run_name} saving model at ./saved_models/{group_name}/{run_name}')   
 
     env = model.get_env()

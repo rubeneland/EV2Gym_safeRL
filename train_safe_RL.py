@@ -46,6 +46,8 @@ from typing import Tuple
 
 from gymnasium import Wrapper
 
+os.environ["WANDB_MODE"] = "offline"
+
 class SpecMaxStepsWrapper(Wrapper):
     def __init__(self, env, spec_max_steps):
         """
@@ -59,12 +61,17 @@ class SpecMaxStepsWrapper(Wrapper):
         self.spec.max_episode_steps = spec_max_steps
 
 # Environment configuration
-# config_file = "V2GProfit_base.yaml"
-config_file = "V2GProfit_loads.yaml"
-# state_function = V2G_profit_max
-state_function = V2G_profit_max_loads
-# cost_function = usrpenalty_cost
-cost_function = tr_overload_usrpenalty_cost
+config_file = "V2GProfit_base.yaml"
+# config_file = "V2GProfit_loads.yaml"
+
+if config_file == "V2GProfit_base.yaml":
+        state_function = V2G_profit_max
+        cost_function = usrpenalty_cost
+
+if config_file == "V2GProfit_loads.yaml":
+        state_function = V2G_profit_max_loads
+        cost_function = tr_overload_usrpenalty_cost
+
 reward_function = ProfitMax_TrPenalty_UserIncentives_safety
 
 # Register the custom environment
@@ -88,56 +95,52 @@ env.spec.max_episode_steps = env.env.env.simulation_length
 
 def train_cpo(args):
 
-        cost_limit = args.cost_limit
-        epoch = args.epoch
+        seed: int = args.seed
+        cost_limit: int = args.cost_limit
+        epoch: int = args.epoch
+        training_num: int = args.train_num
+        testing_num: int = args.test_num
+        step_per_epoch: int = 3000
+        gamma: float = 0.99
+        thread: int = 5
 
-        run_name =  f'CPO_5spawn_20cs_cost_lim_{cost_limit}_epochs_{epoch}_usr_1000_train_envs_8_test_envs_8_run{random.randint(0, 1000)}'
-        group_name = 'CPO'                   
+        run_name= f'cpo_exp1_1_seed_{seed}_cost_lim_{cost_limit}_train_envs_{training_num}_test_envs_{testing_num}_run{random.randint(0, 1000)}'
+        # run_name =  f'CPO_5spawn_20cs_cost_lim_{cost_limit}_epochs_{epoch}_usr_1000_train_envs_8_test_envs_8_run{random.randint(0, 1000)}'
+        group_name = 'EXP1_1'                   
 
-        wandb.init(project='safeRL',
+        wandb.init(project='experiments',
                         sync_tensorboard=True,
                         group=group_name,
                         name=run_name,
                         save_code=True,
+                        mode = "offline",
                         )
 
         task = "fsrl-v0"
 
-        save_path = f"./saved_models/{group_name}/{run_name}"
-
-        os.makedirs(f"./saved_models/{group_name}", exist_ok=True)
-        os.makedirs(save_path, exist_ok=True)
-
-        # initialize torch device
-        device = "cpu"
-        # device = torch.device(device)
-        # device = "cuda" if torch.cuda.is_available() else "cpu"
-        # print(f"cuda{torch.cuda.is_available()}")
-
         # init logger
-        logger = WandbLogger(log_dir="fsrl_logs/5cs_30kw_7spawn", log_txt=True, group=group_name, name=run_name)
+        logger = WandbLogger(log_dir="fsrl_logs/EXP1_1", log_txt=True, group=group_name, name=run_name)
 
-        cost_limit = 40
+        env = gym.make(task)
 
         # CPO agent
-        agent = CPOAgent(gym.make(task), logger, cost_limit = cost_limit, device=device, max_batchsize=200000,
-                        action_bound_method = "tanh")
+        agent = CPOAgent(env=env, logger=logger, cost_limit=cost_limit, seed=seed, thread=thread, gamma=gamma)
 
-        training_num, testing_num = 12, 8
-        train_envs = DummyVectorEnv([lambda: gym.make(task) for _ in range(training_num)])
-        test_envs = DummyVectorEnv([lambda: gym.make(task) for _ in range(testing_num)])
+        train_envs = ShmemVectorEnv([lambda: gym.make(task) for _ in range(training_num)])
+        test_envs = ShmemVectorEnv([lambda: gym.make(task) for _ in range(testing_num)])
 
-        agent.learn(train_envs, test_envs, epoch=args.epoch)
+        agent.learn(train_envs=train_envs, test_envs=test_envs, epoch=epoch, testing_num=testing_num,
+                    episode_per_collect=training_num, step_per_epoch=step_per_epoch, save_interval=1)
 
 def train_cvpo(args):
         # general task params
         task: str = "fsrl-v0"
-        cost_limit: float = args.cost_limit
+        cost_limit: int = args.cost_limit
         device: str = "cpu"
         thread: int = 1  # was 4, if use "cpu" to train
-        # seed: int = random.randint(0, 1000)
-        # seed: int = 549
-        seed: int = 10
+        # seed: int = random.randint(0, 10000)
+        seed: int = args.seed
+        # seed: int = 10
         # CVPO arguments
         estep_iter_num: int = 1
         estep_kl: float = 0.02
@@ -164,7 +167,7 @@ def train_cvpo(args):
         episode_per_collect: int = args.train_num
         step_per_epoch: int = 3000
         update_per_step: float = 0.2
-        buffer_size: int = 400000
+        buffer_size: int = 200000
         worker: str = "ShmemVectorEnv"
         training_num: int = args.train_num
         testing_num: int = args.test_num
@@ -182,18 +185,19 @@ def train_cvpo(args):
 
         # Use 1 task in example.sh! More tasks will create more runs...
 
-        group_name: str = "exp2"
-        run_name= f'cvpo_v32_buff_400k_h20_5_tr_cost_20_usr_10spawn_10cs_120kw_loads_0_6_seed{seed}_cost_lim_{cost_limit}_train_envs_{training_num}_test_envs_{testing_num}_run{random.randint(0, 1000)}'
+        group_name: str = "EXP1_1"
+        # run_name= f'cvpo_v43_load_err_30_buff_200k_h20_5_tr_cost_20_usr_5spawn_10cs_90kw_loads_0_5_PV_0_1_seed{seed}_cost_lim_{cost_limit}_train_envs_{training_num}_test_envs_{testing_num}_run{random.randint(0, 1000)}'
         # run_name= f'cvpo_v67_6_h28_20_usr_5spawn_10cs_seed_{seed}_cost_lim_{cost_limit}_train_envs_{training_num}_test_envs_{testing_num}_run{random.randint(0, 1000)}'
+        run_name= f'cvpo_200_usr_exp1_1_seed_{seed}_cost_lim_{cost_limit}_train_envs_{training_num}_test_envs_{testing_num}_run{random.randint(0, 1000)}'
 
-        wandb.init(project='experiment_2',
+        wandb.init(project='experiments',
                         sync_tensorboard=True,
                         group=group_name,
                         name=run_name,
                         save_code=True,
                         )
         # init logger
-        logger = WandbLogger(log_dir="fsrl_logs/exp_2_loads_no_PV", log_txt=True, group=group_name, name=run_name)
+        logger = WandbLogger(log_dir="fsrl_logs/EXP1_1", log_txt=True, group=group_name, name=run_name)
 
         env = gym.make(task)
         # env.spec.max_episode_steps = env.env.env.simulation_length
@@ -233,7 +237,7 @@ def train_cvpo(args):
                 lr_scheduler=None
         )
 
-        training_num = min(training_num, episode_per_collect)
+        # training_num = min(training_num, episode_per_collect)
         worker = eval(worker)
         train_envs = worker([lambda: SpecMaxStepsWrapper(gym.make(task), sim_length) for _ in range(training_num)])
         test_envs = worker([lambda: SpecMaxStepsWrapper(gym.make(task), sim_length) for _ in range(testing_num)])
@@ -259,11 +263,11 @@ def train_cvpo(args):
 def train_ppol(args):
         # general task params
         task: str = "fsrl-v0"
-        cost_limit: float = args.cost_limit
+        cost_limit: int = args.cost_limit
         device: str = "cpu"
-        thread: int = 4  # if use "cpu" to train
+        thread: int = 5  # if use "cpu" to train
         # seed: int = random.randint(0, 1000)
-        seed: int = 10
+        seed: int = args.seed
         # algorithm params
         lr: float = 5e-4
         hidden_sizes: Tuple[int, ...] = (128, 128)
@@ -293,7 +297,7 @@ def train_ppol(args):
         # collecting params
         epoch: int = args.epoch
         episode_per_collect: int = args.train_num
-        step_per_epoch: int = 5000
+        step_per_epoch: int = 3000
         repeat_per_collect: int = 4  # increasing this can improve efficiency, but less stability
         buffer_size: int = 100000
         worker: str = "ShmemVectorEnv"
@@ -309,18 +313,20 @@ def train_ppol(args):
         render: bool = False
 
         # logger params
-        group_name: str = "all_cost"
-        run_name= f'PPOL_h20_1powerlimit_sacl_100_v2g_cost_40_loads_PV_no_DR_5spawn_10cs_90kw_seed_{seed}_cost_lim_{int(cost_limit)}_usr_-3_100_tr_30_train_envs_{training_num}_test_envs_{testing_num}_run{random.randint(0, 1000)}'
+        group_name: str = "EXP1_1"
+        # run_name= f'PPOL_h20_1powerlimit_sacl_100_v2g_cost_40_loads_PV_no_DR_5spawn_10cs_90kw_seed_{seed}_cost_lim_{int(cost_limit)}_usr_-3_100_tr_30_train_envs_{training_num}_test_envs_{testing_num}_run{random.randint(0, 1000)}'
+        run_name= f'ppol_exp1_1_seed_{seed}_cost_lim_{cost_limit}_train_envs_{training_num}_test_envs_{testing_num}_run{random.randint(0, 1000)}'
 
-        wandb.init(project='safeRL',
+        wandb.init(project='experiments',
                         sync_tensorboard=True,
                         group=group_name,
                         name=run_name,
                         save_code=True,
+                        mode = "offline",
                         )
 
         # init logger
-        logger = WandbLogger(log_dir="fsrl_logs/TEST_FINAL_10_cs_90kw", log_txt=True, group=group_name, name=run_name)
+        logger = WandbLogger(log_dir="fsrl_logs/EXP1_1/ppo", log_txt=True, group=group_name, name=run_name)
 
         env = gym.make(task)
         # env.spec.max_episode_steps = env.env.env.simulation_length
@@ -384,10 +390,10 @@ def train_ppol(args):
 
 def train_sacl(args):
         task: str = "fsrl-v0"
-        cost_limit: float = args.cost_limit
+        cost_limit: int = args.cost_limit
         device: str = "cpu"
-        thread: int = 4  # if use "cpu" to train
-        seed: int = 10
+        thread: int = 5  # if use "cpu" to train
+        seed: int = args.seed
         # algorithm params
         actor_lr: float = 5e-4
         critic_lr: float = 1e-3
@@ -405,16 +411,16 @@ def train_sacl(args):
         lagrangian_pid: Tuple[float, ...] = (0.05, 0.0005, 0.1)
         rescaling: bool = True
         # Base policy common arguments
-        gamma: float = 0.97
+        gamma: float = 0.99
         deterministic_eval: bool = True
         action_scaling: bool = True
         action_bound_method: str = "clip"
         # collecting params
         epoch: int = args.epoch
-        episode_per_collect: int = 4
+        episode_per_collect: int = args.train_num
         step_per_epoch: int = 3000
         update_per_step: float = 0.2
-        buffer_size: int = 200000 # was 100,000
+        buffer_size: int = 200000
         worker: str = "ShmemVectorEnv"
         training_num: int = args.train_num
         testing_num: int = args.test_num
@@ -428,18 +434,20 @@ def train_sacl(args):
         render: bool = False
 
         # logger params
-        group_name: str = "all_cost"
-        run_name= f'sacl_v4_h20_no_v2g_cost_5spawn_10cs_90kw_cost_lim_{int(cost_limit)}_train_envs_{training_num}_test_envs_{testing_num}_run{random.randint(0, 1000)}'
+        group_name: str = "EXP1_1"
+        # run_name= f'sacl_v4_h20_no_v2g_cost_5spawn_10cs_90kw_cost_lim_{int(cost_limit)}_train_envs_{training_num}_test_envs_{testing_num}_run{random.randint(0, 1000)}'
+        run_name= f'sacl_exp1_1_seed_{seed}_cost_lim_{cost_limit}_train_envs_{training_num}_test_envs_{testing_num}_run{random.randint(0, 1000)}'
 
         wandb.init(project='experiment_2',
                         sync_tensorboard=True,
                         group=group_name,
                         name=run_name,
                         save_code=True,
+                        settings=wandb.Settings(init_timeout=90),
                         )
 
         # init logger
-        logger = WandbLogger(log_dir="fsrl_logs/exp_1_no_loads_no_pv_10_cs_spawn_5", log_txt=True, group=group_name, name=run_name)
+        logger = WandbLogger(log_dir="fsrl_logs/EXP1_1", log_txt=True, group=group_name, name=run_name)
 
         env = gym.make(task)
         # env.spec.max_episode_steps = env.env.env.simulation_length
@@ -506,11 +514,12 @@ def train_sacl(args):
 if __name__ == "__main__":
         #create an argument parser to adjust cost limit and define training algorithm
         parser = argparse.ArgumentParser() 
-        parser.add_argument("--train", type=str, default="cvpo", help="Training algorithm to use")
-        parser.add_argument("--cost_limit", type=float, default=40, help="Cost limit for the environment")
-        parser.add_argument("--epoch", type=int, default=1000, help="Number of epochs to train for")
+        parser.add_argument("--train", type=str, default="cvpo", help="Training algorithm to use. Options: 'cpo', 'cvpo', 'ppol', 'sacl'")
+        parser.add_argument("--cost_limit", type=float, default=2, help="Cost limit for the environment")
+        parser.add_argument("--epoch", type=int, default=1000)
         parser.add_argument("--train_num", type=int, default=10, help="Number of training environments")
         parser.add_argument("--test_num", type=int, default=50, help="Number of testing environments")
+        parser.add_argument("--seed", type=int, default=10)
         args = parser.parse_args()
         if args.train == "cvpo":        
                 train_cvpo(args)

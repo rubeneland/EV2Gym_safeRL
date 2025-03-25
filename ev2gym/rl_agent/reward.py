@@ -30,12 +30,21 @@ def SqTrError_TrPenalty_UserIncentives(env, _, user_satisfaction_list, *args):
                     
     return reward
 
+def ProfitMax_UserIncentives(env, total_costs, user_satisfaction_list, *args):
+    
+    reward = total_costs                      
+    
+    for score in user_satisfaction_list:        
+        reward -= 200*math.exp(-3*score) + 200*math.exp(-3)
+        
+    return reward
+
 def ProfitMax_TrPenalty_UserIncentives(env, total_costs, user_satisfaction_list, *args):
     
     reward = total_costs
     
-    # for tr in env.transformers:
-    #     reward -= 100 * tr.get_how_overloaded()                        
+    for tr in env.transformers:
+        reward -= 50 * tr.get_how_overloaded()                        
     
     for score in user_satisfaction_list:        
         reward -= 200*math.exp(-3*score) + 200*math.exp(-3)

@@ -10,13 +10,64 @@ def usrpenalty_cost(env, total_costs, user_satisfaction_list, *args):
 
     cost = 0
     
-    a = 20
+    a = 200
     b = -3      
     
     for score in user_satisfaction_list:  
         cost += a*math.exp(b*score) - a*math.exp(b)
 
     return cost
+
+
+
+def tr_overload_usrpenalty_cost(env, total_costs, user_satisfaction_list, *args):
+    """
+    Returns the cost of transformer overload and user satisfaction penalty.
+    """
+
+    cost = 0
+
+    for tr in env.transformers:
+        cost += 5 * tr.get_how_overloaded()   
+
+    a = 20
+    b = -3   
+    
+    for score in user_satisfaction_list:  
+        cost += a*math.exp(b*score) - a*math.exp(b)
+        
+
+    # invalid_actions = 0
+    # for cs in env.charging_stations:
+    #     invalid_actions += cs.invalid_action_punishment
+    # cost += invalid_actions * 0.002 # 0.01 
+
+
+    # # For every charging station connected to the transformer
+    # for cs in env.charging_stations:
+    #         # For every EV connected to the charging station
+    #         for EV in cs.evs_connected:
+    #             # If there is an EV connected
+    #             if EV is not None:
+    #                 # Add cost for discharging action when SOC below min V2G threshold: 40%
+    #                 soc = EV.get_soc()
+    #                 if soc <= 0.4 and EV.actual_current < 0:
+    #                     cost += (0.4 - soc) * 5
+
+
+    return cost
+
+
+
+def ProfitMax_TrPenalty_UserIncentives_safety(env, total_costs, user_satisfaction_list, *args):
+    
+    reward = total_costs     
+
+
+        
+    return reward
+
+
 
 def V2G_profitmaxV2(env, total_costs, user_satisfaction_list, *args):
 
@@ -74,51 +125,3 @@ def V2G_profitmaxV2(env, total_costs, user_satisfaction_list, *args):
         print(f'!!! User Satisfaction Penalty: {user_costs}')
 
     return (reward + user_costs)
-
-
-def tr_overload_usrpenalty_cost(env, total_costs, user_satisfaction_list, *args):
-    """
-    Returns the cost of transformer overload and user satisfaction penalty.
-    """
-
-    cost = 0
-
-    for tr in env.transformers:
-        cost += 5 * tr.get_how_overloaded()   
-
-    a = 20
-    b = -3   
-    
-    for score in user_satisfaction_list:  
-        cost += a*math.exp(b*score) - a*math.exp(b)
-        
-
-    # invalid_actions = 0
-    # for cs in env.charging_stations:
-    #     invalid_actions += cs.invalid_action_punishment
-    # cost += invalid_actions * 0.002 # 0.01 
-
-
-    # # For every charging station connected to the transformer
-    # for cs in env.charging_stations:
-    #         # For every EV connected to the charging station
-    #         for EV in cs.evs_connected:
-    #             # If there is an EV connected
-    #             if EV is not None:
-    #                 # Add cost for discharging action when SOC below min V2G threshold: 40%
-    #                 soc = EV.get_soc()
-    #                 if soc <= 0.4 and EV.actual_current < 0:
-    #                     cost += (0.4 - soc) * 5
-
-
-    return cost
-
-
-
-def ProfitMax_TrPenalty_UserIncentives_safety(env, total_costs, user_satisfaction_list, *args):
-    
-    reward = total_costs     
-
-
-        
-    return reward
