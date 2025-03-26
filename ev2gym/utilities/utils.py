@@ -58,7 +58,8 @@ def get_statistics(env) -> Dict:
     energy_user_satisfaction = np.zeros((len(env.EVs)))
     for i, ev in enumerate(env.EVs):
         e_actual = ev.current_capacity
-        e_max = ev.max_energy_AFAP
+        # e_max = ev.max_energy_AFAP
+        e_max = ev.battery_capacity
         energy_user_satisfaction[i] = (e_actual / e_max) * 100
         total_steps_min_v2g_soc_violation += ev.min_v2g_soc_metric
 

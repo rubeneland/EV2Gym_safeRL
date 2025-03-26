@@ -14,7 +14,7 @@ from ev2gym.baselines.mpc.V2GProfitMax import V2GProfitMaxOracle
 from ev2gym.baselines.heuristics import RoundRobin, RoundRobin_1transformer_powerlimit, ChargeAsFastAsPossible
 from ev2gym.baselines.heuristics import ChargeAsFastAsPossibleToDesiredCapacity
 
-from cost_functions import transformer_overload_usrpenalty_cost, ProfitMax_TrPenalty_UserIncentives_safety
+from cost_functions import usrpenalty_cost, tr_overload_usrpenalty_cost, ProfitMax_TrPenalty_UserIncentives_safety
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -40,7 +40,7 @@ def eval():
                  verbose=False,
                  #  seed=184692,
                  reward_function=ProfitMax_TrPenalty_UserIncentives_safety,
-                 cost_function=transformer_overload_usrpenalty_cost,
+                 cost_function=tr_overload_usrpenalty_cost,
                  save_replay=True,
                  save_plots=True,
                  )
