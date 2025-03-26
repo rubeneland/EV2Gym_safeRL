@@ -10,7 +10,7 @@ def usrpenalty_cost(env, total_costs, user_satisfaction_list, *args):
 
     cost = 0
     
-    a = 200
+    a = 20
     b = -3      
     
     for score in user_satisfaction_list:  

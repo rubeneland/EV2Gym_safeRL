@@ -188,7 +188,7 @@ def train_cvpo(args):
         group_name: str = "EXP1_1"
         # run_name= f'cvpo_v43_load_err_30_buff_200k_h20_5_tr_cost_20_usr_5spawn_10cs_90kw_loads_0_5_PV_0_1_seed{seed}_cost_lim_{cost_limit}_train_envs_{training_num}_test_envs_{testing_num}_run{random.randint(0, 1000)}'
         # run_name= f'cvpo_v67_6_h28_20_usr_5spawn_10cs_seed_{seed}_cost_lim_{cost_limit}_train_envs_{training_num}_test_envs_{testing_num}_run{random.randint(0, 1000)}'
-        run_name= f'cvpo_200_usr_exp1_1_seed_{seed}_cost_lim_{cost_limit}_train_envs_{training_num}_test_envs_{testing_num}_run{random.randint(0, 1000)}'
+        run_name= f'cvpo_30chargers_exp1_1_seed_{seed}_cost_lim_{cost_limit}_train_envs_{training_num}_test_envs_{testing_num}_run{random.randint(0, 1000)}'
 
         wandb.init(project='experiments',
                         sync_tensorboard=True,
@@ -298,7 +298,7 @@ def train_ppol(args):
         epoch: int = args.epoch
         episode_per_collect: int = args.train_num
         step_per_epoch: int = 3000
-        repeat_per_collect: int = 4  # increasing this can improve efficiency, but less stability
+        repeat_per_collect: int = 12  # was 4! Increasing this can improve efficiency, but less stability
         buffer_size: int = 100000
         worker: str = "ShmemVectorEnv"
         training_num: int = args.train_num
@@ -315,7 +315,7 @@ def train_ppol(args):
         # logger params
         group_name: str = "EXP1_1"
         # run_name= f'PPOL_h20_1powerlimit_sacl_100_v2g_cost_40_loads_PV_no_DR_5spawn_10cs_90kw_seed_{seed}_cost_lim_{int(cost_limit)}_usr_-3_100_tr_30_train_envs_{training_num}_test_envs_{testing_num}_run{random.randint(0, 1000)}'
-        run_name= f'ppol_exp1_1_seed_{seed}_cost_lim_{cost_limit}_train_envs_{training_num}_test_envs_{testing_num}_run{random.randint(0, 1000)}'
+        run_name= f'ppol_12repeatpercollect_exp1_1_seed_{seed}_cost_lim_{cost_limit}_train_envs_{training_num}_test_envs_{testing_num}_run{random.randint(0, 1000)}'
 
         wandb.init(project='experiments',
                         sync_tensorboard=True,
