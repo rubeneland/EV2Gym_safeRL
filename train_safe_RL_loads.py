@@ -61,8 +61,8 @@ class SpecMaxStepsWrapper(Wrapper):
         self.spec.max_episode_steps = spec_max_steps
 
 # Environment configuration
-config_file = "V2GProfit_base.yaml"
-# config_file = "V2GProfit_loads.yaml"
+# config_file = "V2GProfit_base.yaml"
+config_file = "V2GProfit_loads.yaml"
 
 if config_file == "V2GProfit_base.yaml":
         state_function = V2G_profit_max
@@ -166,9 +166,9 @@ def train_cvpo(args):
         # collecting params
         epoch: int = args.epoch
         episode_per_collect: int = args.train_num
-        step_per_epoch: int = 3000
+        step_per_epoch: int = 9000
         update_per_step: float = 0.2
-        buffer_size: int = 400000
+        buffer_size: int = 3000000
         worker: str = "ShmemVectorEnv"
         training_num: int = args.train_num
         testing_num: int = args.test_num
@@ -186,19 +186,19 @@ def train_cvpo(args):
 
         # Use 1 task in example.sh! More tasks will create more runs...
 
-        group_name: str = "EXP1_3"
-        # run_name= f'cvpo_v45_step_epoch_9k_buff_200k_5spawn_10cs_90kw_loads_0_6_PV_0_1_seed{seed}_cost_lim_{cost_limit}_train_envs_{training_num}_test_envs_{testing_num}_run{random.randint(0, 1000)}'
+        group_name: str = "EXP2_1"
+        run_name= f'cvpo_5_tr_cost_step_epoch_9k_buff_3mil_5spawn_10cs_90kw_loads_0_6_PV_0_1_seed{seed}_cost_lim_{cost_limit}_train_envs_{training_num}_test_envs_{testing_num}_run{random.randint(0, 1000)}'
         # run_name= f'cvpo_v67_6_h28_20_usr_5spawn_10cs_seed_{seed}_cost_lim_{cost_limit}_train_envs_{training_num}_test_envs_{testing_num}_run{random.randint(0, 1000)}'
-        run_name= f'cvpo_step_epoch_3k_50chargers_buff_400k_exp1_3_seed_{seed}_cost_lim_{cost_limit}_train_envs_{training_num}_test_envs_{testing_num}_run{random.randint(0, 1000)}'
+        # run_name= f'cvpo_30chargers_exp1_1_seed_{seed}_cost_lim_{cost_limit}_train_envs_{training_num}_test_envs_{testing_num}_run{random.randint(0, 1000)}'
 
-        wandb.init(project='experiments',
+        wandb.init(project='experiment_2',
                         sync_tensorboard=True,
                         group=group_name,
                         name=run_name,
                         save_code=True,
                         )
         # init logger
-        logger = WandbLogger(log_dir="fsrl_logs/EXP1_3", log_txt=True, group=group_name, name=run_name)
+        logger = WandbLogger(log_dir="fsrl_logs/exp_2_loads_PV", log_txt=True, group=group_name, name=run_name)
 
         env = gym.make(task)
         # env.spec.max_episode_steps = env.env.env.simulation_length
@@ -419,9 +419,9 @@ def train_sacl(args):
         # collecting params
         epoch: int = args.epoch
         episode_per_collect: int = args.train_num
-        step_per_epoch: int = 3000
+        step_per_epoch: int = 9000
         update_per_step: float = 0.2
-        buffer_size: int = 400000
+        buffer_size: int = 3000000
         worker: str = "ShmemVectorEnv"
         training_num: int = args.train_num
         testing_num: int = args.test_num
@@ -435,21 +435,21 @@ def train_sacl(args):
         render: bool = False
 
         # logger params
-        group_name: str = "EXP1_3"
+        group_name: str = "EXP2_1"
         # run_name= f'sacl_v4_h20_no_v2g_cost_5spawn_10cs_90kw_cost_lim_{int(cost_limit)}_train_envs_{training_num}_test_envs_{testing_num}_run{random.randint(0, 1000)}'
         # run_name= f'sacl_exp1_1_seed_{seed}_cost_lim_{cost_limit}_train_envs_{training_num}_test_envs_{testing_num}_run{random.randint(0, 1000)}'
-        run_name= f'sacl_step_epoch_3k_30chargers_buff_400k_exp1_3_seed_{seed}_cost_lim_{cost_limit}_train_envs_{training_num}_test_envs_{testing_num}_run{random.randint(0, 1000)}'
+        run_name= f'sacl_50_tr_cost_step_epoch_9k_buff_3mil_5spawn_10cs_90kw_loads_0_5_PV_0_1_seed{seed}_cost_lim_{cost_limit}_train_envs_{training_num}_test_envs_{testing_num}_run{random.randint(0, 1000)}'
 
-        wandb.init(project='experiments',
+        wandb.init(project='experiment_2',
                         sync_tensorboard=True,
                         group=group_name,
                         name=run_name,
                         save_code=True,
-                        settings=wandb.Settings(init_timeout=90),
+                        mode = "offline",
                         )
 
         # init logger
-        logger = WandbLogger(log_dir="fsrl_logs/EXP1_3", log_txt=True, group=group_name, name=run_name)
+        logger = WandbLogger(log_dir="fsrl_logs/exp_2_loads_PV", log_txt=True, group=group_name, name=run_name)
 
         env = gym.make(task)
         # env.spec.max_episode_steps = env.env.env.simulation_length

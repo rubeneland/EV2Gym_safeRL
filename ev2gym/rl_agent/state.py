@@ -125,7 +125,7 @@ def V2G_profit_max_loads(env, *args):
         (env.current_step/env.simulation_length),      
     ]
 
-    tr_max = 120
+    tr_max = 90
 
     for tr in env.transformers:
         # if env.current_step == 0:

@@ -10,7 +10,7 @@ def usrpenalty_cost(env, total_costs, user_satisfaction_list, *args):
 
     cost = 0
     
-    a = 20
+    a = 200
     b = -3      
     
     for score in user_satisfaction_list:  
@@ -28,7 +28,7 @@ def tr_overload_usrpenalty_cost(env, total_costs, user_satisfaction_list, *args)
     cost = 0
 
     for tr in env.transformers:
-        cost += 5 * tr.get_how_overloaded()   
+        cost += 5 * tr.get_how_overloaded()
 
     a = 20
     b = -3   
