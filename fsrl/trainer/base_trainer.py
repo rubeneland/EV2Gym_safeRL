@@ -250,7 +250,7 @@ class BaseTrainer(ABC):
         rew = self.logger.get_mean(mode + "/reward")
         cost = self.logger.get_mean(mode + "/cost")
         if self.best_perf_cost > self.cost_limit:
-            if cost <= self.cost_limit and rew > self.best_perf_rew:
+            if cost <= self.cost_limit or rew > self.best_perf_rew:
                 self.best_perf_cost = cost
                 self.best_perf_rew = rew
                 return True

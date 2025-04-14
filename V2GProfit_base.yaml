@@ -41,7 +41,7 @@ discharge_price_factor: 1 # how many times more abs(expensive/cheaper) it is to 
 # Charging Network
 ##############################################################################
 v2g_enabled: True # True or False
-number_of_charging_stations: 30 # Play somewhere 5-20. Go directly to 20 and see what happens
+number_of_charging_stations: 10 # Play somewhere 5-20. Go directly to 20 and see what happens
 number_of_transformers: 1
 number_of_ports_per_cs: 1
 # Provide path if you want to load a specific charging topology,
@@ -103,7 +103,7 @@ ev_specs_file: ./ev2gym/data/ev_specs_v2g_enabled2024.json # path to the file wi
 
 # Default Transformer model
 transformer:
-  max_power: 360 # in kW 
+  max_power: 120 # in kW 
 
 # Default Charging Station model
 charging_station:  

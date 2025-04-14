@@ -103,12 +103,13 @@ def train_cpo(args):
         step_per_epoch: int = 3000
         gamma: float = 0.99
         thread: int = 1
+        buffer_size: int = 200000
 
         run_name= f'cpo_exp1_1_seed_{seed}_cost_lim_{cost_limit}_train_envs_{training_num}_test_envs_{testing_num}_run{random.randint(0, 1000)}'
         # run_name =  f'CPO_5spawn_20cs_cost_lim_{cost_limit}_epochs_{epoch}_usr_1000_train_envs_8_test_envs_8_run{random.randint(0, 1000)}'
-        group_name = 'EXP1_1'                   
+        group_name = 'EXP1_5'                   
 
-        wandb.init(project='experiments',
+        wandb.init(project='experiment_1_5',
                         sync_tensorboard=True,
                         group=group_name,
                         name=run_name,
@@ -119,7 +120,7 @@ def train_cpo(args):
         task = "fsrl-v0"
 
         # init logger
-        logger = WandbLogger(log_dir="fsrl_logs/EXP1_1", log_txt=True, group=group_name, name=run_name)
+        logger = WandbLogger(log_dir="fsrl_logs/EXP1_5/cpo", log_txt=True, group=group_name, name=run_name)
 
         env = gym.make(task)
 
@@ -129,7 +130,7 @@ def train_cpo(args):
         train_envs = ShmemVectorEnv([lambda: gym.make(task) for _ in range(training_num)])
         test_envs = ShmemVectorEnv([lambda: gym.make(task) for _ in range(testing_num)])
 
-        agent.learn(train_envs=train_envs, test_envs=test_envs, epoch=epoch, testing_num=testing_num,
+        agent.learn(train_envs=train_envs, buffer_size = buffer_size, test_envs=test_envs, epoch=epoch, testing_num=testing_num,
                     episode_per_collect=training_num, step_per_epoch=step_per_epoch, save_interval=1)
 
 def train_cvpo(args):
@@ -168,7 +169,7 @@ def train_cvpo(args):
         episode_per_collect: int = args.train_num
         step_per_epoch: int = 3000
         update_per_step: float = 0.2
-        buffer_size: int = 400000
+        buffer_size: int = 200000
         worker: str = "ShmemVectorEnv"
         training_num: int = args.train_num
         testing_num: int = args.test_num
@@ -186,19 +187,20 @@ def train_cvpo(args):
 
         # Use 1 task in example.sh! More tasks will create more runs...
 
-        group_name: str = "EXP1_3"
+        group_name: str = "EXP1_5"
         # run_name= f'cvpo_v45_step_epoch_9k_buff_200k_5spawn_10cs_90kw_loads_0_6_PV_0_1_seed{seed}_cost_lim_{cost_limit}_train_envs_{training_num}_test_envs_{testing_num}_run{random.randint(0, 1000)}'
         # run_name= f'cvpo_v67_6_h28_20_usr_5spawn_10cs_seed_{seed}_cost_lim_{cost_limit}_train_envs_{training_num}_test_envs_{testing_num}_run{random.randint(0, 1000)}'
-        run_name= f'cvpo_step_epoch_3k_50chargers_buff_400k_exp1_3_seed_{seed}_cost_lim_{cost_limit}_train_envs_{training_num}_test_envs_{testing_num}_run{random.randint(0, 1000)}'
+        # run_name= f'cvpo_step_epoch_3k_30chargers_buff_400k_exp1_3_seed_{seed}_cost_lim_{cost_limit}_train_envs_{training_num}_test_envs_{testing_num}_run{random.randint(0, 1000)}'
+        run_name= f'cvpo_const_eff_0_9_seed_{seed}_cost_lim_{cost_limit}_train_envs_{training_num}_test_envs_{testing_num}_run{random.randint(0, 1000)}'
 
-        wandb.init(project='experiments',
+        wandb.init(project='experiment_1_5',
                         sync_tensorboard=True,
                         group=group_name,
                         name=run_name,
                         save_code=True,
                         )
         # init logger
-        logger = WandbLogger(log_dir="fsrl_logs/EXP1_3", log_txt=True, group=group_name, name=run_name)
+        logger = WandbLogger(log_dir="fsrl_logs/EXP1_5", log_txt=True, group=group_name, name=run_name)
 
         env = gym.make(task)
         # env.spec.max_episode_steps = env.env.env.simulation_length
@@ -289,7 +291,7 @@ def train_ppol(args):
         lagrangian_pid: Tuple[float, ...] = (0.05, 0.0005, 0.1)
         rescaling: bool = True
         # Base policy common arguments
-        gamma: float = 0.97
+        gamma: float = 0.99
         max_batchsize: int = 100000
         rew_norm: bool = False  # no need, it will slow down training and decrease final perf
         deterministic_eval: bool = True
@@ -300,7 +302,7 @@ def train_ppol(args):
         episode_per_collect: int = args.train_num
         step_per_epoch: int = 3000
         repeat_per_collect: int = 10  # was 4! Increasing this can improve efficiency, but less stability
-        buffer_size: int = 100000
+        buffer_size: int = 200000
         worker: str = "ShmemVectorEnv"
         training_num: int = args.train_num
         testing_num: int = args.test_num
@@ -314,11 +316,11 @@ def train_ppol(args):
         render: bool = False
 
         # logger params
-        group_name: str = "EXP1_1"
+        group_name: str = "EXP1_5"
         # run_name= f'PPOL_h20_1powerlimit_sacl_100_v2g_cost_40_loads_PV_no_DR_5spawn_10cs_90kw_seed_{seed}_cost_lim_{int(cost_limit)}_usr_-3_100_tr_30_train_envs_{training_num}_test_envs_{testing_num}_run{random.randint(0, 1000)}'
         run_name= f'ppol_10repeatpercollect_exp1_1_seed_{seed}_cost_lim_{cost_limit}_train_envs_{training_num}_test_envs_{testing_num}_run{random.randint(0, 1000)}'
 
-        wandb.init(project='experiments',
+        wandb.init(project='experiment_1_5',
                         sync_tensorboard=True,
                         group=group_name,
                         name=run_name,
@@ -327,7 +329,7 @@ def train_ppol(args):
                         )
 
         # init logger
-        logger = WandbLogger(log_dir="fsrl_logs/EXP1_1/ppo", log_txt=True, group=group_name, name=run_name)
+        logger = WandbLogger(log_dir="fsrl_logs/EXP1_5/ppol", log_txt=True, group=group_name, name=run_name)
 
         env = gym.make(task)
         # env.spec.max_episode_steps = env.env.env.simulation_length
@@ -439,13 +441,13 @@ def train_sacl(args):
         # run_name= f'sacl_v4_h20_no_v2g_cost_5spawn_10cs_90kw_cost_lim_{int(cost_limit)}_train_envs_{training_num}_test_envs_{testing_num}_run{random.randint(0, 1000)}'
         # run_name= f'sacl_exp1_1_seed_{seed}_cost_lim_{cost_limit}_train_envs_{training_num}_test_envs_{testing_num}_run{random.randint(0, 1000)}'
         run_name= f'sacl_step_epoch_3k_30chargers_buff_400k_exp1_3_seed_{seed}_cost_lim_{cost_limit}_train_envs_{training_num}_test_envs_{testing_num}_run{random.randint(0, 1000)}'
+        
 
-        wandb.init(project='experiments',
+        wandb.init(project='experiment_1_3',
                         sync_tensorboard=True,
                         group=group_name,
                         name=run_name,
                         save_code=True,
-                        settings=wandb.Settings(init_timeout=90),
                         )
 
         # init logger

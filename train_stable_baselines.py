@@ -24,6 +24,7 @@ import random
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
+    parser.add_argument('--seed', type=int, default=10)
     parser.add_argument('--algorithm', type=str, default="td3")
     parser.add_argument('--device', type=str, default="cuda:0")
     parser.add_argument('--run_name', type=str, default="test_td3")
@@ -36,9 +37,11 @@ if __name__ == "__main__":
                          #default="ev2gym/example_config_files/V2GProfitMax.yaml")
     default="V2GProfit_base.yaml")
 
-    config_file = "V2GProfit_base.yaml"
-    # config_file = "V2GProfit_loads.yaml"
+    # config_file = "V2GProfit_base.yaml"
+    config_file = "V2GProfit_loads.yaml"
 
+
+    seed = parser.parse_args().seed
     algorithm = parser.parse_args().algorithm
     device = parser.parse_args().device
     run_name = parser.parse_args().run_name
@@ -76,13 +79,13 @@ if __name__ == "__main__":
     
     # group_name = f'{config["number_of_charging_stations"]}cs_V2GProfit_TEST'
 
-    group_name = 'EXP1_1'
+    group_name = 'EXP2_1'
                 
     # run_name += f'{algorithm}_{reward_function.__name__}_{state_function.__name__}'
 
-    seed = 1025
+    # seed = 1025
 
-    run_name = f'{algorithm}_exp1_1_seed_{seed}'
+    run_name = f'{algorithm}_exp2_1_seed_{seed}'
 
     run = wandb.init(project='experiments_baselines',
                      sync_tensorboard=True,
@@ -146,7 +149,7 @@ if __name__ == "__main__":
                     device=device, tensorboard_log="./logs/")
     elif algorithm == "sac":
         model = SAC("MlpPolicy", env, verbose=1, seed=seed,
-                    device=device, tensorboard_log="./logs/")
+                    device=device, tensorboard_log="./logs/", buffer_size=3_000_000)
     elif algorithm == "a2c":
         model = A2C("MlpPolicy", env, verbose=1,
                     device=device, tensorboard_log="./logs/")
@@ -172,13 +175,14 @@ if __name__ == "__main__":
 
     model.learn(total_timesteps=parser.parse_args().train_steps, #can tweak if takes too long
                 progress_bar=True,
-                callback=[
-                    WandbCallback(
-                        gradient_save_freq=10_000, # was 10_000, 300 for seed 1918!
-                        # model_save_path=f"saved_models/{group_name}/{run_name}.best",
-                        model_save_path=f"saved_models/EXP1_1/{algorithm}/{run_name}.best",
-                        verbose=2),
-                    eval_callback])
+                    callback=[
+                        WandbCallback(
+                            gradient_save_freq=10_000, # was 10_000
+                            # model_save_path=f"saved_models/{group_name}/{run_name}.best",
+                            model_save_path=f"saved_models/EXP1_1/{algorithm}/{run_name}.best",
+                            verbose=2),
+                        eval_callback]
+                    )
 
     # model.save(f"./saved_models/{group_name}/{run_name}.last")
     # model.save(f"saved_models/EXP1_1/{algorithm}/{run_name}.last")

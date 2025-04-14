@@ -293,10 +293,12 @@ class EV():
         
         # if charge efficeincy is dict, then get the charge efficiency based on the current
         # current level
-        if isinstance(self.charge_efficiency, dict):
-            charge_efficiency = self.charge_efficiency.get(np.round(amps), 1)/100
-        else:
-            charge_efficiency = self.charge_efficiency
+        # if isinstance(self.charge_efficiency, dict):
+        #     charge_efficiency = self.charge_efficiency.get(np.round(amps), 1)/100
+        # else:
+        #     charge_efficiency = self.charge_efficiency
+
+        charge_efficiency = 0.9
         
         pilot_dsoc = charge_efficiency * pilot * voltage / 1000 / \
             self.battery_capacity / (60 / period)
@@ -378,11 +380,13 @@ class EV():
             
         # if discharge efficeincy is dict, then get the discharge efficiency based on the current
         # current level
-        if isinstance(self.charge_efficiency, dict):
-            discharge_efficiency = self.discharge_efficiency.get(np.abs(np.round(amps)), 1)/100            
-            assert discharge_efficiency > 0
-        else:
-            discharge_efficiency = self.discharge_efficiency
+        # if isinstance(self.charge_efficiency, dict):
+        #     discharge_efficiency = self.discharge_efficiency.get(np.abs(np.round(amps)), 1)/100            
+        #     assert discharge_efficiency > 0
+        # else:
+        #     discharge_efficiency = self.discharge_efficiency
+
+        discharge_efficiency = 0.9
         
         given_energy = given_power * discharge_efficiency * self.timescale / 60
         # if self.current_capacity + given_energy < self.min_v2g_capacity:
