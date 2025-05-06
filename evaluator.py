@@ -40,7 +40,8 @@ from cost_functions import usrpenalty_cost, tr_overload_usrpenalty_cost, ProfitM
 
 from fsrl.agent import CPOAgent as CPO
 from fsrl.agent import CVPOAgent as CVPO
-from fsrl.agent import SACLagAgent as SACLag
+from fsrl.agent import SACLagAgent as SACLagrangian
+from fsrl.agent import PPOLagAgent as PPOLagrangian
 from fsrl.utils import TensorboardLogger
 
 import gymnasium as gym
@@ -71,8 +72,8 @@ class SpecMaxStepsWrapper(Wrapper):
 def evaluator(seed):
 
     # config_file = "ev2gym/example_config_files/V2G_MPC2.yaml"
-    # config_file = "V2GProfit_eval_loads.yaml"
-    config_file = "V2GProfit_eval_base.yaml"
+    config_file = "V2GProfit_eval_loads.yaml"
+    # config_file = "V2GProfit_eval_base.yaml"
     # config_file = "ev2gym/example_config_files/PublicPST.yaml"
     # config_file = "ev2gym/example_config_files/BusinessPST.yaml"
     # config_file = "ev2gym/example_config_files/V2GProfitPlusLoads.yaml"
@@ -90,21 +91,21 @@ def evaluator(seed):
 
     scenario = config_file.split("/")[-1].split(".")[0]
     # eval_replay_path = f'./replay/{number_of_charging_stations}cs_{n_transformers}tr_{scenario}/'
-    # eval_replay_path = f'./replay/spawn_plot_0_00001spawn/'
+    # eval_replay_path = f'./replay/spawn_plot_10spawn/'
 
     # eval_replay_path = f'./replay/exp1/'
-    eval_replay_path = f'./replay/exp1_1_FINAL/'
+    # eval_replay_path = f'./replay/exp1_1_FINAL/'
     # eval_replay_path = f'./replay/exp1_2_FINAL_spawn1/'
-    # eval_replay_path = f'./replay/exp2_0_6_tr_0_5_PV_120kw/'
-    # eval_replay_path = f'./replay/exp2_0_5_tr_90kw_5spawn/'
+    # eval_replay_path = f'./replay/exp1_2_FINAL_spawn10/'
+    # eval_replay_path = f'./replay/exp1_3_FINAL_30chargers/'
+    # eval_replay_path = f'./replay/exp1_5_FINAL_eff_0_9/'
     # eval_replay_path = f'./replay/exp2_load_0_5_err_20_PV_0_1_tr_90kw_5spawn/'
     # eval_replay_path = f'./replay/exp2_load_0_5_err_30_PV_0_1_tr_90kw_5spawn/'
-    # eval_replay_path = f'./replay/exp2_0_6_tr_90kw_5spawn/'
-    # eval_replay_path = f'./replay/exp2_0_6_tr_120kw_5spawn_new/'
-    # eval_replay_path = f'./replay/exp2_0_6_tr_120kw_5spawn/'
-    # eval_replay_path = f'./replay/exp2_0_6_tr_120kw_10spawn/'
-    # eval_replay_path = f'./replay/exp2_0_7_tr_120kw/'
-    # eval_replay_path = f'./replay/exp2_0_8_tr_120kw/'
+    eval_replay_path = f'./replay/exp2_1_FINAL_load_0_5_err_30_PV_0_1_tr_90kw_5spawn/'
+    # eval_replay_path = f'./replay/exp2_1_FINAL_load_0_6_err_30_PV_0_1_tr_90kw_5spawn/'
+    # eval_replay_path = f'./replay/exp2_1_FINAL_load_0_7_err_30_PV_0_1_tr_90kw_5spawn/'
+    # eval_replay_path = f'./replay/exp2_load_0_6_err_30_PV_0_1_tr_90kw_5spawn/'
+
     print(f'Looking for replay files in {eval_replay_path}')
     try:
         eval_replay_files = [f for f in os.listdir(
@@ -184,11 +185,11 @@ def evaluator(seed):
     # Algorithms to compare:
 
     algorithms = [
-        ChargeAsFastAsPossible,
+        # ChargeAsFastAsPossible,
         # ChargeAsLateAsPossible,
         # PPO, A2C, DDPG, SAC, TD3, TQC, TRPO, ARS, RecurrentPPO,
         # PPO,
-        # SAC,
+        SAC,
         # TQC,
         # TD3,
         # # ARS,
@@ -202,7 +203,8 @@ def evaluator(seed):
         # PowerTrackingErrorrMin,
         # CPO,
         # CVPO,
-        # SACLag,
+        # SACLagrangian,
+        # PPOLagrangian,
     ]
 
     # algorithms = [
@@ -229,10 +231,20 @@ def evaluator(seed):
     # evaluation_name = f'exp1_1_' + f'{datetime.datetime.now().strftime("%Y_%m_%d_%f")}'
 
     # seed = 6651
-
-    evaluation_name = f'EXP1_1_AFAP_seed_{seed}_DIFF_MIN_USER_ENERGY'
-    # evaluation_name = f'EXP1_2_spawn1_cvpo_seed_{seed}'
-    # evaluation_name = f'Optimal_test'
+    
+    # evaluation_name = f'optimal_replay_2'
+    # evaluation_name = f'spawn_plot_10spawn'
+    # evaluation_name = f'EXP1_2_spawn10_AFAP_Optimal'
+    # evaluation_name = f'EXP1_1_td3_seed_{seed}_user_1000'
+    # evaluation_name = f'EXP1_5_cvpo_cost_lim_1_seed_{seed}'
+    # evaluation_name = f'EXP1_5_AFAP_Optimal_eff_0_9'
+    # evaluation_name = f'EXP1_5_env_eff_0_9_cvpo_test'
+    # evaluation_name = f'EXP1_2_spawn10_cpo_seed_{seed}'
+    # evaluation_name = f'CVPO_exp_1_3_date_' + f'{datetime.datetime.now().strftime("%Y_%m_%d_%f")}'
+    evaluation_name = f'EXP2_1_sac_seed_{seed}'
+    # evaluation_name = f'EXP2_2_sac_loads_0_6_seed_{seed}'
+    # evaluation_name = f'AFAP_Optimal_0_6_loads'
+    # evaluation_name = f'EXP1_1_plot'
 
     # evaluation_name = f'spawn_plot_1spawn' + f'{datetime.datetime.now().strftime("%Y_%m_%d_%f")}'
 
@@ -261,37 +273,36 @@ def evaluator(seed):
             #     replay_path = eval_replay_files[k]
 
             # replay_path = f'./replay/{number_of_charging_stations}cs_{n_transformers}tr_{scenario}/' + eval_replay_files[k].split('/')[-1]
-            # replay_path = f'./replay/spawn_plot_0_00001spawn/' + eval_replay_files[k].split('/')[-1]
+            # replay_path = f'./replay/spawn_plot_10spawn/' + eval_replay_files[k].split('/')[-1]
             
-            # replay_path = f'./replay/exp1/' + eval_replay_files[k].split('/')[-1]
-            replay_path = f'./replay/exp1_1_FINAL/' + eval_replay_files[k].split('/')[-1]
+            # replay_path = f'./replay/exp1_1_FINAL/' + eval_replay_files[k].split('/')[-1]
+            # replay_path = f'./replay/exp1_1_FINAL_new/' + eval_replay_files[k].split('/')[-1]
             # replay_path = f'./replay/exp1_2_FINAL_spawn1/' + eval_replay_files[k].split('/')[-1]
-            # replay_path = f'./replay/exp2_0_6_tr_0_5_PV_120kw/' + eval_replay_files[k].split('/')[-1]
-            # replay_path = f'./replay/exp2_0_5_tr_120kw/' + eval_replay_files[k].split('/')[-1]
-            # replay_path = f'./replay/exp2_0_5_tr_90kw_5spawn/' + eval_replay_files[k].split('/')[-1]
+            # replay_path = f'./replay/exp1_2_FINAL_spawn10/' + eval_replay_files[k].split('/')[-1]
+            # replay_path = f'./replay/exp1_3_FINAL_30chargers/' + eval_replay_files[k].split('/')[-1]
+            # replay_path = f'./replay/exp1_5_FINAL_eff_0_9/' + eval_replay_files[k].split('/')[-1]
             # replay_path = f'./replay/exp2_load_0_5_err_20_PV_0_1_tr_90kw_5spawn/' + eval_replay_files[k].split('/')[-1]
-            # replay_path = f'./replay/exp2_load_0_5_err_30_PV_0_1_tr_90kw_5spawn/' + eval_replay_files[k].split('/')[-1]
-            # replay_path = f'./replay/exp2_0_6_tr_90kw_5spawn/' + eval_replay_files[k].split('/')[-1]
-            # replay_path = f'./replay/exp2_0_6_tr_120kw_5spawn/' + eval_replay_files[k].split('/')[-1]
-            # replay_path = f'./replay/exp2_0_6_tr_120kw_10spawn/' + eval_replay_files[k].split('/')[-1]
-            # replay_path = f'./replay/exp2_0_7_tr_120kw/' + eval_replay_files[k].split('/')[-1]
-            # replay_path = f'./replay/exp2_0_8_tr_120kw/' + eval_replay_files[k].split('/')[-1]
-
-            if algorithm == PPO:
-                load_path = f"./saved_models/EXP1_1/ppo_exp1_1_seed_{seed}/best_model.zip"
-            if algorithm == TD3:
-                load_path = f"./saved_models/EXP1_1/td3_exp1_1_seed_{seed}/best_model.zip"
-            if algorithm == SAC:
-                load_path = f"./saved_models/EXP1_1/sac_exp1_1_seed_{seed}/best_model.zip"
+            replay_path = f'./replay/exp2_1_FINAL_load_0_5_err_30_PV_0_1_tr_90kw_5spawn/' + eval_replay_files[k].split('/')[-1]
+            # replay_path = f'./replay/exp2_1_FINAL_load_0_6_err_30_PV_0_1_tr_90kw_5spawn/' + eval_replay_files[k].split('/')[-1]
+            # replay_path = f'./replay/exp2_1_FINAL_load_0_7_err_30_PV_0_1_tr_90kw_5spawn/' + eval_replay_files[k].split('/')[-1]
+            # replay_path = f'./replay/exp2_load_0_6_err_30_PV_0_1_tr_90kw_5spawn/' + eval_replay_files[k].split('/')[-1]
 
             if algorithm in [PPO, A2C, DDPG, SAC, TD3, TQC, TRPO, ARS, RecurrentPPO]:
-                # gym.envs.register(id='evs-v0', entry_point='ev2gym.models.ev2gym_env:EV2Gym',
-                #                   kwargs={'config_file': config_file,
-                #                           'generate_rnd_game': True,
-                #                           'state_function': state_function,
-                #                           'reward_function': reward_function,
-                #                           'load_from_replay_path': replay_path,
-                #                           })
+                if algorithm == PPO:
+                    load_path = f"./saved_models/EXP1_1/user cost 1000/ppo_exp1_1_seed_{seed}_usr_1000/best_model.zip"
+                if algorithm == TD3:
+                    load_path = f"./saved_models/EXP1_1/user cost 1000/td3_exp1_1_seed_{seed}_usr_1000/best_model.zip"
+                if algorithm == SAC:
+                    # load_path = f"./saved_models/EXP1_1/user cost 1000/sac_exp1_1_seed_{seed}_usr_1000/best_model.zip"
+                    load_path = f"./saved_models/EXP2_1/sac_exp2_1_seed_{seed}/best_model.zip"
+
+                gym.envs.register(id='evs-v0', entry_point='ev2gym.models.ev2gym_env:EV2Gym',
+                                  kwargs={'config_file': config_file,
+                                          'generate_rnd_game': True,
+                                          'state_function': state_function,
+                                          'reward_function': reward_function,
+                                          'load_from_replay_path': replay_path,
+                                          })
                 # env = gym.make('evs-v0')
 
                 env = ev2gym_env.EV2Gym(
@@ -309,7 +320,7 @@ def evaluator(seed):
                         f"rppo_{reward_function.__name__}_{state_function.__name__}"
                     
                 timer = time.time()
-                model = algorithm.load(load_path, env, device=device)
+                model = algorithm.load(path=load_path, env=env, device=device)
                 env = model.get_env()
                 state = env.reset()
 
@@ -317,23 +328,34 @@ def evaluator(seed):
                     # load_path = f'./saved_models/{number_of_charging_stations}cs_{scenario}/' + \
                         # f"{algorithm.__name__.lower()}_{reward_function.__name__}_{state_function.__name__}/best_model.zip"
 
-            if algorithm == CPO:
-                load_path = f"./fsrl_logs/EXP1_1/cpo/cpo_exp1_1_seed_{seed}/checkpoint/model_best.pt"
-            if algorithm == SACLag:
-                load_path = f'./fsrl_logs/EXP1_1/sacl/sacl_exp1_1_seed_{seed}/checkpoint/model_best.pt'
-            if algorithm == CVPO:
-                load_path = f'./fsrl_logs/EXP1_1/cvpo/cvpo_exp1_1_seed_{seed}/checkpoint/model_best.pt'
 
-            if algorithm in [CPO, SACLag, CVPO]:
+            elif algorithm in [CPO, PPOLagrangian, SACLagrangian, CVPO]:
+                if algorithm == CPO:
+                    load_path = f"./fsrl_logs/EXP1_1/cpo/cpo_exp1_1_seed_{seed}_cost_lim_1/checkpoint/model_best.pt"
+                    load_path = f"./fsrl_logs/EXP2_1/cpo/cpo_exp2_1_seed_{seed}_cost_lim_2/checkpoint/model_best.pt"
+                if algorithm == PPOLagrangian:
+                    load_path = f'./fsrl_logs/EXP1_1/ppol/ppol_exp1_1_seed_{seed}_cost_lim_1/checkpoint/model_best.pt'
+                if algorithm == SACLagrangian:
+                    # load_path = f'./fsrl_logs/EXP1_1/sacl/sacl_exp1_1_seed_{seed}_cost_lim_10/checkpoint/model_best.pt'
+                    # load_path = f'./fsrl_logs/EXP1_3/sacl/sacl_step_epoch_3k_30chargers_buff_400k_exp1_3_seed_{seed}_cost_lim_20_train_envs_10_test_envs_100/checkpoint/model.pt'
+                    # load_path = f'./fsrl_logs/EXP1_4/sacl/sacl_exp1_4_seed_{seed}_cost_lim_30/checkpoint/model_best.pt'
+                    load_path = f'./fsrl_logs/EXP2_1/sacl/sacl_exp_2_1_seed{seed}/checkpoint/model_best.pt'
+                if algorithm == CVPO:
+                    # load_path = f'./fsrl_logs/EXP1_1/cvpo/cvpo_exp1_1_seed_{seed}_cost_lim_1/checkpoint/model_best.pt'
+                    # load_path = f'./fsrl_logs/EXP1_3/cvpo/cvpo_step_epoch_3k_30chargers_buff_400k_exp1_3_seed_{seed}_cost_lim_2_train_envs_10_test_envs_100/checkpoint/model_best.pt'
+                    # load_path = f'./fsrl_logs/EXP1_4/cvpo/cvpo_exp1_4_seed_{seed}_cost_lim_3/checkpoint/model_best.pt'
+                    load_path = f'./fsrl_logs/EXP1_5/cvpo/cvpo_seed_{seed}_cost_lim_1/checkpoint/model_best.pt'
+                    # load_path = f'./fsrl_logs/EXP2_1/cvpo/cvpo_loads_0_5_cost_lim_2_seed{seed}/checkpoint/model_best.pt'
+
                 gym.envs.register(id='eval', entry_point='ev2gym.models.ev2gym_env:EV2Gym',
-                                  kwargs={'config_file': config_file,
-                                          'verbose': False,
-                                          'save_plots': False,
-                                          'generate_rnd_game': True,
-                                          'reward_function': reward_function,
-                                          'state_function': state_function,
-                                          'cost_function': cost_function,
-                                          })
+                                kwargs={'config_file': config_file,
+                                        'verbose': False,
+                                        'save_plots': False,
+                                        'generate_rnd_game': True,
+                                        'reward_function': reward_function,
+                                        'state_function': state_function,
+                                        'cost_function': cost_function,
+                                        })
 
                 task = "eval"
 
@@ -343,10 +365,11 @@ def evaluator(seed):
                     env = gym.make(task)
                     sim_length = env.env.env.simulation_length
                     agent = CVPO(SpecMaxStepsWrapper(env, sim_length), logger)
-                elif algorithm == SACLag:
+                elif algorithm == SACLagrangian:
                     env = gym.make(task)
                     sim_length = env.env.env.simulation_length
-                    agent = SACLag(SpecMaxStepsWrapper(env, sim_length), logger)
+                    agent = SACLagrangian(SpecMaxStepsWrapper(env, sim_length), logger)
+
 
                 env = ev2gym_env.EV2Gym(
                     config_file=config_file,
@@ -354,13 +377,13 @@ def evaluator(seed):
                     generate_rnd_game=True,
                     state_function=state_function,
                     reward_function=reward_function,
-                    cost_function=cost_function,
-                    verbose=False,
-                    save_plots=False,
                 )
 
                 if algorithm == CPO:
                     agent = CPO(env, logger)
+
+                if algorithm == PPOLagrangian:
+                    agent = PPOLagrangian(env, logger)
 
                 model = agent.policy
                 state_dict = (torch.load(load_path))
@@ -433,15 +456,12 @@ def evaluator(seed):
                 if algorithm in [PPO, A2C, DDPG, SAC, TD3, TQC, TRPO, ARS, RecurrentPPO]:
                     action, _ = model.predict(state, deterministic=True)
                     obs, reward, done, stats = env.step(action)
-                    # if CPO == True:
-                    #     action = policy.predict(state, deterministic=True)
-                    #     obs, reward, done, stats = env.step(action)
                     if i == simulation_length - 2:
                         saved_env = deepcopy(env.get_attr('env')[0])
 
                     stats = stats[0]
                     print(stats)
-                elif algorithm == CPO or algorithm == CVPO or algorithm == SACLag:
+                elif algorithm in [CPO, CVPO, SACLagrangian, PPOLagrangian]:
 
                     # reshape the state to 1 x n_features
                     state = state.reshape(1, -1)
@@ -527,6 +547,8 @@ def evaluator(seed):
         else:
             algorithm_names.append(algorithm.__name__)
 
+    # algorithm_names = ['Charge AFAP', 'SAC', 'TD3', 'Optimal', 'CVPO', 'SAC-L']
+
     # plot_total_power(results_path=save_path + 'plot_results_dict.pkl',
     #                 save_path=save_path,
     #                 algorithm_names=algorithm_names)
@@ -553,7 +575,7 @@ def evaluator(seed):
 
 
 if __name__ == "__main__":
-    # seeds = [1025, 1918, 1986, 3894, 6651]
-    evaluator(1025)
-    # for seed in seeds:
-    #     evaluator(seed)
+    seeds = [1025, 1918, 1986, 3894, 6651]
+    # evaluator(1918)
+    for seed in seeds:
+        evaluator(seed)
