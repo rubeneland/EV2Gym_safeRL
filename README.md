@@ -1,5 +1,5 @@
 
-# EV2Gym: A Realistic EV-V2G-Gym Simulator for EV Smart Charging
+# EV2Gym: A Realistic EV-V2G-Gym Simulator for EV Smart Charging - Safe RL extension by Ruben Eland
 
 <div align="center">
 <img align="center" src="https://github.com/StavrosOrf/EV2Gym/assets/17108978/86e921ad-d711-4dbb-b7b9-c69dee20da11" width="55%"/>
