@@ -10,6 +10,8 @@
 
 Develop and evaluate **any type of smart charging algorithm**: from simple heuristics, Model Predictive Control, Mathematical Programming, to Reinforcement Learning!
 
+**Extension** This Safe RL extension also allows the training and evaluation of Safe RL agents, using the Fast Safe Reinforcement Learning package: https://github.com/liuzuxin/FSRL
+
 EV2Gym is **fully customizable** and easily **configurable**!
 
 The EV2Gym **Paper** can be found at: [link](https://arxiv.org/abs/2404.01849).
